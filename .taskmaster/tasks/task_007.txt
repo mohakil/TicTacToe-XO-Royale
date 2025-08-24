@@ -15,41 +15,21 @@
 Simulate loading delays. Validate animation smoothness (≥60 FPS), accessibility (contrast, luminance), and carousel interaction.
 
 # Subtasks:
-## 1. Implement Animated Background with CustomPainter [pending]
+## 1. Read PRD.md and Get More Info About Task, Verify It, Then Process Task [pending]
 ### Dependencies: None
-### Description: Create the animated background using CustomPainter for efficient rendering of shapes. Ensure low CPU usage and smooth animation.
+### Description: Thoroughly read the PRD.md file to understand the exact requirements for the loading screen, animated background, tips carousel, and performance specifications. Get comprehensive information about the task, verify it aligns with PRD specifications, identify any missing requirements or clarifications needed, and then proceed with task processing.
 ### Details:
-Focus on performance and visual appeal. Implement the CustomPainter logic in a separate file for reusability.
+Review PRD.md, identify specific requirements for loading screen components, performance metrics, and accessibility standards. Document any ambiguities or missing information and seek clarification.
 
-## 2. Build Tips Carousel with Auto-Advance and Swipe Functionality [pending]
-### Dependencies: None
-### Description: Develop the tips carousel using PageView or similar widget. Implement auto-advance functionality and enable swipe gestures for user interaction.
+## 2. Implement Loading Screen with Animated Background and Tips Carousel [pending]
+### Dependencies: 7.1
+### Description: Implement the loading screen with CustomPainter animated background, pulsating logo, progress bar, and swipeable tips carousel. Integrate all components and optimize for performance.
 ### Details:
-Ensure smooth transitions between tips and handle edge cases for the carousel. Consider accessibility for users with disabilities.
+Develop CustomPainter for animated shapes, implement logo_animation.dart for pulsating glow, add Material 3 progress bar with gradient, and build tips_carousel.dart with auto-advance and swipe. Ensure luminance change ≤ 30%.
 
-## 3. Integrate Animated Background and Tips Carousel into Loading Screen [pending]
-### Dependencies: 7.1, 7.2
-### Description: Combine the animated background and tips carousel into the main loading screen layout. Ensure proper positioning and responsiveness across different screen sizes.
+## 3. Verify Implementation Against PRD.md to Ensure Meet Requirements [pending]
+### Dependencies: 7.2
+### Description: Verify that the final result meets all loading screen requirements specified in the PRD.md file. Ensure animations, tips carousel, and performance align with PRD specifications.
 ### Details:
-Test the integration thoroughly to ensure seamless transitions and a visually appealing loading experience. Address any layout issues or performance bottlenecks.
-
-## 4. Read PRD.md and Verify Loading Screen Requirements [pending]
-### Dependencies: None
-### Description: Read the PRD.md file thoroughly to understand the exact requirements for the loading screen, animated background, tips carousel, and performance specifications. Verify that this task aligns with the PRD specifications.
-### Details:
-- Read the complete PRD.md file focusing on loading screen and performance section
-- Identify specific animation requirements, tips content, and performance targets
-- Verify task description matches PRD loading screen requirements
-- Note any additional loading screen requirements or clarifications needed
-- Document findings for implementation reference
-
-## 5. Verify Loading Screen Implementation Against PRD.md [pending]
-### Dependencies: None
-### Description: After completing all loading screen implementation subtasks, verify that the final result meets all loading screen requirements specified in the PRD.md file. Ensure animations, tips carousel, and performance align with PRD specifications.
-### Details:
-- Review completed loading screen implementation against PRD.md requirements
-- Verify animated background meets PRD specifications
-- Confirm tips carousel functionality and content match requirements
-- Validate performance targets (60+ FPS) are achieved
-- Document any deviations or additional loading screen features implemented
+Validate that the implemented loading screen, animated background, tips carousel, and performance metrics align with the PRD.md specifications. Conduct thorough testing to ensure all requirements are met.
 

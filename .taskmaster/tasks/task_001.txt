@@ -1,6 +1,6 @@
 # Task ID: 1
 # Title: Setup Project Repository and Scaffold
-# Status: pending
+# Status: done
 # Dependencies: None
 # Priority: high
 # Description: Initialize the Flutter project with the specified name, package, and directory structure. Configure pubspec.yaml with all required dependencies, fonts, and assets. Prepare the feature-first folder structure as described in the PRD.
@@ -15,7 +15,7 @@
 Build the app on Android and iOS simulators. Verify project structure, dependency resolution, and that the app runs with a blank screen and no errors.
 
 # Subtasks:
-## 1. Read PRD.md and Get More Info About Task, Verify It, Then Process Task [pending]
+## 1. Read PRD.md and Get More Info About Task, Verify It, Then Process Task [done]
 ### Dependencies: None
 ### Description: Read the PRD.md file thoroughly to understand the exact requirements for project setup and scaffolding. Get comprehensive information about the task, verify it aligns with PRD specifications, identify any missing requirements or clarifications needed, and then proceed with task processing.
 ### Details:
@@ -26,7 +26,7 @@ Build the app on Android and iOS simulators. Verify project structure, dependenc
 - Document findings for implementation reference
 - Process the task based on verified PRD requirements
 
-## 2. Initialize Flutter Project [pending]
+## 2. Initialize Flutter Project [done]
 ### Dependencies: None
 ### Description: Run `flutter create --org com.astrixforge tictactoe_xo_royale` to create the base Flutter project.
 ### Details:
@@ -34,7 +34,7 @@ Build the app on Android and iOS simulators. Verify project structure, dependenc
 - Verify project structure is created correctly
 - Check that all basic Flutter files are present
 
-## 3. Set Up Directory Structure [pending]
+## 3. Set Up Directory Structure [done]
 ### Dependencies: None
 ### Description: Create the feature-first folder structure under `lib/` as specified in the PRD.
 ### Details:
@@ -42,7 +42,7 @@ Build the app on Android and iOS simulators. Verify project structure, dependenc
 - Organize directories according to PRD specifications
 - Ensure proper separation of concerns
 
-## 4. Configure pubspec.yaml [pending]
+## 4. Configure pubspec.yaml [done]
 ### Dependencies: None
 ### Description: Add all required dependencies, fonts (Sora, Inter, JetBrains Mono), and assets to `pubspec.yaml`.
 ### Details:
@@ -51,7 +51,7 @@ Build the app on Android and iOS simulators. Verify project structure, dependenc
 - Add necessary assets and resources
 - Verify dependency versions are compatible
 
-## 5. Configure Linting and Code Generation [pending]
+## 5. Configure Linting and Code Generation [done]
 ### Dependencies: None
 ### Description: Set up lints and code generation tools for the project.
 ### Details:
@@ -59,7 +59,7 @@ Build the app on Android and iOS simulators. Verify project structure, dependenc
 - Set up code generation tools
 - Ensure code quality standards are met
 
-## 6. Add Placeholder Assets and README [pending]
+## 6. Add Placeholder Assets and README [done]
 ### Dependencies: None
 ### Description: Add placeholder assets and create a basic README.md file with notes on CustomPainter, Flutter, and Material 3 usage.
 ### Details:
@@ -68,7 +68,7 @@ Build the app on Android and iOS simulators. Verify project structure, dependenc
 - Include notes on CustomPainter, Flutter, and Material 3 usage
 - Document project setup and usage instructions
 
-## 7. Verify Implementation Against PRD.md to Ensure Meet Requirements [pending]
+## 7. Verify Implementation Against PRD.md to Ensure Meet Requirements [done]
 ### Dependencies: None
 ### Description: After completing all implementation subtasks, verify that the final result meets all requirements specified in the PRD.md file. Ensure project setup, directory structure, dependencies, and configuration align with PRD specifications.
 ### Details:

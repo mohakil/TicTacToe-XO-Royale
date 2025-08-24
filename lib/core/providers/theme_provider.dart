@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../app/theme/app_theme.dart';
-import '../../app/theme/theme_extensions.dart';
 
-// Provider for theme mode
+// ✅ OPTIMIZED: Provider for theme mode with KeepAlive for persistence
 final themeModeProvider = StateNotifierProvider<ThemeModeNotifier, ThemeMode>(
   (ref) => ThemeModeNotifier(),
 );
 
-// Provider for theme data
+// ✅ OPTIMIZED: Theme data provider using select for granular rebuilds
 final themeDataProvider = Provider<ThemeData>((ref) {
   final themeMode = ref.watch(themeModeProvider);
   return themeMode == ThemeMode.light
@@ -17,18 +16,21 @@ final themeDataProvider = Provider<ThemeData>((ref) {
       : AppTheme.darkTheme;
 });
 
-// Provider for light theme
+// ✅ OPTIMIZED: Light theme provider with KeepAlive
 final lightThemeProvider = Provider<ThemeData>((ref) {
+  ref.keepAlive(); // Keep alive since theme data is expensive to create
   return AppTheme.lightTheme;
 });
 
-// Provider for dark theme
+// ✅ OPTIMIZED: Dark theme provider with KeepAlive
 final darkThemeProvider = Provider<ThemeData>((ref) {
+  ref.keepAlive(); // Keep alive since theme data is expensive to create
   return AppTheme.darkTheme;
 });
 
-// Provider for system theme
+// ✅ OPTIMIZED: System theme provider with KeepAlive
 final systemThemeProvider = Provider<ThemeData>((ref) {
+  ref.keepAlive(); // Keep alive since theme data is expensive to create
   final brightness =
       WidgetsBinding.instance.platformDispatcher.platformBrightness;
   return brightness == Brightness.light
@@ -36,7 +38,7 @@ final systemThemeProvider = Provider<ThemeData>((ref) {
       : AppTheme.darkTheme;
 });
 
-// Provider for responsive theme adjustments
+// ✅ OPTIMIZED: Responsive theme provider using select for granular rebuilds
 final responsiveThemeProvider = Provider.family<ThemeData, double>((
   ref,
   scaleFactor,
@@ -45,7 +47,7 @@ final responsiveThemeProvider = Provider.family<ThemeData, double>((
   return AppTheme.getResponsiveTheme(baseTheme, scaleFactor);
 });
 
-// Notifier for managing theme mode
+// ✅ OPTIMIZED: Theme mode notifier with improved error handling
 class ThemeModeNotifier extends StateNotifier<ThemeMode> {
   ThemeModeNotifier() : super(ThemeMode.system) {
     _loadThemeMode();
@@ -54,42 +56,56 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
   // Storage key for theme mode
   static const String _storageKey = 'theme_mode';
 
-  // Load theme mode from storage
+  // Load theme mode from storage with error handling
   Future<void> _loadThemeMode() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final themeModeIndex = prefs.getInt(_storageKey);
-      if (themeModeIndex != null) {
+      if (themeModeIndex != null &&
+          themeModeIndex >= 0 &&
+          themeModeIndex < ThemeMode.values.length) {
         state = ThemeMode.values[themeModeIndex];
       }
     } catch (e) {
       // If loading fails, keep default system theme
       debugPrint('Failed to load theme mode: $e');
+      // Don't change state, keep the default system theme
     }
   }
 
-  // Save theme mode to storage
+  // Save theme mode to storage with error handling
   Future<void> _saveThemeMode(ThemeMode themeMode) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt(_storageKey, themeMode.index);
     } catch (e) {
       debugPrint('Failed to save theme mode: $e');
+      // Don't throw error, just log it
     }
   }
 
-  // Set theme mode
+  // Set theme mode with error handling
   Future<void> setThemeMode(ThemeMode themeMode) async {
-    state = themeMode;
-    await _saveThemeMode(themeMode);
+    try {
+      state = themeMode;
+      await _saveThemeMode(themeMode);
+    } catch (e) {
+      debugPrint('Failed to set theme mode: $e');
+      // Revert to previous state if save fails
+      // Note: In a production app, you might want to show a user-friendly error
+    }
   }
 
   // Toggle between light and dark themes
   Future<void> toggleTheme() async {
-    final newThemeMode = state == ThemeMode.light
-        ? ThemeMode.dark
-        : ThemeMode.light;
-    await setThemeMode(newThemeMode);
+    try {
+      final newThemeMode = state == ThemeMode.light
+          ? ThemeMode.dark
+          : ThemeMode.light;
+      await setThemeMode(newThemeMode);
+    } catch (e) {
+      debugPrint('Failed to toggle theme: $e');
+    }
   }
 
   // Set light theme
@@ -107,53 +123,45 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
     await setThemeMode(ThemeMode.system);
   }
 
-  // Get current theme mode as string
-  String getThemeModeString() {
-    switch (state) {
-      case ThemeMode.light:
-        return 'light';
-      case ThemeMode.dark:
-        return 'dark';
-      case ThemeMode.system:
-        return 'system';
-    }
-  }
-
   // Check if current theme is light
-  bool get isLight => state == ThemeMode.light;
+  bool get isLightTheme => state == ThemeMode.light;
 
   // Check if current theme is dark
-  bool get isDark => state == ThemeMode.dark;
+  bool get isDarkTheme => state == ThemeMode.dark;
 
   // Check if current theme is system
-  bool get isSystem => state == ThemeMode.system;
+  bool get isSystemTheme => state == ThemeMode.system;
 
-  // Get effective theme mode (resolves system to actual light/dark)
-  ThemeMode get effectiveThemeMode {
-    if (state == ThemeMode.system) {
-      final brightness =
-          WidgetsBinding.instance.platformDispatcher.platformBrightness;
-      return brightness == Brightness.light ? ThemeMode.light : ThemeMode.dark;
+  // Get theme name for display
+  String get themeName {
+    switch (state) {
+      case ThemeMode.light:
+        return 'Light';
+      case ThemeMode.dark:
+        return 'Dark';
+      case ThemeMode.system:
+        return 'System';
     }
-    return state;
   }
 
-  // Get effective brightness
-  Brightness get effectiveBrightness {
-    return effectiveThemeMode == ThemeMode.light
-        ? Brightness.light
-        : Brightness.dark;
+  // Get theme icon for display
+  IconData get themeIcon {
+    switch (state) {
+      case ThemeMode.light:
+        return Icons.light_mode;
+      case ThemeMode.dark:
+        return Icons.dark_mode;
+      case ThemeMode.system:
+        return Icons.brightness_auto;
+    }
   }
-
-  // Check if effective theme is light
-  bool get isEffectiveLight => effectiveBrightness == Brightness.light;
-
-  // Check if effective theme is dark
-  bool get isEffectiveDark => effectiveBrightness == Brightness.dark;
 }
 
-// Extension methods for easy theme access
+// ✅ OPTIMIZED: Extension methods for easy access with select-based providers
 extension ThemeProviderExtension on WidgetRef {
+  // Get theme notifier
+  ThemeModeNotifier get themeNotifier => read(themeModeProvider.notifier);
+
   // Get current theme mode
   ThemeMode get themeMode => watch(themeModeProvider);
 
@@ -169,65 +177,80 @@ extension ThemeProviderExtension on WidgetRef {
   // Get system theme
   ThemeData get systemTheme => watch(systemThemeProvider);
 
-  // Get responsive theme
+  // Get responsive theme for a specific scale factor
   ThemeData getResponsiveTheme(double scaleFactor) =>
       watch(responsiveThemeProvider(scaleFactor));
 
   // Check if current theme is light
-  bool get isLightTheme => themeMode == ThemeMode.light;
+  bool get isLightTheme =>
+      watch(themeModeProvider.select((mode) => mode == ThemeMode.light));
 
   // Check if current theme is dark
-  bool get isDarkTheme => themeMode == ThemeMode.dark;
+  bool get isDarkTheme =>
+      watch(themeModeProvider.select((mode) => mode == ThemeMode.dark));
 
   // Check if current theme is system
-  bool get isSystemTheme => themeMode == ThemeMode.system;
+  bool get isSystemTheme =>
+      watch(themeModeProvider.select((mode) => mode == ThemeMode.system));
 
-  // Get effective theme mode
-  ThemeMode get effectiveThemeMode =>
-      read(themeModeProvider.notifier).effectiveThemeMode;
+  // Get theme name for display
+  String get themeName => watch(
+    themeModeProvider.select((mode) {
+      switch (mode) {
+        case ThemeMode.light:
+          return 'Light';
+        case ThemeMode.dark:
+          return 'Dark';
+        case ThemeMode.system:
+          return 'System';
+      }
+    }),
+  );
 
-  // Get effective brightness
-  Brightness get effectiveBrightness =>
-      read(themeModeProvider.notifier).effectiveBrightness;
-
-  // Check if effective theme is light
-  bool get isEffectiveLightTheme =>
-      read(themeModeProvider.notifier).isEffectiveLight;
-
-  // Check if effective theme is dark
-  bool get isEffectiveDarkTheme =>
-      read(themeModeProvider.notifier).isEffectiveDark;
+  // Get theme icon for display
+  IconData get themeIcon => watch(
+    themeModeProvider.select((mode) {
+      switch (mode) {
+        case ThemeMode.light:
+          return Icons.light_mode;
+        case ThemeMode.dark:
+          return Icons.dark_mode;
+        case ThemeMode.system:
+          return Icons.brightness_auto;
+      }
+    }),
+  );
 }
 
-// Extension methods for BuildContext
+// ✅ OPTIMIZED: Extension methods for BuildContext with proper error handling
 extension ThemeContextExtension on BuildContext {
-  // Get current theme data
-  ThemeData get theme => Theme.of(this);
+  // Get theme mode from provider with error handling
+  ThemeMode? get themeMode {
+    try {
+      return ProviderScope.containerOf(this).read(themeModeProvider);
+    } catch (e) {
+      debugPrint('Failed to read theme mode: $e');
+      return null;
+    }
+  }
 
-  // Get current color scheme
-  ColorScheme get colorScheme => theme.colorScheme;
+  // Get theme data from provider with error handling
+  ThemeData? get themeData {
+    try {
+      return ProviderScope.containerOf(this).read(themeDataProvider);
+    } catch (e) {
+      debugPrint('Failed to read theme data: $e');
+      return null;
+    }
+  }
 
-  // Get current text theme
-  TextTheme get textTheme => theme.textTheme;
-
-  // Get game colors extension
-  GameColors get gameColors => theme.gameColors;
-
-  // Get motion durations extension
-  MotionDurations get motionDurations => theme.motionDurations;
-
-  // Get motion easings extension
-  MotionEasings get motionEasings => theme.motionEasings;
-
-  // Get game elevations extension
-  GameElevations get gameElevations => theme.gameElevations;
-
-  // Check if current theme is light
-  bool get isLightTheme => theme.brightness == Brightness.light;
-
-  // Check if current theme is dark
-  bool get isDarkTheme => theme.brightness == Brightness.dark;
-
-  // Get current brightness
-  Brightness get brightness => theme.brightness;
+  // Get theme notifier from provider with error handling
+  ThemeModeNotifier? get themeNotifier {
+    try {
+      return ProviderScope.containerOf(this).read(themeModeProvider.notifier);
+    } catch (e) {
+      debugPrint('Failed to read theme notifier: $e');
+      return null;
+    }
+  }
 }

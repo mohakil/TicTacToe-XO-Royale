@@ -14,47 +14,39 @@
 Test all sound cues and haptic events on Android/iOS. Validate toggles in settings screen. Ensure no audio/haptic when disabled.
 
 # Subtasks:
-## 1. Integrate just_audio for SFX/Music Playback [pending]
+## 1. Read PRD.md and Get More Info About Task, Verify It, Then Process Task [pending]
 ### Dependencies: None
-### Description: Integrate the just_audio library into the audio_service.dart to enable low-latency playback of sound effects and music.
+### Description: Thoroughly read the PRD.md file to understand the exact requirements for audio services, haptic feedback, and user preference settings. Get comprehensive information about the task, verify it aligns with PRD specifications, identify any missing requirements or clarifications needed, and then proceed with task processing.
 ### Details:
-Set up the audio player, handle audio focus, and implement basic playback controls.
+Review PRD.md, identify audio/haptic requirements, verify task alignment, identify gaps, and prepare for implementation.
 
-## 2. Implement SFX/Music Asset Preloading and Caching [pending]
+## 2. Implement Audio Services with just_audio and Caching [pending]
 ### Dependencies: 6.1
-### Description: Implement asset preloading and caching mechanisms within the audio_service.dart to ensure smooth and responsive audio playback.
+### Description: Integrate just_audio for low-latency playback of SFX and music. Implement caching mechanisms to preload and store audio assets for efficient access.
 ### Details:
-Develop a caching strategy for SFX and music assets to minimize load times and improve performance.
+Integrate just_audio, implement SFX/music caching, and ensure low-latency playback.
 
-## 3. Implement Haptic Feedback for Game Events [pending]
+## 3. Implement Haptic Feedback and User Toggles [pending]
+### Dependencies: 6.1
+### Description: Implement haptic feedback for all game events as specified in the PRD. Implement user toggles in settings to enable/disable audio and haptic feedback, respecting system settings.
+### Details:
+Implement haptic feedback for game events and user toggles for audio/haptic control.
+
+## 4. Verify Implementation Against PRD.md to Ensure Meet Requirements [pending]
+### Dependencies: 6.2, 6.3
+### Description: Verify that the final result meets all audio and haptic requirements specified in the PRD.md file. Ensure all audio services, haptic feedback, and user preferences align with PRD specifications.
+### Details:
+Validate audio services, haptic feedback, and user preferences against PRD.md.
+
+## 5. Implement Audio Asset Management and Preloading [pending]
 ### Dependencies: None
-### Description: Implement haptic feedback for all relevant game events within the haptic_service.dart, adhering to the specifications outlined in the PRD.
+### Description: Create an audio asset manager that preloads and caches all SFX and music files. Implement proper error handling for missing assets and ensure efficient memory usage with just_audio.
 ### Details:
-Utilize platform-specific APIs to trigger haptic feedback for various game actions and events.
 
-## 4. Implement User Toggle and System Setting Respect [pending]
-### Dependencies: 6.1, 6.3
-### Description: Ensure that both the audio and haptic services respect user-defined toggles and system-level settings for audio and haptic feedback.
-### Details:
-Implement logic to disable audio and/or haptic feedback based on user preferences and system settings.
 
-## 5. Read PRD.md and Verify Audio & Haptic Requirements [pending]
+## 6. Implement Platform-Specific Haptic Feedback [pending]
 ### Dependencies: None
-### Description: Read the PRD.md file thoroughly to understand the exact requirements for audio services, haptic feedback, and user preference settings. Verify that this task aligns with the PRD specifications.
+### Description: Create platform-specific haptic feedback implementations for Android and iOS using the vibration package. Implement different haptic patterns for various game events (move, win, lose, etc.) and respect system haptic settings.
 ### Details:
-- Read the complete PRD.md file focusing on audio and haptic feedback section
-- Identify specific audio requirements, haptic patterns, and user preference specifications
-- Verify task description matches PRD audio & haptic requirements
-- Note any additional audio/haptic requirements or clarifications needed
-- Document findings for implementation reference
 
-## 6. Verify Audio & Haptic Implementation Against PRD.md [pending]
-### Dependencies: None
-### Description: After completing all audio and haptic implementation subtasks, verify that the final result meets all audio and haptic requirements specified in the PRD.md file. Ensure all audio services, haptic feedback, and user preferences align with PRD specifications.
-### Details:
-- Review completed audio & haptic implementation against PRD.md requirements
-- Verify all specified audio features are implemented correctly
-- Confirm haptic feedback patterns match PRD specifications
-- Validate user preference settings and system integration
-- Document any deviations or additional audio/haptic features implemented
 

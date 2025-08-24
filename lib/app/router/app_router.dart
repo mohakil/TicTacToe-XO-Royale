@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../features/loading/loading.dart';
+import '../../features/home/home.dart';
 
 // Theme mode provider
 final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.system);
@@ -53,41 +55,7 @@ final List<RouteBase> appRoutes = [
   ),
 ];
 
-// Placeholder screen widgets (will be implemented later)
-class LoadingScreen extends StatelessWidget {
-  const LoadingScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Loading...',
-              style: Theme.of(context).textTheme.headlineLarge,
-            ),
-            const SizedBox(height: 16),
-            const CircularProgressIndicator(),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('XO Royale')),
-      body: const Center(child: Text('Home Screen - Coming Soon!')),
-    );
-  }
-}
+// HomeScreen is now imported from the home feature
 
 class SetupScreen extends StatelessWidget {
   const SetupScreen({super.key});
@@ -95,8 +63,51 @@ class SetupScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Game Setup')),
-      body: const Center(child: Text('Setup Screen - Coming Soon!')),
+      appBar: AppBar(
+        title: Semantics(
+          label: 'Game Setup Screen',
+          child: const Text('Game Setup'),
+        ),
+        leading: Semantics(
+          label: 'Back to home button',
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => context.go('/home'),
+          ),
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Semantics(
+              label: 'Game setup instructions',
+              child: Text(
+                'Configure your game settings',
+                style: Theme.of(context).textTheme.headlineMedium,
+                textAlign: TextAlign.center,
+              ),
+            ),
+            const SizedBox(height: 32),
+            Semantics(
+              label: 'Start game button',
+              child: ElevatedButton(
+                onPressed: () => context.go('/game'),
+                child: const Text('Start Game'),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Semantics(
+              label: 'Return to home button',
+              child: TextButton(
+                onPressed: () => context.go('/home'),
+                child: const Text('Back to Home'),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -107,8 +118,15 @@ class GameScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Game')),
-      body: const Center(child: Text('Game Screen - Coming Soon!')),
+      appBar: AppBar(
+        title: Semantics(label: 'Game Screen', child: const Text('Game')),
+      ),
+      body: Center(
+        child: Semantics(
+          label: 'Game content - Coming Soon',
+          child: const Text('Game Screen - Coming Soon!'),
+        ),
+      ),
     );
   }
 }
@@ -119,8 +137,15 @@ class StoreScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Store')),
-      body: const Center(child: Text('Store Screen - Coming Soon!')),
+      appBar: AppBar(
+        title: Semantics(label: 'Store Screen', child: const Text('Store')),
+      ),
+      body: Center(
+        child: Semantics(
+          label: 'Store content - Coming Soon',
+          child: const Text('Store Screen - Coming Soon!'),
+        ),
+      ),
     );
   }
 }
@@ -131,8 +156,18 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
-      body: const Center(child: Text('Profile Screen - Coming Soon!')),
+      appBar: AppBar(
+        title: Semantics(
+          label: 'User Profile Screen',
+          child: const Text('Profile'),
+        ),
+      ),
+      body: Center(
+        child: Semantics(
+          label: 'Profile content - Coming Soon',
+          child: const Text('Profile Screen - Coming Soon!'),
+        ),
+      ),
     );
   }
 }
@@ -143,8 +178,18 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
-      body: const Center(child: Text('Settings Screen - Coming Soon!')),
+      appBar: AppBar(
+        title: Semantics(
+          label: 'Settings Screen',
+          child: const Text('Settings'),
+        ),
+      ),
+      body: Center(
+        child: Semantics(
+          label: 'Settings content - Coming Soon',
+          child: const Text('Settings Screen - Coming Soon!'),
+        ),
+      ),
     );
   }
 }

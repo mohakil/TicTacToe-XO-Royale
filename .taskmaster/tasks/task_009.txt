@@ -15,53 +15,33 @@
 Test all input flows, carousel snapping, and validation logic. Ensure previews render correctly and accessibility is met.
 
 # Subtasks:
-## 1. Implement Input Components [pending]
+## 1. Verify Game Setup Screen Requirements in PRD [pending]
 ### Dependencies: None
-### Description: Build the mode selector, player name input fields, first move selection, difficulty selection, board size selection, and win condition selection using `choice_chips.dart` and `custom_text_field.dart`.
+### Description: Read the PRD.md document and verify all requirements related to the game setup screen, including input fields, validation rules, carousel behavior, and responsive layout specifications.
 ### Details:
-Focus on creating functional and visually appealing input components for all game setup options.
+Ensure all requirements are understood and documented for subsequent implementation tasks.
 
-## 2. Implement Carousels [pending]
+## 2. Implement Input Components and Validation [pending]
 ### Dependencies: None
-### Description: Develop `board_carousel.dart` and `win_carousel.dart` using `PageView` and transforms to allow users to select board sizes and win conditions.
+### Description: Implement the input components for the setup screen using choice_chips.dart and custom_text_field.dart. This includes mode selector, player names, first move, difficulty, board size and win condition. Implement input validation logic to ensure all inputs are valid before starting the game.
 ### Details:
-Ensure smooth carousel transitions and proper display of options.
+Ensure all input fields are correctly implemented and validated according to the PRD.
 
-## 3. Render Board Previews [pending]
-### Dependencies: 9.2
-### Description: Implement `board_preview.dart` using `CustomPainter` to render previews of the selected board size and win condition.
+## 3. Implement Carousels and Board Preview [pending]
+### Dependencies: None
+### Description: Implement the board_carousel.dart and win_carousel.dart using PageView and transforms. Render board previews using board_preview.dart (CustomPainter).
 ### Details:
-Ensure previews accurately reflect the selected board configuration.
+Ensure carousels snap correctly and board previews render accurately for different board sizes and win conditions.
 
-## 4. Implement Input Validation [pending]
-### Dependencies: 9.1, 9.2
-### Description: Implement validation logic for all input fields to ensure valid game configurations. Disable the 'Start' button if any inputs are invalid.
+## 4. Implement Responsive Layout [pending]
+### Dependencies: None
+### Description: Implement a responsive and adaptive layout for the setup screen to ensure it looks good on both phones and tablets.
 ### Details:
-Provide clear error messages for invalid inputs.
+Use appropriate layout techniques to adapt the UI to different screen sizes and orientations.
 
-## 5. Implement Responsive Layout [pending]
+## 5. Verify Implementation Against PRD [pending]
 ### Dependencies: 9.1, 9.2, 9.3, 9.4
-### Description: Create a responsive and adaptive layout for the setup screen that works well on both phones and tablets.
+### Description: Verify that the implemented game setup screen meets all the requirements specified in the PRD.md document. This includes input validation, carousel behavior, board preview rendering, and responsive layout.
 ### Details:
-Ensure the layout adapts to different screen sizes and orientations.
-
-## 6. Read PRD.md and Verify Game Setup Screen Requirements [pending]
-### Dependencies: None
-### Description: Read the PRD.md file thoroughly to understand the exact requirements for the game setup screen, input components, carousels, validation, and board previews. Verify that this task aligns with the PRD specifications.
-### Details:
-- Read the complete PRD.md file focusing on game setup and configuration section
-- Identify specific input requirements, carousel specifications, and validation rules
-- Verify task description matches PRD game setup requirements
-- Note any additional setup screen requirements or clarifications needed
-- Document findings for implementation reference
-
-## 7. Verify Game Setup Screen Implementation Against PRD.md [pending]
-### Dependencies: None
-### Description: After completing all game setup screen implementation subtasks, verify that the final result meets all setup screen requirements specified in the PRD.md file. Ensure input components, carousels, validation, and board previews align with PRD specifications.
-### Details:
-- Review completed setup screen implementation against PRD.md requirements
-- Verify all input components meet specifications
-- Confirm carousel functionality and board previews match requirements
-- Validate input validation rules work correctly
-- Document any deviations or additional setup screen features implemented
+Ensure all aspects of the setup screen are implemented correctly and according to the PRD.
 

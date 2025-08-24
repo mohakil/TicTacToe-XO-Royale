@@ -13,41 +13,21 @@
 Run all tests with `flutter test`. Ensure high coverage and all tests pass. Validate against acceptance criteria in PRD.
 
 # Subtasks:
-## 1. Write Unit Tests for Core Models and Utils [pending]
+## 1. Review PRD and Define Test Scenarios [pending]
 ### Dependencies: None
-### Description: Develop unit tests for all models located in the `core/models` directory and utility functions in the `utils` directory. Use mock data to simulate various scenarios and ensure comprehensive coverage.
+### Description: Read the PRD.md document and identify specific requirements and acceptance criteria to be covered by unit and widget tests. Define detailed test scenarios for models, providers, game logic, and UI components based on the PRD.
 ### Details:
-Focus on testing data integrity, validation logic, and edge cases within the models and utils.
+Focus on identifying testable aspects of core features as defined in the PRD. Document the test scenarios to guide test implementation.
 
-## 2. Write Unit Tests for Core Providers [pending]
-### Dependencies: None
-### Description: Develop unit tests for all providers located in the `core/providers` directory. Mock dependencies and state changes to ensure proper provider behavior and state management.
+## 2. Implement Unit and Widget Tests [pending]
+### Dependencies: 17.1
+### Description: Write unit tests for core/models, core/providers, and utils using flutter_test and mock data. Implement widget tests for key screens (e.g., Home Screen, Settings Screen) and widgets (e.g., game mode cards, theme selector). Ensure comprehensive coverage of game logic and UI interactions.
 ### Details:
-Focus on testing state updates, data fetching, and interaction with other services.
+Use mock data to isolate components and ensure testability. Aim for high test coverage and address edge cases. Include tests for error handling and boundary conditions.
 
-## 3. Write Widget Tests for Key Screens and Widgets [pending]
-### Dependencies: None
-### Description: Develop widget tests for key screens and reusable widgets. Verify UI rendering, user interactions, and state updates using `flutter_test` and mock data.
+## 3. Verify Implementation Against PRD and Ensure Coverage [pending]
+### Dependencies: 17.2
+### Description: Execute all unit and widget tests and verify that the implementation meets the requirements and acceptance criteria defined in the PRD. Ensure comprehensive test coverage across all core features. Address any test failures and improve test coverage as needed.
 ### Details:
-Prioritize testing the Home Screen, Settings Screen, and any custom widgets used throughout the application.
-
-## 4. Read PRD.md and Verify Testing Requirements [pending]
-### Dependencies: None
-### Description: Read the PRD.md file thoroughly to understand the exact requirements for testing coverage, test types, and quality assurance specifications. Verify that this task aligns with the PRD specifications.
-### Details:
-- Read the complete PRD.md file focusing on testing and quality assurance section
-- Identify specific testing requirements, coverage targets, and test type specifications
-- Verify task description matches PRD testing requirements
-- Note any additional testing requirements or clarifications needed
-- Document findings for implementation reference
-
-## 5. Verify Testing Implementation Against PRD.md [pending]
-### Dependencies: None
-### Description: After completing all testing implementation subtasks, verify that the final result meets all testing requirements specified in the PRD.md file. Ensure test coverage, test types, and quality assurance align with PRD specifications.
-### Details:
-- Review completed testing implementation against PRD.md requirements
-- Verify unit tests for models and providers meet specifications
-- Confirm widget tests for key screens work correctly
-- Validate overall test coverage and quality assurance targets
-- Document any deviations or additional testing features implemented
+Review test results and identify any gaps in coverage. Refactor code and add tests to address gaps. Ensure that all tests pass and that the implementation aligns with the PRD.
 

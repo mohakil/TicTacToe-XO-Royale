@@ -14,53 +14,33 @@
 Navigate all tabs, attempt unlocks, use 'Watch Ad' to earn gems. Validate UI updates and state changes. Test accessibility and responsive layout.
 
 # Subtasks:
-## 1. Create Store Tabs [pending]
+## 1. Read and Verify Store Screen Requirements in PRD [pending]
 ### Dependencies: None
-### Description: Implement the tabbed interface in store_screen.dart for themes, boards, symbols, and gems using store_tabs.dart.
+### Description: Thoroughly review the PRD.md document to understand and confirm all requirements related to the store screen, including functionality, UI elements, and data handling.
 ### Details:
-Create the tab bar and tab view structure. Ensure each tab corresponds to a different category of store items.
+Focus on sections detailing store tabs, grid layout, item previews, mock purchase flow, and gem earning mechanics. Document any discrepancies or ambiguities.
 
-## 2. Implement Grid Layout [pending]
+## 2. Implement Store Tabs and Grid Layout [pending]
 ### Dependencies: 15.1
-### Description: Display store items in a grid layout within each tab using store_grid.dart.
+### Description: Create the tabbed interface for the store screen using store_tabs.dart. Implement the grid layout using store_grid.dart to display store items within each tab.
 ### Details:
-Populate the grid with mock data. Ensure the grid is responsive and adapts to different screen sizes.
+Ensure tabs are correctly linked to their respective content (themes, boards, symbols, gems). The grid should dynamically adapt to different screen sizes and orientations.
 
-## 3. Render Item Previews [pending]
+## 3. Render Store Item Previews with Lock Overlays, Price Chips, and CTAs [pending]
 ### Dependencies: 15.2
-### Description: Render previews for each store item, including lock overlays, price chips, and CTAs, using store_item_preview.dart.
+### Description: Implement the rendering of individual store items within the grid using store_item_preview.dart. Include lock overlays for unavailable items, price chips indicating the cost, and call-to-action buttons (CTAs) for purchasing or unlocking.
 ### Details:
-Implement the UI elements for displaying item previews. Use ThemeExtensions to preview themes. Ensure lock overlays and price chips are displayed correctly.
+Utilize ThemeExtensions for previewing themes. Ensure the UI accurately reflects the item's availability and cost.
 
-## 4. Implement Mock Purchases [pending]
+## 4. Implement Mock Purchase Flow and Gem Earning System [pending]
 ### Dependencies: 15.3
-### Description: Implement mock purchase functionality for store items. Update the store state in mock only.
+### Description: Implement the mock purchase flow, allowing users to 'purchase' items using gems. Integrate the 'Watch Ad' button (watch_ad_button.dart) to enable users to earn gems.
 ### Details:
-Implement the logic for 'purchasing' items. Update the mock store state to reflect the purchase. Ensure the UI updates accordingly.
+Update the store state and gem balance in mock only. Ensure the UI reflects the updated gem balance and item availability after a purchase or gem earning.
 
-## 5. Implement Gem Earning [pending]
-### Dependencies: 15.3
-### Description: Implement mock gem earning via the 'Watch Ad' button using watch_ad_button.dart. Update the gem balance in mock only.
+## 5. Verify Store Screen Implementation Against PRD [pending]
+### Dependencies: 15.4
+### Description: Thoroughly test the implemented store screen against the requirements outlined in the PRD.md document.
 ### Details:
-Implement the 'Watch Ad' button functionality. Update the mock gem balance when the button is pressed. Ensure the UI updates to reflect the new gem balance.
-
-## 6. Read PRD.md and Verify Store Screen Requirements [pending]
-### Dependencies: None
-### Description: Read the PRD.md file thoroughly to understand the exact requirements for the store screen, tabs, grid layout, mock purchases, and gem earning system. Verify that this task aligns with the PRD specifications.
-### Details:
-- Read the complete PRD.md file focusing on store and monetization section
-- Identify specific tab requirements, item display, and purchase specifications
-- Verify task description matches PRD store requirements
-- Note any additional store requirements or clarifications needed
-- Document findings for implementation reference
-
-## 7. Verify Store Screen Implementation Against PRD.md [pending]
-### Dependencies: None
-### Description: After completing all store screen implementation subtasks, verify that the final result meets all store requirements specified in the PRD.md file. Ensure tabs, grid layout, mock purchases, and gem earning align with PRD specifications.
-### Details:
-- Review completed store implementation against PRD.md requirements
-- Verify all store tabs (themes, boards, symbols, gems) work correctly
-- Confirm grid layout and item previews meet specifications
-- Validate mock purchase functionality and gem earning system
-- Document any deviations or additional store features implemented
+Verify all UI elements, functionality, and data handling match the specifications. Ensure the mock purchase flow and gem earning system function as expected. Address any discrepancies or bugs identified during testing.
 

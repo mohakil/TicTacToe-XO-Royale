@@ -15,41 +15,21 @@
 Test all animations for smoothness and correct timing. Validate navigation, card states, and stats updates. Check accessibility labels and contrast.
 
 # Subtasks:
-## 1. Implement Hero Section and CTA Cards [pending]
+## 1. Verify Home Screen Requirements in PRD [pending]
 ### Dependencies: None
-### Description: Develop the hero section with typewriter animation using typewriter_text.dart and implement the CTA cards (Local/Robot) with hover/press/parallax effects using game_mode_cards.dart.
+### Description: Read the PRD.md document and verify all requirements related to the home screen are clearly understood and documented. Clarify any ambiguities.
 ### Details:
-Ensure the hero section displays the game title and a brief description. The CTA cards should allow users to select the game mode (Local or Robot). Implement hover, press, and parallax effects for visual feedback.
+Ensure all functional and non-functional requirements for the home screen are accounted for.
 
-## 2. Implement Stats Ribbon and Navigation [pending]
+## 2. Implement Hero Section and CTA Cards [pending]
 ### Dependencies: None
-### Description: Implement the quick stats ribbon using quick_stats_ribbon.dart to display stats, gems, and hints. Implement navigation to the setup screen when a game mode is selected.
+### Description: Implement the hero section with typewriter animation using typewriter_text.dart. Build game_mode_cards.dart with hover/press/parallax effects for CTA cards (Local/Robot).
 ### Details:
-The stats ribbon should display relevant game statistics, the number of gems the user has, and the number of hints available. Implement navigation to the setup screen when the user selects a game mode from the CTA cards.
+Ensure the hero animation is smooth and the CTA cards have the correct visual effects and navigation.
 
-## 3. Implement Ambient Effects and Responsive Layout [pending]
-### Dependencies: None
-### Description: Animate the background with X/O particles using ambient_particles.dart with AnimatedBuilder/CustomPainter. Ensure the entire home screen has a responsive layout and is accessible.
+## 3. Verify Home Screen Implementation Against PRD [pending]
+### Dependencies: 8.1, 8.2
+### Description: After implementing all home screen components, verify that the implementation meets all requirements outlined in the PRD.md document. Address any discrepancies.
 ### Details:
-The background animation should create a visually appealing ambient effect. Ensure the layout adapts to different screen sizes and orientations. Implement accessibility features such as proper labels and contrast ratios.
-
-## 4. Read PRD.md and Verify Home Screen Requirements [pending]
-### Dependencies: None
-### Description: Read the PRD.md file thoroughly to understand the exact requirements for the home screen, hero section, CTA cards, stats ribbon, and ambient effects. Verify that this task aligns with the PRD specifications.
-### Details:
-- Read the complete PRD.md file focusing on home screen and UI section
-- Identify specific hero animation, CTA card, and stats requirements
-- Verify task description matches PRD home screen requirements
-- Note any additional home screen requirements or clarifications needed
-- Document findings for implementation reference
-
-## 5. Verify Home Screen Implementation Against PRD.md [pending]
-### Dependencies: None
-### Description: After completing all home screen implementation subtasks, verify that the final result meets all home screen requirements specified in the PRD.md file. Ensure hero section, CTA cards, stats ribbon, and ambient effects align with PRD specifications.
-### Details:
-- Review completed home screen implementation against PRD.md requirements
-- Verify hero section and typewriter animation meet specifications
-- Confirm CTA cards functionality and visual effects match requirements
-- Validate stats ribbon displays correct information
-- Document any deviations or additional home screen features implemented
+Perform a thorough review to ensure all features and functionalities align with the documented requirements.
 

@@ -152,14 +152,6 @@
 			"recommendedSubtasks": 3,
 			"expansionPrompt": "Break down this task with a focus on prepare documentation and readme.",
 			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 19,
-			"taskTitle": "Verify Gemini 2.0 Flash Model Functionality",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on verify gemini 2.0 flash model functionality.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
 		}
 	]
 }
