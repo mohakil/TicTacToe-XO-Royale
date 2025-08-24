@@ -1,0 +1,80 @@
+# Task ID: 11
+# Title: Build Game Screen: CustomPainter Board, Animations, HUD, and Controls
+# Status: pending
+# Dependencies: 10
+# Priority: high
+# Description: Create game_screen.dart with CustomPainter board, animated X/O marks, winning line, particle effects, overlays for scoreboard, turn indicator, and bottom controls. Integrate input handling and performance optimizations.
+# Details:
+- Implement tic_tac_toe_board.dart and painters for board, cells, marks, winning line, confetti, hint sparkle, ambient.
+- Use AnimationController for all timed effects (60–144 FPS).
+- Overlay HUD: scoreboard, turn indicator, control bar.
+- Handle gestures and input via GestureDetector.
+- Use RepaintBoundary and cache Paint objects.
+- Ensure responsive/adaptive layout for all devices.
+
+# Test Strategy:
+Play full games on all board sizes/difficulties. Validate animation smoothness, input accuracy, and overlay correctness. Profile frame times and memory usage.
+
+# Subtasks:
+## 1. Implement Tic-Tac-Toe Board Rendering [pending]
+### Dependencies: None
+### Description: Implement tic_tac_toe_board.dart using CustomPainter to draw the board, cells, and handle board layout.
+### Details:
+Focus on creating a visually appealing and responsive board using CustomPainter. Consider using RepaintBoundary for performance.
+
+## 2. Animate X/O Marks and Winning Line [pending]
+### Dependencies: None
+### Description: Implement animations for X/O marks appearing on the board and for highlighting the winning line using AnimationController.
+### Details:
+Use AnimationController to create smooth animations for mark placement and winning line highlighting. Optimize for 60-144 FPS.
+
+## 3. Implement Particle Effects [pending]
+### Dependencies: None
+### Description: Add particle effects, such as confetti, hint sparkles, and ambient effects, using CustomPainter and AnimationController.
+### Details:
+Create visually appealing particle effects to enhance the game experience. Optimize for performance.
+
+## 4. Implement HUD Overlays [pending]
+### Dependencies: None
+### Description: Create HUD overlays for the scoreboard and turn indicator.
+### Details:
+Design and implement the scoreboard and turn indicator overlays. Ensure they are visually clear and informative.
+
+## 5. Implement Control Bar [pending]
+### Dependencies: None
+### Description: Implement the control bar at the bottom of the screen for game controls.
+### Details:
+Design and implement the control bar with necessary game controls. Ensure it is easily accessible and responsive.
+
+## 6. Handle Gestures and Input [pending]
+### Dependencies: None
+### Description: Implement gesture handling and input processing using GestureDetector to allow user interaction with the board.
+### Details:
+Use GestureDetector to detect user taps on the board and process them as game moves. Ensure accurate and responsive input handling.
+
+## 7. Optimize Performance and Responsiveness [pending]
+### Dependencies: None
+### Description: Optimize the game screen for performance and ensure a responsive/adaptive layout for all devices.
+### Details:
+Use RepaintBoundary and cache Paint objects to improve rendering performance. Ensure the layout adapts to different screen sizes and orientations.
+
+## 8. Read PRD.md and Verify Game Screen Requirements [pending]
+### Dependencies: None
+### Description: Read the PRD.md file thoroughly to understand the exact requirements for the game screen, CustomPainter board, animations, HUD, controls, and performance targets. Verify that this task aligns with the PRD specifications.
+### Details:
+- Read the complete PRD.md file focusing on game screen and performance section
+- Identify specific board rendering, animation, and HUD requirements
+- Verify task description matches PRD game screen requirements
+- Note any additional game screen requirements or clarifications needed
+- Document findings for implementation reference
+
+## 9. Verify Game Screen Implementation Against PRD.md [pending]
+### Dependencies: None
+### Description: After completing all game screen implementation subtasks, verify that the final result meets all game screen requirements specified in the PRD.md file. Ensure board rendering, animations, HUD, controls, and performance align with PRD specifications.
+### Details:
+- Review completed game screen implementation against PRD.md requirements
+- Verify CustomPainter board rendering meets specifications
+- Confirm all animations and particle effects work correctly
+- Validate HUD overlays and control bar functionality
+- Document any deviations or additional game screen features implemented
+

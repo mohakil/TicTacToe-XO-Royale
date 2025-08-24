@@ -1,0 +1,53 @@
+# Task ID: 5
+# Title: Setup State Management with Riverpod Providers
+# Status: pending
+# Dependencies: 4
+# Priority: high
+# Description: Create feature-scoped and global providers for theme, settings, profile, store, and game state. Use Riverpod best practices and immutable models.
+# Details:
+- Implement providers in core/providers/ and features/*/providers/.
+- Ensure providers expose state, actions, and selectors as needed.
+- Integrate providers with UI via ConsumerWidget/HookConsumerWidget.
+
+# Test Strategy:
+Write unit tests for provider logic. Validate state updates and reactivity in sample widgets.
+
+# Subtasks:
+## 1. Implement Core Providers (Theme, Settings) [pending]
+### Dependencies: None
+### Description: Create Riverpod providers for theme and settings, including state, actions, and selectors. Store settings in shared preferences.
+### Details:
+Implement providers in core/providers/. Ensure providers expose state, actions, and selectors as needed. Persist settings to local storage.
+
+## 2. Implement Feature-Scoped Providers (Profile, Store, Game) [pending]
+### Dependencies: None
+### Description: Create Riverpod providers for profile, store, and game state, including state, actions, and selectors. Use immutable models.
+### Details:
+Implement providers in features/*/providers/. Ensure providers expose state, actions, and selectors as needed. Use immutable models for state.
+
+## 3. Integrate Providers with UI [pending]
+### Dependencies: 5.1, 5.2
+### Description: Integrate the created Riverpod providers with the UI using ConsumerWidget/HookConsumerWidget in relevant screens.
+### Details:
+Integrate providers with UI via ConsumerWidget/HookConsumerWidget. Ensure UI components react to state changes.
+
+## 4. Read PRD.md and Verify State Management Requirements [pending]
+### Dependencies: None
+### Description: Read the PRD.md file thoroughly to understand the exact requirements for state management, provider architecture, and data flow specifications. Verify that this task aligns with the PRD specifications.
+### Details:
+- Read the complete PRD.md file focusing on state management and architecture section
+- Identify specific provider requirements, state flow, and data persistence needs
+- Verify task description matches PRD state management requirements
+- Note any additional state management requirements or clarifications needed
+- Document findings for implementation reference
+
+## 5. Verify State Management Implementation Against PRD.md [pending]
+### Dependencies: None
+### Description: After completing all state management implementation subtasks, verify that the final result meets all state management requirements specified in the PRD.md file. Ensure all providers, state flow, and data persistence align with PRD specifications.
+### Details:
+- Review completed state management implementation against PRD.md requirements
+- Verify all specified providers are implemented correctly
+- Confirm state flow and data persistence work as expected
+- Validate provider integration with UI components
+- Document any deviations or additional state management features implemented
+

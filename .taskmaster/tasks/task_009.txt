@@ -1,0 +1,67 @@
+# Task ID: 9
+# Title: Implement Game Setup Screen with Carousels and Validation
+# Status: pending
+# Dependencies: 8
+# Priority: high
+# Description: Build setup_screen.dart with mode selector, player names, first move, difficulty, board size and win condition carousels, and start button. Use CustomPainter for board previews. Validate all inputs.
+# Details:
+- Use choice_chips.dart and custom_text_field.dart for inputs.
+- Implement board_carousel.dart and win_carousel.dart with PageView and transforms.
+- Render previews with board_preview.dart (CustomPainter).
+- Disable Start if inputs invalid.
+- Responsive/adaptive layout for phones/tablets.
+
+# Test Strategy:
+Test all input flows, carousel snapping, and validation logic. Ensure previews render correctly and accessibility is met.
+
+# Subtasks:
+## 1. Implement Input Components [pending]
+### Dependencies: None
+### Description: Build the mode selector, player name input fields, first move selection, difficulty selection, board size selection, and win condition selection using `choice_chips.dart` and `custom_text_field.dart`.
+### Details:
+Focus on creating functional and visually appealing input components for all game setup options.
+
+## 2. Implement Carousels [pending]
+### Dependencies: None
+### Description: Develop `board_carousel.dart` and `win_carousel.dart` using `PageView` and transforms to allow users to select board sizes and win conditions.
+### Details:
+Ensure smooth carousel transitions and proper display of options.
+
+## 3. Render Board Previews [pending]
+### Dependencies: 9.2
+### Description: Implement `board_preview.dart` using `CustomPainter` to render previews of the selected board size and win condition.
+### Details:
+Ensure previews accurately reflect the selected board configuration.
+
+## 4. Implement Input Validation [pending]
+### Dependencies: 9.1, 9.2
+### Description: Implement validation logic for all input fields to ensure valid game configurations. Disable the 'Start' button if any inputs are invalid.
+### Details:
+Provide clear error messages for invalid inputs.
+
+## 5. Implement Responsive Layout [pending]
+### Dependencies: 9.1, 9.2, 9.3, 9.4
+### Description: Create a responsive and adaptive layout for the setup screen that works well on both phones and tablets.
+### Details:
+Ensure the layout adapts to different screen sizes and orientations.
+
+## 6. Read PRD.md and Verify Game Setup Screen Requirements [pending]
+### Dependencies: None
+### Description: Read the PRD.md file thoroughly to understand the exact requirements for the game setup screen, input components, carousels, validation, and board previews. Verify that this task aligns with the PRD specifications.
+### Details:
+- Read the complete PRD.md file focusing on game setup and configuration section
+- Identify specific input requirements, carousel specifications, and validation rules
+- Verify task description matches PRD game setup requirements
+- Note any additional setup screen requirements or clarifications needed
+- Document findings for implementation reference
+
+## 7. Verify Game Setup Screen Implementation Against PRD.md [pending]
+### Dependencies: None
+### Description: After completing all game setup screen implementation subtasks, verify that the final result meets all setup screen requirements specified in the PRD.md file. Ensure input components, carousels, validation, and board previews align with PRD specifications.
+### Details:
+- Review completed setup screen implementation against PRD.md requirements
+- Verify all input components meet specifications
+- Confirm carousel functionality and board previews match requirements
+- Validate input validation rules work correctly
+- Document any deviations or additional setup screen features implemented
+

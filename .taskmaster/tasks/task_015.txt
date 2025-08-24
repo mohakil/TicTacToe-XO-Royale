@@ -1,0 +1,66 @@
+# Task ID: 15
+# Title: Implement Store Screen with Tabs, Grid, Mock Purchases, and Gem Earning
+# Status: pending
+# Dependencies: 5
+# Priority: medium
+# Description: Create store_screen.dart with tabs for themes, boards, symbols, gems. Display items in grid with previews, lock overlays, price chips, and CTAs. Implement mock gem earning via 'Watch Ad'.
+# Details:
+- Use store_tabs.dart, store_grid.dart, store_item_preview.dart, watch_ad_button.dart.
+- Update store state and gem balance in mock only.
+- Preview themes with ThemeExtensions.
+- Ensure all interactions update mock state.
+
+# Test Strategy:
+Navigate all tabs, attempt unlocks, use 'Watch Ad' to earn gems. Validate UI updates and state changes. Test accessibility and responsive layout.
+
+# Subtasks:
+## 1. Create Store Tabs [pending]
+### Dependencies: None
+### Description: Implement the tabbed interface in store_screen.dart for themes, boards, symbols, and gems using store_tabs.dart.
+### Details:
+Create the tab bar and tab view structure. Ensure each tab corresponds to a different category of store items.
+
+## 2. Implement Grid Layout [pending]
+### Dependencies: 15.1
+### Description: Display store items in a grid layout within each tab using store_grid.dart.
+### Details:
+Populate the grid with mock data. Ensure the grid is responsive and adapts to different screen sizes.
+
+## 3. Render Item Previews [pending]
+### Dependencies: 15.2
+### Description: Render previews for each store item, including lock overlays, price chips, and CTAs, using store_item_preview.dart.
+### Details:
+Implement the UI elements for displaying item previews. Use ThemeExtensions to preview themes. Ensure lock overlays and price chips are displayed correctly.
+
+## 4. Implement Mock Purchases [pending]
+### Dependencies: 15.3
+### Description: Implement mock purchase functionality for store items. Update the store state in mock only.
+### Details:
+Implement the logic for 'purchasing' items. Update the mock store state to reflect the purchase. Ensure the UI updates accordingly.
+
+## 5. Implement Gem Earning [pending]
+### Dependencies: 15.3
+### Description: Implement mock gem earning via the 'Watch Ad' button using watch_ad_button.dart. Update the gem balance in mock only.
+### Details:
+Implement the 'Watch Ad' button functionality. Update the mock gem balance when the button is pressed. Ensure the UI updates to reflect the new gem balance.
+
+## 6. Read PRD.md and Verify Store Screen Requirements [pending]
+### Dependencies: None
+### Description: Read the PRD.md file thoroughly to understand the exact requirements for the store screen, tabs, grid layout, mock purchases, and gem earning system. Verify that this task aligns with the PRD specifications.
+### Details:
+- Read the complete PRD.md file focusing on store and monetization section
+- Identify specific tab requirements, item display, and purchase specifications
+- Verify task description matches PRD store requirements
+- Note any additional store requirements or clarifications needed
+- Document findings for implementation reference
+
+## 7. Verify Store Screen Implementation Against PRD.md [pending]
+### Dependencies: None
+### Description: After completing all store screen implementation subtasks, verify that the final result meets all store requirements specified in the PRD.md file. Ensure tabs, grid layout, mock purchases, and gem earning align with PRD specifications.
+### Details:
+- Review completed store implementation against PRD.md requirements
+- Verify all store tabs (themes, boards, symbols, gems) work correctly
+- Confirm grid layout and item previews meet specifications
+- Validate mock purchase functionality and gem earning system
+- Document any deviations or additional store features implemented
+

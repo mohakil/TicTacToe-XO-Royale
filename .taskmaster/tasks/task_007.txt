@@ -1,0 +1,55 @@
+# Task ID: 7
+# Title: Build Loading Screen with Animated Background and Tips Carousel
+# Status: pending
+# Dependencies: 3, 5
+# Priority: high
+# Description: Implement the loading screen with CustomPainter animated background, pulsating logo, progress bar, and swipeable tips carousel. Ensure accessibility and performance targets.
+# Details:
+- Use CustomPainter for animated shapes (low CPU).
+- Implement logo_animation.dart for pulsating glow.
+- Add Material 3 progress bar with gradient.
+- Build tips_carousel.dart with auto-advance and swipe.
+- Ensure luminance change ≤ 30%.
+
+# Test Strategy:
+Simulate loading delays. Validate animation smoothness (≥60 FPS), accessibility (contrast, luminance), and carousel interaction.
+
+# Subtasks:
+## 1. Implement Animated Background with CustomPainter [pending]
+### Dependencies: None
+### Description: Create the animated background using CustomPainter for efficient rendering of shapes. Ensure low CPU usage and smooth animation.
+### Details:
+Focus on performance and visual appeal. Implement the CustomPainter logic in a separate file for reusability.
+
+## 2. Build Tips Carousel with Auto-Advance and Swipe Functionality [pending]
+### Dependencies: None
+### Description: Develop the tips carousel using PageView or similar widget. Implement auto-advance functionality and enable swipe gestures for user interaction.
+### Details:
+Ensure smooth transitions between tips and handle edge cases for the carousel. Consider accessibility for users with disabilities.
+
+## 3. Integrate Animated Background and Tips Carousel into Loading Screen [pending]
+### Dependencies: 7.1, 7.2
+### Description: Combine the animated background and tips carousel into the main loading screen layout. Ensure proper positioning and responsiveness across different screen sizes.
+### Details:
+Test the integration thoroughly to ensure seamless transitions and a visually appealing loading experience. Address any layout issues or performance bottlenecks.
+
+## 4. Read PRD.md and Verify Loading Screen Requirements [pending]
+### Dependencies: None
+### Description: Read the PRD.md file thoroughly to understand the exact requirements for the loading screen, animated background, tips carousel, and performance specifications. Verify that this task aligns with the PRD specifications.
+### Details:
+- Read the complete PRD.md file focusing on loading screen and performance section
+- Identify specific animation requirements, tips content, and performance targets
+- Verify task description matches PRD loading screen requirements
+- Note any additional loading screen requirements or clarifications needed
+- Document findings for implementation reference
+
+## 5. Verify Loading Screen Implementation Against PRD.md [pending]
+### Dependencies: None
+### Description: After completing all loading screen implementation subtasks, verify that the final result meets all loading screen requirements specified in the PRD.md file. Ensure animations, tips carousel, and performance align with PRD specifications.
+### Details:
+- Review completed loading screen implementation against PRD.md requirements
+- Verify animated background meets PRD specifications
+- Confirm tips carousel functionality and content match requirements
+- Validate performance targets (60+ FPS) are achieved
+- Document any deviations or additional loading screen features implemented
+

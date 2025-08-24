@@ -1,0 +1,75 @@
+# Task ID: 12
+# Title: Implement Popups and Overlays: Hint, Exit, Result
+# Status: pending
+# Dependencies: 11
+# Priority: high
+# Description: Develop overlays for hint (with sparkle animation), exit confirmation, and result (win/loss/draw with effects). Use scrim blur and focus trap. Integrate with game state and controls.
+# Details:
+- Build hint_overlay.dart, exit_overlay.dart, result_overlay.dart with required animations and effects.
+- Deduct hints and update state as needed.
+- Ensure accessibility and keyboard/screen reader support.
+- Use blur_overlay.dart for modal backgrounds.
+
+# Test Strategy:
+Trigger all popups in-game. Validate animation, focus trap, and state updates. Test accessibility and blur fallback on unsupported devices.
+
+# Subtasks:
+## 1. Implement Hint Overlay [pending]
+### Dependencies: None
+### Description: Build hint_overlay.dart with sparkle animation and hint deduction logic. Update game state accordingly.
+### Details:
+- Implement UI for hint overlay.
+- Add sparkle animation.
+- Deduct hints and update game state.
+
+## 2. Implement Exit Confirmation Overlay [pending]
+### Dependencies: None
+### Description: Build exit_overlay.dart for exit confirmation with focus trap and accessibility support.
+### Details:
+- Implement UI for exit confirmation overlay.
+- Add focus trap.
+- Ensure accessibility.
+
+## 3. Implement Result Overlay (Win/Loss/Draw) [pending]
+### Dependencies: None
+### Description: Build result_overlay.dart with win/loss/draw effects and integrate with game state.
+### Details:
+- Implement UI for result overlay.
+- Add win/loss/draw effects.
+- Integrate with game state.
+
+## 4. Implement Common Blur Overlay [pending]
+### Dependencies: None
+### Description: Implement blur_overlay.dart for modal backgrounds with scrim blur effect.
+### Details:
+- Implement blur overlay.
+- Add scrim blur effect.
+
+## 5. Integrate Popups with Game State and Controls [pending]
+### Dependencies: 12.1, 12.2, 12.3, 12.4
+### Description: Integrate all popups with game state and controls, ensuring proper triggering and state updates.
+### Details:
+- Integrate hint overlay with hint button.
+- Integrate exit overlay with exit button.
+- Integrate result overlay with game end logic.
+
+## 6. Read PRD.md and Verify Popups & Overlays Requirements [pending]
+### Dependencies: None
+### Description: Read the PRD.md file thoroughly to understand the exact requirements for popups, overlays, hint system, exit confirmation, and result displays. Verify that this task aligns with the PRD specifications.
+### Details:
+- Read the complete PRD.md file focusing on popups and overlays section
+- Identify specific overlay requirements, animations, and accessibility needs
+- Verify task description matches PRD popup requirements
+- Note any additional popup requirements or clarifications needed
+- Document findings for implementation reference
+
+## 7. Verify Popups & Overlays Implementation Against PRD.md [pending]
+### Dependencies: None
+### Description: After completing all popups and overlays implementation subtasks, verify that the final result meets all popup requirements specified in the PRD.md file. Ensure hint overlay, exit confirmation, result overlay, and blur effects align with PRD specifications.
+### Details:
+- Review completed popups implementation against PRD.md requirements
+- Verify hint overlay with sparkle animation meets specifications
+- Confirm exit confirmation and result overlay functionality
+- Validate blur overlay and focus trap accessibility
+- Document any deviations or additional popup features implemented
+

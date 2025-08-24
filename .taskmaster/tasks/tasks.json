@@ -1,0 +1,1208 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Setup Project Repository and Scaffold",
+        "description": "Initialize the Flutter project with the specified name, package, and directory structure. Configure pubspec.yaml with all required dependencies, fonts, and assets. Prepare the feature-first folder structure as described in the PRD.",
+        "details": "- Run `flutter create --org com.astrixforge tictactoe_xo_royale`.\n- Set up the directory structure under lib/ as per PRD.\n- Add all dependencies, fonts, and assets to pubspec.yaml.\n- Configure lints and code generation tools.\n- Add placeholder assets and README with CustomPainter/Flutter/Material 3 usage notes.",
+        "testStrategy": "Build the app on Android and iOS simulators. Verify project structure, dependency resolution, and that the app runs with a blank screen and no errors.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Read PRD.md and Get More Info About Task, Verify It, Then Process Task",
+            "description": "Read the PRD.md file thoroughly to understand the exact requirements for project setup and scaffolding. Get comprehensive information about the task, verify it aligns with PRD specifications, identify any missing requirements or clarifications needed, and then proceed with task processing.",
+            "details": "- Read the complete PRD.md file focusing on project setup and scaffolding section\n- Identify specific requirements for project creation, directory structure, dependencies, and configuration\n- Verify task description matches PRD specifications\n- Note any additional requirements or clarifications needed\n- Document findings for implementation reference\n- Process the task based on verified PRD requirements",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 1
+          },
+          {
+            "id": 2,
+            "title": "Initialize Flutter Project",
+            "description": "Run `flutter create --org com.astrixforge tictactoe_xo_royale` to create the base Flutter project.",
+            "details": "- Run flutter create command with specified organization and project name\n- Verify project structure is created correctly\n- Check that all basic Flutter files are present",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 1
+          },
+          {
+            "id": 3,
+            "title": "Set Up Directory Structure",
+            "description": "Create the feature-first folder structure under `lib/` as specified in the PRD.",
+            "details": "- Create feature-first folder structure under lib/\n- Organize directories according to PRD specifications\n- Ensure proper separation of concerns",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 1
+          },
+          {
+            "id": 4,
+            "title": "Configure pubspec.yaml",
+            "description": "Add all required dependencies, fonts (Sora, Inter, JetBrains Mono), and assets to `pubspec.yaml`.",
+            "details": "- Add all required dependencies to pubspec.yaml\n- Configure fonts (Sora, Inter, JetBrains Mono)\n- Add necessary assets and resources\n- Verify dependency versions are compatible",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 1
+          },
+          {
+            "id": 5,
+            "title": "Configure Linting and Code Generation",
+            "description": "Set up lints and code generation tools for the project.",
+            "details": "- Configure linting rules and analysis options\n- Set up code generation tools\n- Ensure code quality standards are met",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 1
+          },
+          {
+            "id": 6,
+            "title": "Add Placeholder Assets and README",
+            "description": "Add placeholder assets and create a basic README.md file with notes on CustomPainter, Flutter, and Material 3 usage.",
+            "details": "- Add placeholder assets for the project\n- Create comprehensive README.md file\n- Include notes on CustomPainter, Flutter, and Material 3 usage\n- Document project setup and usage instructions",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 1
+          },
+          {
+            "id": 7,
+            "title": "Verify Implementation Against PRD.md to Ensure Meet Requirements",
+            "description": "After completing all implementation subtasks, verify that the final result meets all requirements specified in the PRD.md file. Ensure project setup, directory structure, dependencies, and configuration align with PRD specifications.",
+            "details": "- Review completed implementation against PRD.md requirements\n- Verify project structure matches PRD specifications\n- Confirm all dependencies and assets are properly configured\n- Validate that setup instructions and documentation are complete\n- Document any deviations or additional features implemented\n- Ensure all PRD requirements are met",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 1
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Implement Theming: Material 3 ColorScheme, Typography, ThemeExtensions",
+        "description": "Create light/dark ColorSchemes from PRD tokens. Implement ThemeExtensions for game-specific colors, motion, and elevations. Set up custom typography with Sora, Inter, JetBrains Mono.",
+        "details": "- Define color_schemes.dart for light/dark schemes using PRD tokens.\n- Implement theme_extensions.dart for GameColors, MotionDurations, etc.\n- Set up typography.dart with custom text themes and font weights.\n- Ensure all tokens and gradients are accessible via ThemeData.\n- Enable useMaterial3 = true in app.dart.",
+        "testStrategy": "Switch between light/dark themes. Check all tokens via a theme playground widget. Validate contrast ratios and typography scaling with MediaQuery.textScaleFactor.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Read PRD.md and Get More Info About Task, Verify It, Then Process Task",
+            "description": "Read the PRD.md file thoroughly to understand the exact theming requirements, color tokens, typography specifications, and Material 3 implementation details. Get comprehensive information about the task, verify it aligns with PRD specifications, identify any missing requirements or clarifications needed, and then proceed with task processing.",
+            "details": "- Read the complete PRD.md file focusing on theming section\n- Identify specific color tokens, typography requirements, and Material 3 specifications\n- Verify task description matches PRD theming requirements\n- Note any additional theming requirements or clarifications needed\n- Document findings for implementation reference\n- Process the task based on verified PRD requirements",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 2
+          },
+          {
+            "id": 2,
+            "title": "Define Material 3 ColorSchemes",
+            "description": "Implement color_schemes.dart to define light and dark ColorSchemes based on the PRD tokens. Ensure all color tokens are accessible.",
+            "details": "- Implement color_schemes.dart with light and dark ColorSchemes\n- Use PRD color tokens as specified\n- Ensure all colors meet accessibility standards\n- Test color contrast ratios",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 2
+          },
+          {
+            "id": 3,
+            "title": "Implement ThemeExtensions",
+            "description": "Implement theme_extensions.dart for game-specific theming, including GameColors, MotionDurations, and Elevations. Ensure these extensions are properly integrated into the ThemeData.",
+            "details": "- Implement theme_extensions.dart with GameColors, MotionDurations, and Elevations\n- Integrate extensions into ThemeData\n- Ensure proper theming structure\n- Test theme switching functionality",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 2
+          },
+          {
+            "id": 4,
+            "title": "Set Up Custom Typography",
+            "description": "Set up typography.dart with custom text themes and font weights using Sora, Inter, and JetBrains Mono fonts. Ensure proper scaling and accessibility.",
+            "details": "- Set up typography.dart with custom text themes\n- Configure Sora, Inter, and JetBrains Mono fonts\n- Ensure proper font scaling\n- Test accessibility features",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 2
+          },
+          {
+            "id": 5,
+            "title": "Verify Implementation Against PRD.md to Ensure Meet Requirements",
+            "description": "After completing all theming implementation subtasks, verify that the final result meets all theming requirements specified in the PRD.md file. Ensure color schemes, typography, and Material 3 implementation align with PRD specifications.",
+            "details": "- Review completed theming implementation against PRD.md requirements\n- Verify color schemes match PRD token specifications\n- Confirm typography implementation follows PRD font and weight requirements\n- Validate Material 3 implementation and theme extensions\n- Document any deviations or additional theming features implemented\n- Ensure all PRD theming requirements are met\n<info added on 2025-08-24T07:23:58.592Z>\n✅ VERIFICATION COMPLETE - All theming requirements from PRD.md have been successfully implemented:\n\n🎨 **Material 3 ColorSchemes**: \n- Light and dark color schemes with neuroscience-informed colors (Electric Azure #2DD4FF, Vivid Magenta #F43F9D, Lime Pulse #A3E635)\n- Complete Material 3 color tokens including surface variants, outline variants, and semantic colors\n- Game-specific colors for win/loss/draw states and special effects\n\n🔧 **ThemeExtensions**: \n- GameColors extension with light/dark variants for game-specific UI elements\n- MotionDurations extension for consistent animation timing\n- MotionEasings extension with custom curves for different interactions\n- GameElevations extension for proper depth hierarchy\n- Extension methods for easy theme access\n\n📝 **Typography**: \n- Sora Variable font for headings and display text\n- Inter Variable font for body and label text\n- JetBrains Mono for scoreboard digits with tabular figures\n- Complete Material 3 TextTheme implementation\n- Responsive typography helpers for different screen sizes\n\n🏗️ **Integration**: \n- AppTheme class properly configured with Material 3\n- Light and dark themes with all extensions\n- Component theming for buttons, cards, inputs, navigation\n- Theme mode provider for dynamic switching\n- Proper font asset configuration in pubspec.yaml\n\nAll font files are present in assets/fonts/ and the theming system is ready for use across the application.\n</info added on 2025-08-24T07:23:58.592Z>",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 2
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Configure Routing with GoRouter and Custom Transitions",
+        "description": "Set up GoRouter with typed routes for all screens. Implement custom shared axis and fade transitions as specified. Ensure navigation structure matches PRD.",
+        "details": "- Define routes: /loading, /home, /setup, /game, /store, /profile, /settings.\n- Implement route_transitions.dart for shared axis and fade transitions.\n- Integrate GoRouter in app_router.dart and app.dart.\n- Add semantic labels for navigation items.",
+        "testStrategy": "Navigate between all screens. Confirm transitions match duration/easing specs. Validate accessibility labels on navigation elements.",
+        "priority": "high",
+        "dependencies": [
+          2
+        ],
+        "status": "in-progress",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Read PRD.md and Get More Info About Task, Verify It, Then Process Task",
+            "description": "Thoroughly read the PRD.md file to understand the exact routing requirements, screen specifications, transition requirements, and navigation structure. Get comprehensive information about the task, verify it aligns with PRD specifications, identify any missing requirements or clarifications needed, and then proceed with task processing.",
+            "dependencies": [],
+            "details": "Review PRD.md, identify all routing-related specifications, and document any discrepancies or questions.",
+            "status": "in-progress",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Define Routes and Implement Custom Transitions",
+            "description": "Define typed routes for all screens (/loading, /home, /setup, /game, /store, /profile, /settings) using GoRouter. Implement custom shared axis and fade transitions in route_transitions.dart as specified in the PRD.",
+            "dependencies": [
+              "3.1"
+            ],
+            "details": "Create GoRouter routes for each screen. Implement shared axis and fade transitions with specified duration and easing. Ensure transitions are reusable and configurable.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Integrate GoRouter and Add Semantic Labels",
+            "description": "Integrate GoRouter in app_router.dart and app.dart to enable navigation. Add semantic labels for navigation items to improve accessibility.",
+            "dependencies": [
+              "3.2"
+            ],
+            "details": "Configure GoRouter in app_router.dart and app.dart. Add semantic labels to all navigation elements (e.g., buttons, links) to provide context for screen readers.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Verify Implementation Against PRD.md to Ensure Meet Requirements",
+            "description": "Verify that the final result meets all routing requirements specified in the PRD.md file. Ensure all routes, transitions, and navigation align with PRD specifications.",
+            "dependencies": [
+              "3.3"
+            ],
+            "details": "Test all routes and transitions to ensure they function as expected and match the PRD specifications. Verify navigation structure and accessibility labels.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Implement Core Models and Mock Data",
+        "description": "Define PlayerProfile, StoreItem, GameConfig, and GameState models using freezed and json_serializable. Provide mock data for profile and store as per PRD.",
+        "details": "- Implement models in core/models/ using freezed and json_serializable.\n- Add mock data for themes, board designs, symbols, gems, and profile.\n- Ensure models are immutable and support local persistence.",
+        "testStrategy": "Write unit tests for model serialization/deserialization. Validate mock data loads and updates correctly in providers.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Read PRD.md and Get More Info About Task, Verify It, Then Process Task",
+            "description": "Thoroughly read the PRD.md file to understand the exact requirements for core models (PlayerProfile, StoreItem, GameConfig, GameState), data structures, serialization needs, and mock data specifications. Get comprehensive information about the task, verify it aligns with PRD specifications, identify any missing requirements or clarifications needed, and then proceed with task processing.",
+            "dependencies": [],
+            "details": "Read PRD.md, verify task alignment, identify missing requirements, and proceed with task processing.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Implement Core Models and Mock Data",
+            "description": "Define PlayerProfile, StoreItem, GameConfig, and GameState models using freezed and json_serializable. Provide mock data for profile, themes, board designs, symbols, and gems as per PRD. Ensure models are immutable and support local persistence.",
+            "dependencies": [
+              "4.1"
+            ],
+            "details": "Implement models in core/models/ using freezed and json_serializable. Add mock data for themes, board designs, symbols, gems, and profile. Ensure models are immutable and support local persistence.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Verify Implementation Against PRD.md to Ensure Meet Requirements",
+            "description": "Verify that the final result meets all model requirements specified in the PRD.md file. Ensure all models, serialization, and mock data align with PRD specifications.",
+            "dependencies": [
+              "4.2"
+            ],
+            "details": "Verify that the final result meets all model requirements specified in the PRD.md file. Ensure all models, serialization, and mock data align with PRD specifications.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Setup State Management with Riverpod Providers",
+        "description": "Create feature-scoped and global providers for theme, settings, profile, store, and game state. Use Riverpod best practices and immutable models.",
+        "details": "- Implement providers in core/providers/ and features/*/providers/.\n- Ensure providers expose state, actions, and selectors as needed.\n- Integrate providers with UI via ConsumerWidget/HookConsumerWidget.",
+        "testStrategy": "Write unit tests for provider logic. Validate state updates and reactivity in sample widgets.",
+        "priority": "high",
+        "dependencies": [
+          4
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Read PRD.md and Get More Info About Task, Verify It, Then Process Task",
+            "description": "Thoroughly read the PRD.md file to understand the exact requirements for state management, provider architecture, and data flow specifications. Get comprehensive information about the task, verify it aligns with PRD specifications, identify any missing requirements or clarifications needed, and then proceed with task processing.",
+            "dependencies": [],
+            "details": "Review PRD.md, identify state management requirements, verify task alignment, and document any clarifications needed.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Implement Core and Feature-Scoped Riverpod Providers",
+            "description": "Create global providers in core/providers/ for theme, settings, and profile state. Implement feature-scoped providers in features/*/providers/ for store and game state. Ensure providers expose state, actions, and selectors as needed, using immutable models and Riverpod best practices.",
+            "dependencies": [
+              "5.1"
+            ],
+            "details": "Implement providers in core/providers/ and features/*/providers/. Ensure providers expose state, actions, and selectors as needed. Use Riverpod best practices and immutable models.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Verify Implementation Against PRD.md to Ensure Meet Requirements",
+            "description": "Verify that the final result meets all state management requirements specified in the PRD.md file. Ensure all providers, state flow, and data persistence align with PRD specifications. Integrate providers with UI via ConsumerWidget/HookConsumerWidget.",
+            "dependencies": [
+              "5.2"
+            ],
+            "details": "Verify that the final result meets all state management requirements specified in the PRD.md file. Ensure all providers, state flow, and data persistence align with PRD specifications.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Implement Audio and Haptic Services",
+        "description": "Create audio_service.dart using just_audio for SFX/music with caching. Implement haptic_service.dart for platform haptics. Expose toggles via settings.",
+        "details": "- Integrate just_audio for low-latency playback.\n- Preload/caches SFX/music assets.\n- Implement haptic feedback for all game events per PRD.\n- Respect user toggles and system settings.",
+        "testStrategy": "Test all sound cues and haptic events on Android/iOS. Validate toggles in settings screen. Ensure no audio/haptic when disabled.",
+        "priority": "medium",
+        "dependencies": [
+          5
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Read PRD.md and Get More Info About Task, Verify It, Then Process Task",
+            "description": "Thoroughly read the PRD.md file to understand the exact requirements for audio services, haptic feedback, and user preference settings. Get comprehensive information about the task, verify it aligns with PRD specifications, identify any missing requirements or clarifications needed, and then proceed with task processing.",
+            "dependencies": [],
+            "details": "Review PRD.md, identify audio/haptic requirements, verify task alignment, identify gaps, and prepare for implementation.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Implement Audio Services with just_audio and Caching",
+            "description": "Integrate just_audio for low-latency playback of SFX and music. Implement caching mechanisms to preload and store audio assets for efficient access.",
+            "dependencies": [
+              "6.1"
+            ],
+            "details": "Integrate just_audio, implement SFX/music caching, and ensure low-latency playback.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Implement Haptic Feedback and User Toggles",
+            "description": "Implement haptic feedback for all game events as specified in the PRD. Implement user toggles in settings to enable/disable audio and haptic feedback, respecting system settings.",
+            "dependencies": [
+              "6.1"
+            ],
+            "details": "Implement haptic feedback for game events and user toggles for audio/haptic control.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Verify Implementation Against PRD.md to Ensure Meet Requirements",
+            "description": "Verify that the final result meets all audio and haptic requirements specified in the PRD.md file. Ensure all audio services, haptic feedback, and user preferences align with PRD specifications.",
+            "dependencies": [
+              "6.2",
+              "6.3"
+            ],
+            "details": "Validate audio services, haptic feedback, and user preferences against PRD.md.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Build Loading Screen with Animated Background and Tips Carousel",
+        "description": "Implement the loading screen with CustomPainter animated background, pulsating logo, progress bar, and swipeable tips carousel. Ensure accessibility and performance targets.",
+        "details": "- Use CustomPainter for animated shapes (low CPU).\n- Implement logo_animation.dart for pulsating glow.\n- Add Material 3 progress bar with gradient.\n- Build tips_carousel.dart with auto-advance and swipe.\n- Ensure luminance change ≤ 30%.",
+        "testStrategy": "Simulate loading delays. Validate animation smoothness (≥60 FPS), accessibility (contrast, luminance), and carousel interaction.",
+        "priority": "high",
+        "dependencies": [
+          3,
+          5
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Read PRD.md and Get More Info About Task, Verify It, Then Process Task",
+            "description": "Thoroughly read the PRD.md file to understand the exact requirements for the loading screen, animated background, tips carousel, and performance specifications. Get comprehensive information about the task, verify it aligns with PRD specifications, identify any missing requirements or clarifications needed, and then proceed with task processing.",
+            "dependencies": [],
+            "details": "Review PRD.md, identify specific requirements for loading screen components, performance metrics, and accessibility standards. Document any ambiguities or missing information and seek clarification.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Implement Loading Screen with Animated Background and Tips Carousel",
+            "description": "Implement the loading screen with CustomPainter animated background, pulsating logo, progress bar, and swipeable tips carousel. Integrate all components and optimize for performance.",
+            "dependencies": [
+              "7.1"
+            ],
+            "details": "Develop CustomPainter for animated shapes, implement logo_animation.dart for pulsating glow, add Material 3 progress bar with gradient, and build tips_carousel.dart with auto-advance and swipe. Ensure luminance change ≤ 30%.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Verify Implementation Against PRD.md to Ensure Meet Requirements",
+            "description": "Verify that the final result meets all loading screen requirements specified in the PRD.md file. Ensure animations, tips carousel, and performance align with PRD specifications.",
+            "dependencies": [
+              "7.2"
+            ],
+            "details": "Validate that the implemented loading screen, animated background, tips carousel, and performance metrics align with the PRD.md specifications. Conduct thorough testing to ensure all requirements are met.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "Develop Home Screen with Hero, CTA Cards, Stats Ribbon, and Ambient Effects",
+        "description": "Create home_screen.dart with typewriter hero, CTA cards (Local/Robot), quick stats ribbon, and animated X/O background. Implement navigation to setup screen.",
+        "details": "- Use typewriter_text.dart for hero animation.\n- Build game_mode_cards.dart with hover/press/parallax.\n- Add quick_stats_ribbon.dart for stats/gems/hints.\n- Animate ambient_particles.dart with AnimatedBuilder/CustomPainter.\n- Ensure responsive layout and accessibility.",
+        "testStrategy": "Test all animations for smoothness and correct timing. Validate navigation, card states, and stats updates. Check accessibility labels and contrast.",
+        "priority": "high",
+        "dependencies": [
+          7
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Verify Home Screen Requirements in PRD",
+            "description": "Read the PRD.md document and verify all requirements related to the home screen are clearly understood and documented. Clarify any ambiguities.",
+            "dependencies": [],
+            "details": "Ensure all functional and non-functional requirements for the home screen are accounted for.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Implement Hero Section and CTA Cards",
+            "description": "Implement the hero section with typewriter animation using typewriter_text.dart. Build game_mode_cards.dart with hover/press/parallax effects for CTA cards (Local/Robot).",
+            "dependencies": [],
+            "details": "Ensure the hero animation is smooth and the CTA cards have the correct visual effects and navigation.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Verify Home Screen Implementation Against PRD",
+            "description": "After implementing all home screen components, verify that the implementation meets all requirements outlined in the PRD.md document. Address any discrepancies.",
+            "dependencies": [
+              "8.1",
+              "8.2"
+            ],
+            "details": "Perform a thorough review to ensure all features and functionalities align with the documented requirements.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "Implement Game Setup Screen with Carousels and Validation",
+        "description": "Build setup_screen.dart with mode selector, player names, first move, difficulty, board size and win condition carousels, and start button. Use CustomPainter for board previews. Validate all inputs.",
+        "details": "- Use choice_chips.dart and custom_text_field.dart for inputs.\n- Implement board_carousel.dart and win_carousel.dart with PageView and transforms.\n- Render previews with board_preview.dart (CustomPainter).\n- Disable Start if inputs invalid.\n- Responsive/adaptive layout for phones/tablets.",
+        "testStrategy": "Test all input flows, carousel snapping, and validation logic. Ensure previews render correctly and accessibility is met.",
+        "priority": "high",
+        "dependencies": [
+          8
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Verify Game Setup Screen Requirements in PRD",
+            "description": "Read the PRD.md document and verify all requirements related to the game setup screen, including input fields, validation rules, carousel behavior, and responsive layout specifications.",
+            "dependencies": [],
+            "details": "Ensure all requirements are understood and documented for subsequent implementation tasks.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Implement Input Components and Validation",
+            "description": "Implement the input components for the setup screen using choice_chips.dart and custom_text_field.dart. This includes mode selector, player names, first move, difficulty, board size and win condition. Implement input validation logic to ensure all inputs are valid before starting the game.",
+            "dependencies": [],
+            "details": "Ensure all input fields are correctly implemented and validated according to the PRD.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Implement Carousels and Board Preview",
+            "description": "Implement the board_carousel.dart and win_carousel.dart using PageView and transforms. Render board previews using board_preview.dart (CustomPainter).",
+            "dependencies": [],
+            "details": "Ensure carousels snap correctly and board previews render accurately for different board sizes and win conditions.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Implement Responsive Layout",
+            "description": "Implement a responsive and adaptive layout for the setup screen to ensure it looks good on both phones and tablets.",
+            "dependencies": [],
+            "details": "Use appropriate layout techniques to adapt the UI to different screen sizes and orientations.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Verify Implementation Against PRD",
+            "description": "Verify that the implemented game setup screen meets all the requirements specified in the PRD.md document. This includes input validation, carousel behavior, board preview rendering, and responsive layout.",
+            "dependencies": [
+              "9.1",
+              "9.2",
+              "9.3",
+              "9.4"
+            ],
+            "details": "Ensure all aspects of the setup screen are implemented correctly and according to the PRD.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "title": "Implement Game Logic and Robot AI (Easy/Medium/Hard)",
+        "description": "Develop core game logic for board state, win/draw detection, and robot AI for all difficulties. Use efficient algorithms and ensure testability.",
+        "details": "- Implement game_logic.dart for move validation, win/draw detection, and state transitions.\n- Develop robot_logic.dart for Easy (random/blunder), Medium (minimax depth-limited), Hard (optimal/alpha-beta).\n- Expose hint logic for hint system.\n- Optimize for performance and maintainability.",
+        "testStrategy": "Write comprehensive unit tests for all game logic and AI behaviors. Validate correctness for all board sizes and win conditions.",
+        "priority": "high",
+        "dependencies": [
+          4,
+          9
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Verify Requirements in PRD",
+            "description": "Read the PRD.md document and verify all requirements related to game logic and robot AI are understood and documented.",
+            "dependencies": [],
+            "details": "Review the PRD for specific rules, AI behavior, and hint system requirements. Document any ambiguities or questions.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Implement Core Game Rules and Win/Draw Detection",
+            "description": "Implement the core game rules in game_logic.dart, including move validation, board state updates, and win/draw detection logic.",
+            "dependencies": [
+              "10.1"
+            ],
+            "details": "Focus on correctness and efficiency of the game rules. Implement unit tests to validate all possible game states and outcomes.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Implement Easy AI",
+            "description": "Develop the Easy AI in robot_logic.dart using a random move selection or simple blunder-based strategy.",
+            "dependencies": [
+              "10.2"
+            ],
+            "details": "The Easy AI should be easily beatable and make obvious mistakes. Implement unit tests to ensure it behaves as expected.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Implement Medium AI",
+            "description": "Develop the Medium AI in robot_logic.dart using a minimax algorithm with a limited search depth.",
+            "dependencies": [
+              "10.2"
+            ],
+            "details": "The Medium AI should provide a reasonable challenge. Optimize the minimax algorithm for performance and implement unit tests to validate its behavior.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Implement Hard AI and Hint Logic",
+            "description": "Develop the Hard AI in robot_logic.dart using an optimal strategy or alpha-beta pruning. Implement hint logic to suggest moves to the player.",
+            "dependencies": [
+              "10.2"
+            ],
+            "details": "The Hard AI should be difficult to beat. Optimize the algorithm for performance. Implement unit tests to validate its behavior and the correctness of the hint logic.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Verify Implementation Against PRD",
+            "description": "Verify that the implemented game logic and AI meet all requirements specified in the PRD.md document.",
+            "dependencies": [
+              "10.3",
+              "10.4",
+              "10.5"
+            ],
+            "details": "Perform thorough testing to ensure all game rules, AI behaviors, and hint system functionality are implemented correctly and according to the PRD.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "title": "Build Game Screen: CustomPainter Board, Animations, HUD, and Controls",
+        "description": "Create game_screen.dart with CustomPainter board, animated X/O marks, winning line, particle effects, overlays for scoreboard, turn indicator, and bottom controls. Integrate input handling and performance optimizations.",
+        "details": "- Implement tic_tac_toe_board.dart and painters for board, cells, marks, winning line, confetti, hint sparkle, ambient.\n- Use AnimationController for all timed effects (60–144 FPS).\n- Overlay HUD: scoreboard, turn indicator, control bar.\n- Handle gestures and input via GestureDetector.\n- Use RepaintBoundary and cache Paint objects.\n- Ensure responsive/adaptive layout for all devices.",
+        "testStrategy": "Play full games on all board sizes/difficulties. Validate animation smoothness, input accuracy, and overlay correctness. Profile frame times and memory usage.",
+        "priority": "high",
+        "dependencies": [
+          10
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Verify Requirements Against PRD",
+            "description": "Read the PRD.md document and verify all requirements related to the game screen are understood and accounted for.",
+            "dependencies": [],
+            "details": "Ensure all functional and non-functional requirements are clear.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Implement Board Rendering with CustomPainter",
+            "description": "Implement the tic_tac_toe_board.dart using CustomPainter to draw the board, cells, and X/O marks.",
+            "dependencies": [],
+            "details": "Focus on visual accuracy and performance. Cache Paint objects and use RepaintBoundary.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Implement Mark and Winning Line Animations",
+            "description": "Implement animations for X/O marks appearing and the winning line using AnimationController.",
+            "dependencies": [
+              "11.2"
+            ],
+            "details": "Ensure smooth animations at 60-144 FPS. Include animations for hint sparkle and ambient effects.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Implement Particle Effects",
+            "description": "Implement particle effects such as confetti for winning games using CustomPainter and AnimationController.",
+            "dependencies": [
+              "11.3"
+            ],
+            "details": "Optimize particle rendering for performance.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Implement HUD Overlays",
+            "description": "Implement the HUD overlays for the scoreboard, turn indicator, and any other relevant game information.",
+            "dependencies": [],
+            "details": "Ensure the HUD is responsive and adapts to different screen sizes.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Implement Control Bar and Gesture Handling",
+            "description": "Implement the control bar at the bottom of the screen and handle user gestures for game interactions using GestureDetector.",
+            "dependencies": [],
+            "details": "Ensure accurate input handling and responsive feedback.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 7,
+            "title": "Verify Implementation Against PRD",
+            "description": "Verify the implemented game screen against the PRD.md document to ensure all requirements are met.",
+            "dependencies": [
+              "11.2",
+              "11.3",
+              "11.4",
+              "11.5",
+              "11.6"
+            ],
+            "details": "Ensure all functional and non-functional requirements are satisfied.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 12,
+        "title": "Implement Popups and Overlays: Hint, Exit, Result",
+        "description": "Develop overlays for hint (with sparkle animation), exit confirmation, and result (win/loss/draw with effects). Use scrim blur and focus trap. Integrate with game state and controls.",
+        "details": "- Build hint_overlay.dart, exit_overlay.dart, result_overlay.dart with required animations and effects.\n- Deduct hints and update state as needed.\n- Ensure accessibility and keyboard/screen reader support.\n- Use blur_overlay.dart for modal backgrounds.",
+        "testStrategy": "Trigger all popups in-game. Validate animation, focus trap, and state updates. Test accessibility and blur fallback on unsupported devices.",
+        "priority": "high",
+        "dependencies": [
+          11
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Verify Requirements in PRD",
+            "description": "Read the PRD.md document and verify all requirements related to popups and overlays (Hint, Exit, Result) are clearly understood and documented.",
+            "dependencies": [],
+            "details": "Ensure all functional and non-functional requirements are accounted for, including animations, accessibility, and integration points.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Implement Blur Overlay",
+            "description": "Develop the common blur overlay component (blur_overlay.dart) for modal backgrounds.",
+            "dependencies": [],
+            "details": "Implement the blur effect and ensure it works correctly on different platforms. Consider fallback mechanisms for devices that don't support blur.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Implement Hint, Exit, and Result Overlays",
+            "description": "Develop the individual popup overlays: hint_overlay.dart (with sparkle animation), exit_overlay.dart (exit confirmation), and result_overlay.dart (win/loss/draw with effects).",
+            "dependencies": [
+              "12.2"
+            ],
+            "details": "Implement the UI and animations for each overlay. Ensure accessibility and keyboard/screen reader support. Implement focus trap.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Integrate Popups with Game State and Controls",
+            "description": "Integrate the popup overlays with the game state and controls. Deduct hints and update state as needed. Trigger popups based on game events.",
+            "dependencies": [
+              "12.3"
+            ],
+            "details": "Connect the hint overlay to the hint system, the exit overlay to the exit button, and the result overlay to the game over event. Ensure state updates are correct.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Verify Implementation Against PRD",
+            "description": "Verify that the implemented popups and overlays meet all requirements specified in the PRD.md document.",
+            "dependencies": [
+              "12.4"
+            ],
+            "details": "Perform thorough testing to ensure all functional and non-functional requirements are met, including animations, accessibility, and integration points. Ensure all edge cases are handled correctly.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 13,
+        "title": "Develop Settings Screen with Toggles, Theme Switch, and Data Management",
+        "description": "Create settings_screen.dart with toggles for sound, music, vibration, theme switch, about section, and clear data dialog. Persist settings to local storage.",
+        "details": "- Use toggle_setting.dart and theme_selector.dart for controls.\n- Store settings in shared_preferences via settings_provider.dart.\n- Implement about_section.dart and clear data confirmation.\n- Ensure accessibility and responsive layout.",
+        "testStrategy": "Toggle all settings and verify persistence. Test theme switching and data clearing. Validate accessibility and contrast.",
+        "priority": "medium",
+        "dependencies": [
+          5
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Verify Settings Screen Requirements",
+            "description": "Read the PRD.md document and verify all requirements related to the settings screen, including toggles, theme switch, data management, accessibility, and responsive layout.",
+            "dependencies": [],
+            "details": "Ensure a comprehensive understanding of all functional and non-functional requirements before proceeding with implementation.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Implement Core Settings Screen Features",
+            "description": "Implement the core features of the settings screen, including toggle settings (sound, music, vibration), theme switch, about section, and clear data dialog. Integrate with settings_provider.dart and shared_preferences for data persistence.",
+            "dependencies": [],
+            "details": "Utilize toggle_setting.dart, theme_selector.dart, and about_section.dart. Implement the clear data confirmation dialog and ensure proper data clearing functionality.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Verify Settings Screen Implementation Against PRD",
+            "description": "Thoroughly test the implemented settings screen against the PRD.md document to ensure all requirements are met, including functionality, accessibility, responsiveness, and data persistence.",
+            "dependencies": [
+              "13.1",
+              "13.2"
+            ],
+            "details": "Validate all settings toggles, theme switching, about section information, and clear data functionality. Verify accessibility and responsive layout across different devices and screen sizes.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 14,
+        "title": "Build User Profile Screen with Stats, History, Achievements",
+        "description": "Implement profile_screen.dart with avatar, editable nickname, login/link buttons, stats cards, history list, and achievements grid. Use mock data and local persistence.",
+        "details": "- Use profile_header.dart, stats_section.dart, history_list.dart, achievements_grid.dart.\n- Integrate with profile_provider.dart and local storage.\n- Ensure responsive layout and accessibility.",
+        "testStrategy": "Edit nickname, view stats/history/achievements. Validate data updates and persistence. Test accessibility and layout on all devices.",
+        "priority": "medium",
+        "dependencies": [
+          5
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Profile Screen: Verify Requirements in PRD",
+            "description": "Read the PRD.md document and verify all requirements related to the user profile screen are understood and accounted for.",
+            "dependencies": [],
+            "details": "Ensure all functional and non-functional requirements are clear before proceeding with implementation.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Profile Screen: Implement Header and Stats Section",
+            "description": "Implement the profile header (profile_header.dart) with avatar, editable nickname, login/link buttons, and the stats section (stats_section.dart) with relevant user statistics cards.",
+            "dependencies": [
+              "14.1"
+            ],
+            "details": "Use mock data initially. Ensure responsive layout and accessibility.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Profile Screen: Implement History List and Achievements Grid",
+            "description": "Implement the history list (history_list.dart) to display user activity and the achievements grid (achievements_grid.dart) to showcase user accomplishments.",
+            "dependencies": [
+              "14.1"
+            ],
+            "details": "Use mock data initially. Ensure responsive layout and accessibility.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Profile Screen: Integrate with Profile Provider and Local Storage",
+            "description": "Integrate the profile screen with profile_provider.dart for state management and local storage for data persistence.",
+            "dependencies": [
+              "14.2",
+              "14.3"
+            ],
+            "details": "Implement data fetching, updates, and persistence logic. Ensure data consistency.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Profile Screen: Verify Implementation Against PRD",
+            "description": "Verify the implemented profile screen against the PRD.md document to ensure all requirements are met.",
+            "dependencies": [
+              "14.4"
+            ],
+            "details": "Perform thorough testing to validate functionality, responsiveness, accessibility, and data persistence.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 15,
+        "title": "Implement Store Screen with Tabs, Grid, Mock Purchases, and Gem Earning",
+        "description": "Create store_screen.dart with tabs for themes, boards, symbols, gems. Display items in grid with previews, lock overlays, price chips, and CTAs. Implement mock gem earning via 'Watch Ad'.",
+        "details": "- Use store_tabs.dart, store_grid.dart, store_item_preview.dart, watch_ad_button.dart.\n- Update store state and gem balance in mock only.\n- Preview themes with ThemeExtensions.\n- Ensure all interactions update mock state.",
+        "testStrategy": "Navigate all tabs, attempt unlocks, use 'Watch Ad' to earn gems. Validate UI updates and state changes. Test accessibility and responsive layout.",
+        "priority": "medium",
+        "dependencies": [
+          5
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Read and Verify Store Screen Requirements in PRD",
+            "description": "Thoroughly review the PRD.md document to understand and confirm all requirements related to the store screen, including functionality, UI elements, and data handling.",
+            "dependencies": [],
+            "details": "Focus on sections detailing store tabs, grid layout, item previews, mock purchase flow, and gem earning mechanics. Document any discrepancies or ambiguities.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Implement Store Tabs and Grid Layout",
+            "description": "Create the tabbed interface for the store screen using store_tabs.dart. Implement the grid layout using store_grid.dart to display store items within each tab.",
+            "dependencies": [
+              "15.1"
+            ],
+            "details": "Ensure tabs are correctly linked to their respective content (themes, boards, symbols, gems). The grid should dynamically adapt to different screen sizes and orientations.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Render Store Item Previews with Lock Overlays, Price Chips, and CTAs",
+            "description": "Implement the rendering of individual store items within the grid using store_item_preview.dart. Include lock overlays for unavailable items, price chips indicating the cost, and call-to-action buttons (CTAs) for purchasing or unlocking.",
+            "dependencies": [
+              "15.2"
+            ],
+            "details": "Utilize ThemeExtensions for previewing themes. Ensure the UI accurately reflects the item's availability and cost.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Implement Mock Purchase Flow and Gem Earning System",
+            "description": "Implement the mock purchase flow, allowing users to 'purchase' items using gems. Integrate the 'Watch Ad' button (watch_ad_button.dart) to enable users to earn gems.",
+            "dependencies": [
+              "15.3"
+            ],
+            "details": "Update the store state and gem balance in mock only. Ensure the UI reflects the updated gem balance and item availability after a purchase or gem earning.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Verify Store Screen Implementation Against PRD",
+            "description": "Thoroughly test the implemented store screen against the requirements outlined in the PRD.md document.",
+            "dependencies": [
+              "15.4"
+            ],
+            "details": "Verify all UI elements, functionality, and data handling match the specifications. Ensure the mock purchase flow and gem earning system function as expected. Address any discrepancies or bugs identified during testing.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 16,
+        "title": "Implement Accessibility, Responsive, and Performance Enhancements",
+        "description": "Ensure all screens and widgets meet accessibility, responsiveness, and performance requirements. Add semantic labels, dynamic type support, and optimize for 60–144 FPS.",
+        "details": "- Add semantic labels for all icons and controls.\n- Support MediaQuery.textScaleFactor for dynamic type.\n- Enforce contrast ratios and tap target sizes.\n- Use responsive_builder.dart and adaptive_padding.dart for layouts.\n- Profile and optimize frame times, animation counts, and memory usage.",
+        "testStrategy": "Run accessibility audits, test with screen readers, and simulate large text. Profile app for frame pacing and responsiveness on various devices.",
+        "priority": "high",
+        "dependencies": [
+          7,
+          8,
+          9,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Verify Accessibility and Performance Requirements in PRD",
+            "description": "Read the PRD.md document and verify all accessibility, responsiveness, and performance requirements are clearly defined and understood.",
+            "dependencies": [],
+            "details": "Review the PRD for specific details on semantic labeling, dynamic type support, contrast ratios, tap target sizes, responsive layouts, target FPS, and memory usage limits.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Implement Semantic Labels for Icons and Controls",
+            "description": "Add semantic labels to all icons and controls throughout the application to improve accessibility for users with screen readers.",
+            "dependencies": [
+              "16.1"
+            ],
+            "details": "Use `Semantics` widgets and `Tooltip` widgets to provide descriptive labels for all interactive elements. Ensure labels are concise and informative.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Implement Dynamic Type Support",
+            "description": "Support `MediaQuery.textScaleFactor` to allow users to adjust text size according to their preferences.",
+            "dependencies": [
+              "16.1"
+            ],
+            "details": "Ensure all text elements scale appropriately with the `textScaleFactor`. Test with various text scale settings to ensure readability and layout integrity.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Implement Responsive Layouts",
+            "description": "Utilize `responsive_builder.dart` and `adaptive_padding.dart` to create responsive layouts that adapt to different screen sizes and orientations.",
+            "dependencies": [
+              "16.1"
+            ],
+            "details": "Ensure layouts are visually appealing and functional on a variety of devices, including phones, tablets, and desktops. Test with different screen resolutions and aspect ratios.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Profile and Optimize Performance",
+            "description": "Profile the application to identify performance bottlenecks and optimize frame times, animation counts, and memory usage.",
+            "dependencies": [
+              "16.1"
+            ],
+            "details": "Use Flutter's performance profiling tools to identify areas for improvement. Optimize animations, reduce unnecessary widget rebuilds, and minimize memory allocations.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Verify Implementation Against PRD",
+            "description": "Verify that all implemented accessibility, responsiveness, and performance enhancements meet the requirements specified in the PRD.md document.",
+            "dependencies": [
+              "16.2",
+              "16.3",
+              "16.4",
+              "16.5"
+            ],
+            "details": "Conduct thorough testing to ensure that all features are working as expected and that the application meets the defined accessibility, responsiveness, and performance standards.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 17,
+        "title": "Write Unit and Widget Tests for Core Features",
+        "description": "Develop comprehensive unit and widget tests for models, providers, game logic, and UI components. Ensure high coverage and reliability.",
+        "details": "- Write tests for all core/models, core/providers, and utils.\n- Add widget tests for key screens and widgets.\n- Use flutter_test and mock data for validation.",
+        "testStrategy": "Run all tests with `flutter test`. Ensure high coverage and all tests pass. Validate against acceptance criteria in PRD.",
+        "priority": "high",
+        "dependencies": [
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Review PRD and Define Test Scenarios",
+            "description": "Read the PRD.md document and identify specific requirements and acceptance criteria to be covered by unit and widget tests. Define detailed test scenarios for models, providers, game logic, and UI components based on the PRD.",
+            "dependencies": [],
+            "details": "Focus on identifying testable aspects of core features as defined in the PRD. Document the test scenarios to guide test implementation.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Implement Unit and Widget Tests",
+            "description": "Write unit tests for core/models, core/providers, and utils using flutter_test and mock data. Implement widget tests for key screens (e.g., Home Screen, Settings Screen) and widgets (e.g., game mode cards, theme selector). Ensure comprehensive coverage of game logic and UI interactions.",
+            "dependencies": [
+              "17.1"
+            ],
+            "details": "Use mock data to isolate components and ensure testability. Aim for high test coverage and address edge cases. Include tests for error handling and boundary conditions.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Verify Implementation Against PRD and Ensure Coverage",
+            "description": "Execute all unit and widget tests and verify that the implementation meets the requirements and acceptance criteria defined in the PRD. Ensure comprehensive test coverage across all core features. Address any test failures and improve test coverage as needed.",
+            "dependencies": [
+              "17.2"
+            ],
+            "details": "Review test results and identify any gaps in coverage. Refactor code and add tests to address gaps. Ensure that all tests pass and that the implementation aligns with the PRD.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 18,
+        "title": "Prepare Documentation and README",
+        "description": "Document project structure, setup instructions, CustomPainter/Flutter/Material 3 usage, and FPS considerations. List all dependencies and assets.",
+        "details": "- Write README.md with setup, architecture, and usage notes.\n- Document where CustomPainter, Flutter, and Material 3 are used.\n- Include FPS/performance notes and testing instructions.",
+        "testStrategy": "Review documentation for completeness and clarity. Validate setup steps on a clean environment.",
+        "priority": "medium",
+        "dependencies": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Read PRD.md and Verify Requirements",
+            "description": "Thoroughly read the PRD.md document and verify all requirements related to documentation and README content are understood and accounted for.",
+            "dependencies": [],
+            "details": "Focus on sections detailing project structure, setup instructions, technology usage (CustomPainter/Flutter/Material 3), FPS considerations, dependencies, and assets.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Implement Documentation and README Content",
+            "description": "Write README.md with setup, architecture, and usage notes. Document where CustomPainter, Flutter, and Material 3 are used. Include FPS/performance notes and testing instructions. List all dependencies and assets.",
+            "dependencies": [
+              "18.1"
+            ],
+            "details": "Create the README.md file and populate it with the required information. Create separate documentation files for technology usage and performance notes if necessary.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Verify Implementation Against PRD.md",
+            "description": "Ensure all documentation and README content aligns with the requirements outlined in PRD.md. Validate setup steps on a clean environment.",
+            "dependencies": [
+              "18.2"
+            ],
+            "details": "Review the completed documentation and README against the PRD.md. Test the setup instructions on a fresh environment to ensure they are accurate and complete.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 19,
+        "title": "Dependency Analysis and Best Practices Documentation",
+        "description": "Research and document all project dependencies, including Flutter SDK, Dart packages, and development tools. Analyze current versions against the latest stable releases, document best practices for dependency management, and provide version recommendations.",
+        "details": "- Research current Flutter SDK version and Dart packages listed in `pubspec.yaml`.\n- Identify development dependencies (linters, code generators, etc.).\n- Analyze current versions against the latest stable releases as of August 2025.\n- Document best practices for dependency management, including version pinning strategies and semantic versioning.\n- Research security considerations for each dependency and document potential vulnerabilities.\n- Define upgrade paths for dependencies, including potential breaking changes and migration strategies.\n- Provide specific version recommendations with rationale for each dependency, focusing on performance, security, and maintainability aspects.\n- Document the process for updating dependencies and testing the application after updates.\n- Include a section on resolving dependency conflicts and managing transitive dependencies.\n- Document the use of `flutter pub outdated` and similar tools for dependency analysis.",
+        "testStrategy": "- Verify that all dependencies are correctly listed and documented.\n- Confirm that version recommendations are accurate and justified.\n- Ensure that the documentation covers best practices for dependency management and security.\n- Validate that upgrade paths are clearly defined and include potential breaking changes.\n- Check that the documentation includes instructions for resolving dependency conflicts.\n- Review the documentation for completeness and clarity with a senior developer.",
+        "status": "done",
+        "dependencies": [
+          1
+        ],
+        "priority": "medium",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Flutter SDK Analysis",
+            "description": "Research the current Flutter SDK version used in the project and compare it against the latest stable release as of August 2025. Document any significant changes, improvements, or deprecations.",
+            "dependencies": [],
+            "details": "Include specific version numbers and links to official Flutter documentation.\n<info added on 2025-08-24T07:32:32.194Z>\nFlutter SDK Analysis Complete:\n\nCurrent Version: Flutter SDK ^3.9.0 (from pubspec.yaml)\nLatest Stable Version (August 2025): Flutter 3.35 with Dart 3.9.0-333.2.beta\n\nKey Findings:\n- Project is using Flutter 3.9.0 which is significantly behind the latest stable 3.35\n- Flutter 3.35 includes new features like hot reload for web and deprecation of IDE support for Flutter SDKs before 3.13\n- Security recommendation: Upgrade to Flutter 3.35 for latest security patches and features\n\nUpgrade Path:\n1. Update Flutter SDK: flutter upgrade\n2. Update pubspec.yaml to use Flutter SDK >=3.35.0\n3. Test application thoroughly after upgrade\n4. Review breaking changes in Flutter changelog\n\nSecurity Best Practices Identified:\n- Keep Flutter SDK updated regularly for security patches\n- Subscribe to flutter-announce mailing list for security updates\n- Monitor Flutter release notes for security-related fixes\n</info added on 2025-08-24T07:32:32.194Z>",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "pubspec.yaml Package Analysis",
+            "description": "Analyze all Dart packages listed in the `pubspec.yaml` file. Identify the purpose of each package and its current version.",
+            "dependencies": [],
+            "details": "Create a table or spreadsheet listing each package, its description, and current version.\n<info added on 2025-08-24T07:34:45.114Z>\n**Current vs Latest Versions (August 2025):**\n- flutter_riverpod: ^2.5.1 → Latest: 2.6.1 (stable), 3.0.0-dev.17 (prerelease)\n- go_router: ^13.2.4 → Latest: 16.2.0 (published 5 days ago)\n- google_fonts: ^6.2.1 → Latest: Still current (no newer stable found)\n- audioplayers: ^6.0.0 → Latest: Still maintained, active development\n- shared_preferences: ^2.2.3 → Latest: 2.5.3 (published 4 months ago)\n- device_info_plus: ^10.1.0 → Latest: 11.5.0 (published 2 months ago)\n- json_annotation: ^4.9.0 → Latest: Still current\n\n**Development Dependencies:**\n- build_runner: ^2.4.9 → Needs version check\n- freezed: ^2.5.2 → Needs version check\n- json_serializable: ^6.8.0 → Needs version check\n- riverpod_generator: ^2.4.0 → Should align with Riverpod version\n- riverpod_lint: ^2.3.10 → Should align with Riverpod version\n\n**Security & Best Practices:**\n- Most packages are significantly behind latest versions\n- go_router has major version updates (13.2.4 → 16.2.0) with breaking changes\n- Riverpod has v3.0 prerelease with new features\n- Regular updates needed for security patches and performance improvements\n\n**Upgrade Priority:**\n1. HIGH: go_router (major version behind)\n2. HIGH: shared_preferences (security updates)\n3. MEDIUM: device_info_plus (feature updates)\n4. MEDIUM: flutter_riverpod (consider v3.0 migration)\n5. LOW: Other packages (minor updates)\n</info added on 2025-08-24T07:34:45.114Z>",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Development Dependency Identification",
+            "description": "Identify all development dependencies used in the project, such as linters, code generators, and testing frameworks.",
+            "dependencies": [],
+            "details": "Document how each dependency is used and its impact on the development workflow.\n<info added on 2025-08-24T07:36:19.944Z>\nCompleted comprehensive security audit of dependencies. Key findings and recommendations:\n\n**Security Audit Tools Available:**\n1. **OSV-Scanner (Google)** - Primary recommendation for Flutter/Dart projects\n   - Scans pubspec.lock against OSV vulnerability database\n   - Command: `osv-scanner -r <project_path>` or `osv-scanner --lockfile=pubspec.lock`\n   - Supports GitHub Advisory Database, PyPI, Go, Rust, and Pub ecosystems\n   - Free, automated vulnerability detection\n\n2. **Dependabot (GitHub)** - Automated security updates\n   - Now supports Pub packages (since Nov 2022)\n   - Automatically creates PRs for vulnerable dependencies\n   - Integrates with GitHub repositories\n\n3. **Flutter Built-in Commands:**\n   - `flutter pub outdated` - Check for outdated packages\n   - `flutter pub upgrade` - Update to latest compatible versions\n   - `flutter pub deps` - Analyze dependency tree for conflicts\n\n**Current Project Security Assessment:**\n- **CRITICAL**: No automated vulnerability scanning currently implemented\n- **HIGH RISK**: Multiple packages significantly behind latest versions\n- **MEDIUM RISK**: No dependency pinning strategy documented\n\n**Security Best Practices Implementation:**\n1. **Regular Updates** - Keep Flutter SDK and packages current\n2. **Avoid Version Pinning** - Unless regularly checked for security updates\n3. **Dependency Auditing** - Run `flutter pub outdated` and `flutter pub upgrade` regularly\n4. **Vulnerability Monitoring** - Implement OSV-Scanner in CI/CD pipeline\n5. **Remove Unused Dependencies** - Clean up pubspec.yaml regularly\n6. **Active Maintenance Check** - Verify packages have active maintainers\n\n**Immediate Actions Required:**\n1. Install and run OSV-Scanner on current project\n2. Set up Dependabot for automated security updates\n3. Create security update schedule (monthly reviews)\n4. Document dependency management policy\n5. Implement CI/CD security scanning\n\n**Security Reporting:**\n- Flutter vulnerabilities: security@flutter.dev\n- Subscribe to flutter-announce mailing list for security updates\n- Monitor GitHub Advisory Database for Dart/Flutter packages\n</info added on 2025-08-24T07:36:19.944Z>",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Security Audit of Dependencies",
+            "description": "Research security considerations for each dependency and document potential vulnerabilities. Check for known security issues and advisories.",
+            "dependencies": [
+              "19.2",
+              "19.3"
+            ],
+            "details": "Use tools like `pub audit` and online vulnerability databases to identify potential risks.\n<info added on 2025-08-24T07:37:09.070Z>\nComprehensive version comparison and upgrade recommendations based on August 2025 data:\n\n**FLUTTER SDK COMPARISON:**\n- Current: ^3.9.0 (March 2024)\n- Latest Stable: 3.35 (August 14, 2025)\n- Dart Version: 3.9.0-333.2.beta\n- Gap: ~17 months behind\n- **RECOMMENDATION: HIGH PRIORITY UPGRADE**\n\n**PACKAGE VERSION ANALYSIS (August 2025):**\n\n**HIGH PRIORITY UPGRADES:**\n1. **go_router**: 7.1.1 → 16.2.0 (Latest: Aug 18, 2025)\n   - Major version jump with breaking changes\n   - Feature-complete, focus on stability\n   - Critical for navigation improvements\n\n2. **shared_preferences**: 2.2.2 → 2.5.3 (Latest: Apr 2025)\n   - 3 minor versions behind\n   - Important for data persistence\n\n**MEDIUM PRIORITY UPGRADES:**\n3. **device_info_plus**: 9.1.0 → 11.5.0 (Latest: Jun 2025)\n   - 2 major versions behind\n   - Enhanced device detection capabilities\n\n4. **flutter_riverpod**: 2.4.9 → 2.6.1 (Stable) / 3.0.0-dev.17 (Prerelease)\n   - Riverpod 3.0 brings significant improvements\n   - Consider prerelease for new projects\n\n**LOW PRIORITY UPGRADES:**\n5. **google_fonts**: 6.1.0 → Latest available\n6. **audioplayers**: 5.2.1 → Latest available\n7. **json_annotation**: 4.8.1 → Latest available\n\n**DEVELOPMENT DEPENDENCIES TO CHECK:**\n- build_runner\n- json_serializable\n- flutter_lints\n- flutter_test (SDK)\n\n**UPGRADE STRATEGY RECOMMENDATIONS:**\n\n**Phase 1 - Foundation (Week 1):**\n1. Upgrade Flutter SDK to 3.35\n2. Run `flutter pub upgrade --major-versions`\n3. Test basic app functionality\n\n**Phase 2 - Critical Packages (Week 2):**\n1. Upgrade go_router (expect breaking changes)\n2. Update navigation code for new API\n3. Upgrade shared_preferences\n4. Test data persistence\n\n**Phase 3 - Supporting Packages (Week 3):**\n1. Upgrade device_info_plus\n2. Consider Riverpod 3.0 migration\n3. Update remaining packages\n\n**BREAKING CHANGES TO EXPECT:**\n- **go_router 16.x**: Route configuration changes, navigation API updates\n- **Flutter 3.35**: Potential widget API changes, new Material Design updates\n- **Riverpod 3.0**: New syntax, improved performance, breaking API changes\n\n**TESTING STRATEGY:**\n1. Create feature branch for upgrades\n2. Upgrade incrementally, not all at once\n3. Run full test suite after each major upgrade\n4. Test on multiple devices/platforms\n5. Performance testing for Riverpod changes\n\n**RISK MITIGATION:**\n- Backup current working version\n- Document current functionality before upgrade\n- Plan rollback strategy\n- Allocate extra time for go_router migration\n- Consider gradual Riverpod 3.0 adoption\n\n**BENEFITS OF UPGRADING:**\n- Latest security patches\n- Performance improvements\n- New Flutter 3.35 features (hot reload for web, etc.)\n- Better development experience\n- Long-term maintainability\n</info added on 2025-08-24T07:37:09.070Z>",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Version Comparison and Recommendation",
+            "description": "Compare current dependency versions against the latest stable releases as of August 2025. Provide specific version recommendations with rationale for each dependency, focusing on performance, security, and maintainability aspects.",
+            "dependencies": [
+              "19.1",
+              "19.2",
+              "19.3"
+            ],
+            "details": "Justify each version recommendation with evidence from release notes, performance benchmarks, or security advisories.\n<info added on 2025-08-24T07:38:04.392Z>\nCompleted comprehensive Flutter dependency management best practices documentation (August 2025):\n\n**CORE DEPENDENCY MANAGEMENT PRINCIPLES:**\n\n**1. VERSION MANAGEMENT STRATEGY**\n- **Semantic Versioning**: Use caret (^) constraints for automatic minor/patch updates\n- **Avoid Exact Pinning**: Unless security requires it, avoid exact versions (=1.0.0)\n- **Regular Updates**: Monthly dependency review and updates\n- **Staged Upgrades**: Test major version upgrades in separate branches\n\n**2. SECURITY-FIRST APPROACH**\n- **Automated Scanning**: Implement OSV-Scanner in CI/CD pipeline\n- **Dependabot Integration**: Enable GitHub Dependabot for Pub packages\n- **Vulnerability Monitoring**: Subscribe to flutter-announce for security updates\n- **Regular Audits**: Run `flutter pub outdated` weekly\n- **Clean Dependencies**: Remove unused packages immediately\n\n**3. FLUTTER SDK MAINTENANCE**\n- **Stay Current**: Keep within 2-3 months of latest stable\n- **LTS Strategy**: For production apps, consider Flutter's stable channel\n- **Testing**: Always test SDK upgrades in development environment first\n- **Documentation**: Track SDK upgrade impacts and breaking changes\n\n**4. PACKAGE SELECTION CRITERIA**\n- **Active Maintenance**: Check last update date (< 6 months preferred)\n- **Community Support**: High pub.dev scores and GitHub stars\n- **Official Packages**: Prefer Flutter team or Google-maintained packages\n- **Null Safety**: Ensure all packages support null safety\n- **Platform Support**: Verify support for target platforms\n\n**5. DEVELOPMENT WORKFLOW BEST PRACTICES**\n\n**Daily Commands:**\n```bash\n# Check for outdated packages\nflutter pub outdated\n\n# Analyze dependency tree\nflutter pub deps\n\n# Clean and get dependencies\nflutter clean && flutter pub get\n```\n\n**Weekly Commands:**\n```bash\n# Security scan (if OSV-Scanner installed)\nosv-scanner -r .\n\n# Upgrade compatible versions\nflutter pub upgrade\n```\n\n**Monthly Commands:**\n```bash\n# Major version upgrades (with testing)\nflutter pub upgrade --major-versions\n\n# Dependency analysis\nflutter pub deps --style=compact\n```\n\n**6. PUBSPEC.YAML ORGANIZATION**\n```yaml\n# Group dependencies logically\ndependencies:\n  # Core Flutter\n  flutter:\n    sdk: flutter\n  \n  # State Management\n  flutter_riverpod: ^2.6.1\n  \n  # Navigation\n  go_router: ^16.2.0\n  \n  # UI/UX\n  google_fonts: ^6.1.0\n  \n  # Data/Storage\n  shared_preferences: ^2.5.3\n  \n  # Device/Platform\n  device_info_plus: ^11.5.0\n  \n  # Media\n  audioplayers: ^5.2.1\n  \n  # Serialization\n  json_annotation: ^4.8.1\n\ndev_dependencies:\n  # Testing\n  flutter_test:\n    sdk: flutter\n  \n  # Code Generation\n  build_runner: ^2.4.7\n  json_serializable: ^6.7.1\n  \n  # Linting\n  flutter_lints: ^3.0.1\n```\n\n**7. CI/CD INTEGRATION**\n```yaml\n# .github/workflows/dependencies.yml\nname: Dependency Security Check\non: [push, pull_request, schedule]\njobs:\n  security-scan:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - name: Install OSV-Scanner\n        run: go install github.com/google/osv-scanner/cmd/osv-scanner@latest\n      - name: Run OSV-Scanner\n        run: osv-scanner -r .\n```\n\n**8. DEPENDENCY CONFLICT RESOLUTION**\n- **Override Strategy**: Use dependency_overrides sparingly\n- **Version Constraints**: Adjust constraints to resolve conflicts\n- **Alternative Packages**: Consider switching to compatible alternatives\n- **Fork Strategy**: Fork and maintain packages if necessary\n\n**9. PERFORMANCE CONSIDERATIONS**\n- **Bundle Size**: Monitor app size impact of new dependencies\n- **Build Time**: Track compilation time increases\n- **Runtime Performance**: Profile apps after major upgrades\n- **Tree Shaking**: Ensure packages support tree shaking\n\n**10. DOCUMENTATION AND TRACKING**\n- **Changelog**: Maintain dependency upgrade log\n- **Breaking Changes**: Document API changes and migration steps\n- **Testing Notes**: Record test results for each upgrade\n- **Rollback Plan**: Always have a rollback strategy\n\n**11. TEAM COLLABORATION**\n- **Lock File**: Always commit pubspec.lock to version control\n- **Upgrade Coordination**: Coordinate major upgrades across team\n- **Knowledge Sharing**: Document upgrade experiences\n- **Code Reviews**: Include dependency changes in review process\n\n**12. EMERGENCY PROCEDURES**\n- **Security Patches**: Immediate upgrade process for critical vulnerabilities\n- **Rollback Process**: Quick revert to last known good state\n- **Communication**: Alert team of critical dependency issues\n- **Hotfix Strategy**: Process for emergency dependency fixes\n\n**RECOMMENDED TOOLS:**\n- **OSV-Scanner**: Primary security scanning\n- **Dependabot**: Automated updates\n- **pub.dev**: Package research and evaluation\n- **GitHub Advisory Database**: Vulnerability tracking\n- **Flutter DevTools**: Performance monitoring post-upgrade\n</info added on 2025-08-24T07:38:04.392Z>",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Best Practices Documentation",
+            "description": "Document best practices for dependency management, including version pinning strategies, semantic versioning, and dependency conflict resolution.",
+            "dependencies": [],
+            "details": "Provide clear and concise guidelines for managing dependencies effectively.",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 7,
+            "title": "Upgrade Path Definition",
+            "description": "Define upgrade paths for dependencies, including potential breaking changes and migration strategies. Document the process for updating dependencies and testing the application after updates.",
+            "dependencies": [
+              "19.5"
+            ],
+            "details": "Include step-by-step instructions and examples for upgrading dependencies safely.",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 8,
+            "title": "Dependency Analysis Tool Documentation",
+            "description": "Document the use of `flutter pub outdated` and similar tools for dependency analysis. Explain how to interpret the output and use it to make informed decisions about dependency updates.",
+            "dependencies": [],
+            "details": "Provide examples of how to use the tools and interpret their output.",
+            "status": "done",
+            "testStrategy": ""
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "created": "2025-08-24T06:11:27.921Z",
+      "updated": "2025-08-24T07:38:26.498Z",
+      "description": "Tasks for master context"
+    }
+  }
+}

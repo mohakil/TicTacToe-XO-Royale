@@ -1,0 +1,66 @@
+# Task ID: 2
+# Title: Implement Theming: Material 3 ColorScheme, Typography, ThemeExtensions
+# Status: pending
+# Dependencies: 1
+# Priority: high
+# Description: Create light/dark ColorSchemes from PRD tokens. Implement ThemeExtensions for game-specific colors, motion, and elevations. Set up custom typography with Sora, Inter, JetBrains Mono.
+# Details:
+- Define color_schemes.dart for light/dark schemes using PRD tokens.
+- Implement theme_extensions.dart for GameColors, MotionDurations, etc.
+- Set up typography.dart with custom text themes and font weights.
+- Ensure all tokens and gradients are accessible via ThemeData.
+- Enable useMaterial3 = true in app.dart.
+
+# Test Strategy:
+Switch between light/dark themes. Check all tokens via a theme playground widget. Validate contrast ratios and typography scaling with MediaQuery.textScaleFactor.
+
+# Subtasks:
+## 1. Read PRD.md and Get More Info About Task, Verify It, Then Process Task [pending]
+### Dependencies: None
+### Description: Read the PRD.md file thoroughly to understand the exact theming requirements, color tokens, typography specifications, and Material 3 implementation details. Get comprehensive information about the task, verify it aligns with PRD specifications, identify any missing requirements or clarifications needed, and then proceed with task processing.
+### Details:
+- Read the complete PRD.md file focusing on theming section
+- Identify specific color tokens, typography requirements, and Material 3 specifications
+- Verify task description matches PRD theming requirements
+- Note any additional theming requirements or clarifications needed
+- Document findings for implementation reference
+- Process the task based on verified PRD requirements
+
+## 2. Define Material 3 ColorSchemes [pending]
+### Dependencies: None
+### Description: Implement color_schemes.dart to define light and dark ColorSchemes based on the PRD tokens. Ensure all color tokens are accessible.
+### Details:
+- Implement color_schemes.dart with light and dark ColorSchemes
+- Use PRD color tokens as specified
+- Ensure all colors meet accessibility standards
+- Test color contrast ratios
+
+## 3. Implement ThemeExtensions [pending]
+### Dependencies: None
+### Description: Implement theme_extensions.dart for game-specific theming, including GameColors, MotionDurations, and Elevations. Ensure these extensions are properly integrated into the ThemeData.
+### Details:
+- Implement theme_extensions.dart with GameColors, MotionDurations, and Elevations
+- Integrate extensions into ThemeData
+- Ensure proper theming structure
+- Test theme switching functionality
+
+## 4. Set Up Custom Typography [pending]
+### Dependencies: None
+### Description: Set up typography.dart with custom text themes and font weights using Sora, Inter, and JetBrains Mono fonts. Ensure proper scaling and accessibility.
+### Details:
+- Set up typography.dart with custom text themes
+- Configure Sora, Inter, and JetBrains Mono fonts
+- Ensure proper font scaling
+- Test accessibility features
+
+## 5. Verify Implementation Against PRD.md to Ensure Meet Requirements [pending]
+### Dependencies: None
+### Description: After completing all theming implementation subtasks, verify that the final result meets all theming requirements specified in the PRD.md file. Ensure color schemes, typography, and Material 3 implementation align with PRD specifications.
+### Details:
+- Review completed theming implementation against PRD.md requirements
+- Verify color schemes match PRD token specifications
+- Confirm typography implementation follows PRD font and weight requirements
+- Validate Material 3 implementation and theme extensions
+- Document any deviations or additional theming features implemented
+- Ensure all PRD theming requirements are met
+

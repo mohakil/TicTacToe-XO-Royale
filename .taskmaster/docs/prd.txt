@@ -1,0 +1,127 @@
+# Tic Tac Toe XO Royale - Product Requirements Document
+
+## Project Overview
+Build a modern, sleek, premium Tic Tac Toe mobile game with obsessive attention to motion, color psychology, and Material 3 coherence. Use Flutter for all app functionality including the interactive game canvas, animations, and celebrations. Adhere to best practices for responsiveness, accessibility, and 60–144 FPS performance on Android and iOS (phones and tablets).
+
+## Tech Stack and Architecture
+- Flutter (stable), Material 3 (ColorScheme + Typography + component theming)
+- CustomPainter and Canvas for the game board, input handling, animations, and visual effects
+- GoRouter for navigation with custom transitions
+- Riverpod for state management with immutable models
+- Audio: just_audio for low-latency SFX/Music with caching
+- Assets: vector (SVG for icons where possible), raster WebP/PNG, 2x/3x density
+
+## Core Features
+
+### 1. Loading Screen
+- Animated background using CustomPainter (low-CPU animated shapes)
+- Centered logo "XO" lock-up with subtle pulsating glow (azure → magenta)
+- Progress indicator: determinate linear bar (M3) with soft gradient
+- Tips carousel below (3–5 tips) with 5 s auto-advance, swipeable
+- Duration target: 1–2 s typical; show skeleton if longer
+
+### 2. Home Screen
+- Header hero with typewriter animation:
+  - small: "Welcome back!"
+  - big: "Ready to play?"
+- CTA cards (Material 3 Cards, large):
+  - Local Player (icon: groups_2)
+  - Robot (Computer) (icon: smart_toy)
+- Quick stats ribbon: last result, streak, gems count, hint count
+- Ambient: subtle floating X/O shapes at 5% opacity using AnimatedBuilder
+
+### 3. Game Setup Screen
+- Two modes: Local Player, Robot (Computer)
+- Player Names section with text fields (auto-capitalize words, max 12 chars)
+- First Move selector: "X", "O", "Random" (default Random)
+- Difficulty (Robot mode only): Easy, Medium, Hard with descriptions
+- Board Size carousel (3x3, 4x4, 5x5) with visual board previews
+- Win Condition carousel: "3 in a row", "4 in a row", "5 in a row"
+- Start button (prominent, full-width on phones)
+
+### 4. Game Screen (CustomPainter + Flutter overlays)
+- Layout with scoreboard overlay, turn indicator, and control bar
+- Board (center): CustomPainter canvas rendering grid and marks
+- X/O animation with distinct drawing styles and timing
+- Winning line: neon sweep (azure/magenta blend) from first to last cell
+- Bottom control bar: Hint button, New Game button
+- Performance: Use CustomPainter with cached Paint objects; avoid per-frame text layout
+
+### 5. Settings Screen
+- Toggles: Sound, Music, Vibration, Theme (Light/Dark)
+- About: version, credits
+- Data: Clear local data (with confirm dialog)
+
+### 6. User Profile Screen
+- Header: Avatar, Nickname editable, Login/Link buttons (Google/Apple)
+- Stats: Games Played, Wins, Losses, Draws, Win Rate, Longest Streak
+- History list (last 20): opponent type, board size, win condition, result, timestamp
+- Achievements grid: badges locked/unlocked, progress ring 0–100%
+
+### 7. Store Screen (mock data for initial version)
+- Tabs: Themes, Board Designs, X/O Symbols, Gems
+- General grid item layout with preview thumbnails and pricing
+- Default: Only Default Theme (light/dark) selectable; all others locked
+- Gems tab: packages (100, 500, 1200) mock, disabled purchases
+- "Watch Ad" button to earn +10 gems (mock)
+
+### 8. Popups and Overlays
+- Hint popup with animated sparkle path or gem cost offer
+- Exit confirmation with "Continue" and "Exit" options
+- Result popup with win/loss/draw celebrations and CTAs
+
+## Design Language
+- Style: clean, bold accents with deep neutrals, deliberate glow, soft shadows
+- Grid and spacing: 4‑pt base with spacing tokens: 4, 8, 12, 16, 20, 24, 32, 40
+- Iconography: Material Symbols Rounded with consistent optical sizes
+- Elevation: flat by default with tinted state layers in M3
+
+## Color System
+- Low-chroma, calming surfaces with high-chroma neon accent(s)
+- Primary accent: azure/cyan + magenta; lime for win/success feedback
+- Maintain contrast: normal text ≥ 4.5:1, large text ≥ 3:1
+- Full light/dark mode support with semantic color tokens
+
+## Typography
+- Fonts: Sora Variable (Display/Headings), Inter Variable (UI/Body), JetBrains Mono (Numeric)
+- Type scale optimized for mobile with tablet scaling (+2–4 pt)
+- Tight letter-spacing on large headings and figure-aligned numerals for scoreboard
+
+## Motion and Interaction
+- Global durations: micro (90–120 ms), standard (200–240 ms), emphasized (300–400 ms)
+- Easing: standard cubic(0.2, 0, 0, 1), emphasized with overshoot for celebrations
+- Haptics: lightImpact for tap, selectionClick for place mark, successHeavy for win
+- Sound cues: soft wood/plastic tick for tap, distinct tones for X/O placement
+
+## Navigation
+- Bottom navigation with 4 items: Home, Store, Profile, Settings
+- GoRouter transitions: shared axis X for lateral moves (200 ms), fade through for modals
+
+## Performance Requirements
+- Target min 60 FPS; allow 120–144 FPS on supported devices
+- Board draw: ≤ 0.8 ms/frame on mid-tier devices
+- Use RepaintBoundary and cached CustomPainter; avoid rebuilding overlays per frame
+
+## Accessibility
+- Dynamic type support with MediaQuery.textScaleFactor
+- Contrast enforcement with 4.5:1 minimum for normal text
+- Haptics toggle respects system settings
+- Semantic descriptions for board cells and game state changes
+
+## Responsive Design
+- Phones portrait: single-column layouts, compact bottom bars
+- Phones landscape: two-panel game with sidebar
+- Tablets/iPads: two-column layouts, enlarged board up to 70% width
+- Safe areas: respect notches and ensure controls are inside safe padding
+
+## Data Models
+- PlayerProfile: id, nickname, avatarUrlOrProvider, stats, gems, hints
+- StoreItem: id, category, name, desc, priceGems, priceReal, premium, locked, previewAsset
+- GameConfig: mode, firstMove, difficulty, boardSize, winCondition, players
+
+## Implementation Notes
+- Theme setup: Build ColorScheme.light/dark with tokens; extend with ThemeExtensions
+- Routing: go_router with typed routes for all screens
+- Game integration: CustomPainter widget inside Game screen with GestureDetector
+- Board sizing: fits min(width, height * 0.64) with paddings; maintain square grid
+- Hint system: suggest winning/blocking cell prioritizing immediate win > block opponent > center > corners > edges
