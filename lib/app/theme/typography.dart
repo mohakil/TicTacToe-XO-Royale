@@ -134,7 +134,7 @@ class AppTypography {
   );
 
   // Create TextTheme for Material 3
-  static TextTheme get textTheme => TextTheme(
+  static TextTheme get textTheme => const TextTheme(
     displayLarge: displayLarge,
     displayMedium: displayMedium,
     headlineLarge: headlineLarge,

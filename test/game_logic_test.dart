@@ -280,7 +280,7 @@ void main() {
 
     group('Large Board Tests', () {
       test('4x4 board with 4-in-a-row win condition', () {
-        final largeConfig = GameConfig(
+        const largeConfig = GameConfig(
           boardSize: 4,
           winCondition: 4,
           gameMode: GameMode.local,
@@ -299,7 +299,7 @@ void main() {
       });
 
       test('5x5 board with 5-in-a-row win condition', () {
-        final largeConfig = GameConfig(
+        const largeConfig = GameConfig(
           boardSize: 5,
           winCondition: 5,
           gameMode: GameMode.local,

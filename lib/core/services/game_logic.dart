@@ -1,4 +1,3 @@
-
 import '../models/game_config.dart';
 
 /// Represents a position on the game board
@@ -143,7 +142,7 @@ class GameLogic {
 
     // Check for draw
     if (getAvailableMoves().isEmpty) {
-      return GameResult(
+      return const GameResult(
         state: GameState.draw,
         winner: null,
         winningLine: null,
@@ -166,7 +165,7 @@ class GameLogic {
     for (int row = 0; row < _boardSize; row++) {
       final result = _checkLine(
         start: Position(row, 0),
-        direction: Position(0, 1),
+        direction: const Position(0, 1),
         length: _winCondition,
       );
       if (result != null) return result;
@@ -176,7 +175,7 @@ class GameLogic {
     for (int col = 0; col < _boardSize; col++) {
       final result = _checkLine(
         start: Position(0, col),
-        direction: Position(1, 0),
+        direction: const Position(1, 0),
         length: _winCondition,
       );
       if (result != null) return result;
@@ -186,8 +185,8 @@ class GameLogic {
     // Main diagonal (top-left to bottom-right)
     if (_boardSize >= _winCondition) {
       final result = _checkLine(
-        start: Position(0, 0),
-        direction: Position(1, 1),
+        start: const Position(0, 0),
+        direction: const Position(1, 1),
         length: _winCondition,
       );
       if (result != null) return result;
@@ -197,7 +196,7 @@ class GameLogic {
     if (_boardSize >= _winCondition) {
       final result = _checkLine(
         start: Position(0, _boardSize - 1),
-        direction: Position(1, -1),
+        direction: const Position(1, -1),
         length: _winCondition,
       );
       if (result != null) return result;
@@ -337,7 +336,7 @@ extension PositionExtensions on Position {
   /// Get corner positions for a given board size
   static List<Position> getCorners(int boardSize) {
     return [
-      Position(0, 0),
+      const Position(0, 0),
       Position(0, boardSize - 1),
       Position(boardSize - 1, 0),
       Position(boardSize - 1, boardSize - 1),

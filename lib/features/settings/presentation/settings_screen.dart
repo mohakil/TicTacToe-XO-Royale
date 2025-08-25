@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../../../core/providers/settings_provider.dart';
 import '../../../app/router/app_router.dart';
+import '../../../core/widgets/performance_monitor.dart';
 import 'widgets/toggle_setting.dart';
 import 'widgets/theme_selector.dart';
 import 'widgets/about_section.dart';
@@ -19,28 +19,23 @@ class SettingsScreen extends ConsumerWidget {
     final themeMode = ref.watch(themeModeProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Semantics(
-          label: 'Settings screen',
-          child: const Text('Settings'),
-        ),
-        leading: Semantics(
-          label: 'Back button',
-          child: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () => context.go('/home'),
-          ),
-        ),
-        backgroundColor: colorScheme.surface,
-        foregroundColor: colorScheme.onSurface,
-        elevation: 0,
-      ),
       backgroundColor: colorScheme.surface,
       body: SafeArea(
         child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Settings Header
+              Text(
+                'Settings',
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: colorScheme.onSurface,
+                ),
+              ),
+              const SizedBox(height: 24),
+
               // Audio & Haptics Section
               SettingsSection(
                 title: 'Audio & Haptics',
@@ -181,6 +176,8 @@ class SettingsScreen extends ConsumerWidget {
                       }).toList(),
                     ),
                   ),
+                  const SizedBox(height: 16),
+                  const PerformanceMonitor(),
                 ],
               ),
 

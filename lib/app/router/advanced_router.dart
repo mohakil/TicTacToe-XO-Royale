@@ -116,10 +116,10 @@ class AdvancedRouter {
             path: AppRoutes.game,
             name: AppRoutes.gameName,
             parentNavigatorKey: _shellNavigatorKey,
-            builder: (context, state) => GameScreen(),
+            builder: (context, state) => const GameScreen(),
             pageBuilder: (context, state) => CustomTransitionPage(
               key: state.pageKey,
-              child: GameScreen(),
+              child: const GameScreen(),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
                     return AppRouteTransitions.sharedAxisVertical(
@@ -210,7 +210,7 @@ class AdvancedRouter {
         path: '/game/:gameId',
         name: 'game-deep-link',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => GameScreen(),
+        builder: (context, state) => const GameScreen(),
         redirect: (context, state) {
           // Handle deep link redirects
           final gameId = state.pathParameters['gameId'];

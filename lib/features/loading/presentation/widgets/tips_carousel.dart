@@ -14,11 +14,11 @@ class _TipsCarouselState extends State<TipsCarousel> {
   Timer? _autoAdvanceTimer;
 
   final List<String> _tips = [
-    "Tip: Use hints strategically to improve your game!",
-    "Tip: Try different board sizes for a new challenge",
-    "Tip: Practice against the computer to sharpen your skills",
+    'Tip: Use hints strategically to improve your game!',
+    'Tip: Try different board sizes for a new challenge',
+    'Tip: Practice against the computer to sharpen your skills',
     "Tip: Watch for patterns in your opponent's moves",
-    "Tip: The center position is often the strongest opening move",
+    'Tip: The center position is often the strongest opening move',
   ];
 
   @override

@@ -109,7 +109,7 @@ class DeepLinkingConfig {
     String gameId,
     Map<String, String> queryParams,
   ) {
-    final baseRoute = AppRoutes.game;
+    const baseRoute = AppRoutes.game;
 
     if (queryParams.isEmpty) {
       return '$baseRoute?gameId=$gameId';

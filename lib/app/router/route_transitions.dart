@@ -31,7 +31,7 @@ class AppRouteTransitions {
           tween = Tween(begin: -begin, end: end);
         }
 
-        var offsetAnimation = animation.drive(
+        final offsetAnimation = animation.drive(
           tween.chain(CurveTween(curve: curve)),
         );
 
@@ -60,7 +60,7 @@ class AppRouteTransitions {
           tween = Tween(begin: -begin, end: end);
         }
 
-        var offsetAnimation = animation.drive(
+        final offsetAnimation = animation.drive(
           tween.chain(CurveTween(curve: curve)),
         );
 

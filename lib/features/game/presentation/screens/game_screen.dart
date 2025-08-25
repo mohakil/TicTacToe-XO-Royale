@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import '../widgets/game_board/tic_tac_toe_board.dart';
 import '../widgets/game_hud.dart';
@@ -357,7 +358,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
           if (_showExitDialog)
             ExitOverlay(
               onContinue: () => setState(() => _showExitDialog = false),
-              onExit: () => Navigator.of(context).pop(),
+              onExit: () => context.go('/home'),
             ),
 
           if (_showSettings)
@@ -373,7 +374,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                   ? widget.player1Name
                   : widget.player2Name,
               onPlayAgain: _newGame,
-              onHome: () => Navigator.of(context).pop(),
+              onHome: () => context.go('/home'),
             ),
         ],
       ),

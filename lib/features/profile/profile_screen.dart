@@ -1,21 +1,125 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/providers/profile_provider.dart';
+import 'presentation/widgets/profile_header.dart';
+import 'presentation/widgets/stats_section.dart';
+import 'presentation/widgets/history_list.dart';
+import 'presentation/widgets/achievements_grid.dart';
 
-/// Placeholder profile screen
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isLoading = ref.watch(profileIsLoadingProvider);
+    final error = ref.watch(profileErrorProvider);
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go('/home'),
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      body: SafeArea(
+        child: isLoading
+            ? const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 16),
+                    Text('Loading profile...'),
+                  ],
+                ),
+              )
+            : error != null
+            ? _buildErrorState(context, ref, error)
+            : _buildProfileContent(context, ref),
+      ),
+    );
+  }
+
+  Widget _buildErrorState(BuildContext context, WidgetRef ref, String error) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 64,
+              color: Theme.of(context).colorScheme.error,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Failed to load profile',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                color: Theme.of(context).colorScheme.error,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              error,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                OutlinedButton(
+                  onPressed: () =>
+                      ref.read(profileProvider.notifier).clearError(),
+                  child: const Text('Dismiss'),
+                ),
+                FilledButton(
+                  onPressed: () =>
+                      ref.read(profileProvider.notifier).refreshProfile(),
+                  child: const Text('Retry'),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
-      body: const Center(child: Text('Profile Screen - Coming Soon!')),
+    );
+  }
+
+  Widget _buildProfileContent(BuildContext context, WidgetRef ref) {
+    return RefreshIndicator(
+      onRefresh: () => ref.read(profileProvider.notifier).refreshProfile(),
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Profile Header
+            Text(
+              'Profile',
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Profile Header Widget
+            const ProfileHeader(),
+
+            // Stats Section
+            const StatsSection(),
+
+            // History List
+            const HistoryList(),
+
+            // Achievements Grid
+            const AchievementsGrid(),
+
+            // Bottom Spacing
+            const SizedBox(height: 24),
+          ],
+        ),
+      ),
     );
   }
 }

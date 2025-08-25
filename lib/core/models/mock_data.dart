@@ -2,7 +2,7 @@ import 'models.dart';
 
 class MockData {
   static final List<StoreItem> themes = [
-    StoreItem(
+    const StoreItem(
       id: 'default_light',
       category: StoreItemCategory.theme,
       name: 'Default Light',
@@ -10,7 +10,7 @@ class MockData {
       premium: false,
       locked: false,
     ),
-    StoreItem(
+    const StoreItem(
       id: 'default_dark',
       category: StoreItemCategory.theme,
       name: 'Default Dark',
@@ -18,7 +18,7 @@ class MockData {
       premium: false,
       locked: false,
     ),
-    StoreItem(
+    const StoreItem(
       id: 'neon_nights',
       category: StoreItemCategory.theme,
       name: 'Neon Nights',
@@ -27,7 +27,7 @@ class MockData {
       premium: false,
       locked: true,
     ),
-    StoreItem(
+    const StoreItem(
       id: 'retro_glow',
       category: StoreItemCategory.theme,
       name: 'Retro Glow',
@@ -39,7 +39,7 @@ class MockData {
   ];
 
   static final List<StoreItem> boardDesigns = [
-    StoreItem(
+    const StoreItem(
       id: 'minimal_grid',
       category: StoreItemCategory.board,
       name: 'Minimal Grid',
@@ -47,7 +47,7 @@ class MockData {
       premium: false,
       locked: false,
     ),
-    StoreItem(
+    const StoreItem(
       id: 'holo_lines',
       category: StoreItemCategory.board,
       name: 'Holo Lines',
@@ -56,7 +56,7 @@ class MockData {
       premium: false,
       locked: true,
     ),
-    StoreItem(
+    const StoreItem(
       id: 'chalkboard',
       category: StoreItemCategory.board,
       name: 'Chalkboard',
@@ -68,7 +68,7 @@ class MockData {
   ];
 
   static final List<StoreItem> symbols = [
-    StoreItem(
+    const StoreItem(
       id: 'solid_sora',
       category: StoreItemCategory.symbol,
       name: 'Solid Sora',
@@ -76,7 +76,7 @@ class MockData {
       premium: false,
       locked: false,
     ),
-    StoreItem(
+    const StoreItem(
       id: 'outline_neon',
       category: StoreItemCategory.symbol,
       name: 'Outline Neon',
@@ -85,7 +85,7 @@ class MockData {
       premium: false,
       locked: true,
     ),
-    StoreItem(
+    const StoreItem(
       id: '3d_gel',
       category: StoreItemCategory.symbol,
       name: '3D Gel',
@@ -97,7 +97,7 @@ class MockData {
   ];
 
   static final List<StoreItem> gemPackages = [
-    StoreItem(
+    const StoreItem(
       id: 'gems_100',
       category: StoreItemCategory.gems,
       name: '100 Gems',
@@ -106,7 +106,7 @@ class MockData {
       premium: false,
       locked: false,
     ),
-    StoreItem(
+    const StoreItem(
       id: 'gems_500',
       category: StoreItemCategory.gems,
       name: '500 Gems',
@@ -115,7 +115,7 @@ class MockData {
       premium: false,
       locked: false,
     ),
-    StoreItem(
+    const StoreItem(
       id: 'gems_1200',
       category: StoreItemCategory.gems,
       name: '1200 Gems',

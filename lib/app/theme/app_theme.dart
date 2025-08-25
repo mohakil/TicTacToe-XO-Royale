@@ -13,7 +13,7 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: AppColorSchemes.light,
       textTheme: AppTypography.textTheme,
-      extensions: [
+      extensions: const [
         GameColors.light,
         MotionDurations.defaultDurations,
         MotionEasings.defaultEasings,
@@ -148,7 +148,7 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: AppColorSchemes.dark,
       textTheme: AppTypography.textTheme,
-      extensions: [
+      extensions: const [
         GameColors.dark,
         MotionDurations.defaultDurations,
         MotionEasings.defaultEasings,

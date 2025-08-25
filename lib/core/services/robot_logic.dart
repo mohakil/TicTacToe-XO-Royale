@@ -28,7 +28,7 @@ class RobotLogic {
   /// Easy AI: Random with light heuristics and 10-20% intentional blunders
   Position _getEasyMove(CellState robotPlayer) {
     final availableMoves = gameLogic.getAvailableMoves();
-    if (availableMoves.isEmpty) return Position(0, 0);
+    if (availableMoves.isEmpty) return const Position(0, 0);
 
     // 15% chance to make an intentional blunder
     if (_random.nextDouble() < 0.15) {
@@ -101,7 +101,7 @@ class RobotLogic {
   /// Medium AI: Minimax with limited depth, avoid obvious traps
   Position _getMediumMove(CellState robotPlayer) {
     final availableMoves = gameLogic.getAvailableMoves();
-    if (availableMoves.isEmpty) return Position(0, 0);
+    if (availableMoves.isEmpty) return const Position(0, 0);
 
     // Use minimax with limited depth (3-4 moves ahead)
     final maxDepth = min(4, availableMoves.length);
@@ -131,14 +131,14 @@ class RobotLogic {
   /// Hard AI: Full optimal strategy with alpha-beta pruning
   Position _getHardMove(CellState robotPlayer) {
     final availableMoves = gameLogic.getAvailableMoves();
-    if (availableMoves.isEmpty) return Position(0, 0);
+    if (availableMoves.isEmpty) return const Position(0, 0);
 
     // Use minimax with alpha-beta pruning for optimal play
     final maxDepth = availableMoves.length; // Look ahead as far as possible
     Position? bestMove;
     int bestScore = -1000;
     int alpha = -1000;
-    int beta = 1000;
+    const int beta = 1000;
 
     for (final move in availableMoves) {
       gameLogic.makeMove(move, robotPlayer);
@@ -230,7 +230,7 @@ class RobotLogic {
   /// Get hint for the current player (immediate win > block opponent > center > corners > edges)
   Position getHint(CellState currentPlayer) {
     final availableMoves = gameLogic.getAvailableMoves();
-    if (availableMoves.isEmpty) return Position(0, 0);
+    if (availableMoves.isEmpty) return const Position(0, 0);
 
     // 1. Check for immediate win
     for (final move in availableMoves) {
@@ -359,7 +359,7 @@ class RobotLogic {
     for (int row = 0; row < boardSize; row++) {
       score += _evaluateLine(
         start: Position(row, 0),
-        direction: Position(0, 1),
+        direction: const Position(0, 1),
         length: winCondition,
         player: player,
         opponent: opponent,
@@ -370,7 +370,7 @@ class RobotLogic {
     for (int col = 0; col < boardSize; col++) {
       score += _evaluateLine(
         start: Position(0, col),
-        direction: Position(1, 0),
+        direction: const Position(1, 0),
         length: winCondition,
         player: player,
         opponent: opponent,
@@ -381,8 +381,8 @@ class RobotLogic {
     if (boardSize >= winCondition) {
       // Main diagonal
       score += _evaluateLine(
-        start: Position(0, 0),
-        direction: Position(1, 1),
+        start: const Position(0, 0),
+        direction: const Position(1, 1),
         length: winCondition,
         player: player,
         opponent: opponent,
@@ -391,7 +391,7 @@ class RobotLogic {
       // Anti-diagonal
       score += _evaluateLine(
         start: Position(0, boardSize - 1),
-        direction: Position(1, -1),
+        direction: const Position(1, -1),
         length: winCondition,
         player: player,
         opponent: opponent,

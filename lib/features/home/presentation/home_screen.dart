@@ -117,7 +117,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           SafeArea(
             child: CustomScrollView(
               slivers: [
-                // App bar
+                // App bar - simplified without settings button
                 SliverAppBar(
                   backgroundColor: Colors.transparent,
                   elevation: 0,
@@ -132,18 +132,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       ),
                     ),
                   ),
-                  actions: [
-                    Semantics(
-                      label: 'Settings button',
-                      child: IconButton(
-                        icon: Icon(
-                          Icons.settings,
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                        onPressed: () => context.go('/settings'),
-                      ),
-                    ),
-                  ],
+                  // Removed settings button - now accessible via FAB
                 ),
 
                 // Content

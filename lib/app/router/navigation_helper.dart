@@ -132,7 +132,7 @@ class NavigationHelper {
     // This would typically resolve to the actual screen widget
     // For now, return a placeholder
     return Scaffold(
-      appBar: AppBar(title: Text('Route: $route'), leading: BackButton()),
+      appBar: AppBar(title: Text('Route: $route'), leading: const BackButton()),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

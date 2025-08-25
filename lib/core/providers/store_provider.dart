@@ -43,7 +43,7 @@ class StoreState {
   }
 
   // Initial state
-  factory StoreState.initial() => StoreState(
+  factory StoreState.initial() => const StoreState(
     items: [],
     selectedCategory: StoreItemCategory.theme,
     isLoading: true,

@@ -18,7 +18,7 @@ void main() {
     });
 
     test('should calculate computed properties', () {
-      final stats = PlayerStats(wins: 10, losses: 5, draws: 2, streak: 3);
+      const stats = PlayerStats(wins: 10, losses: 5, draws: 2, streak: 3);
 
       expect(stats.totalGames, 17);
       expect(stats.winRate, closeTo(10 / 17, 0.01));
@@ -35,7 +35,7 @@ void main() {
 
   group('StoreItem Model Tests', () {
     test('should create store item with correct properties', () {
-      final item = StoreItem(
+      const item = StoreItem(
         id: 'test_theme',
         category: StoreItemCategory.theme,
         name: 'Test Theme',
@@ -53,7 +53,7 @@ void main() {
     });
 
     test('should handle locked items correctly', () {
-      final lockedItem = StoreItem(
+      const lockedItem = StoreItem(
         id: 'locked_theme',
         category: StoreItemCategory.theme,
         name: 'Locked Theme',

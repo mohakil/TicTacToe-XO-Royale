@@ -43,7 +43,7 @@ class ControlBar extends StatelessWidget {
               onPressed: hintCount > 0 ? onHint : null,
               icon: Stack(
                 children: [
-                  Icon(Symbols.lightbulb),
+                  const Icon(Symbols.lightbulb),
                   if (hintCount > 0)
                     Positioned(
                       right: 0,

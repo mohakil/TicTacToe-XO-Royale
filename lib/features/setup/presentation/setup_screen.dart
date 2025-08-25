@@ -153,159 +153,148 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Game Setup',
-          style: theme.textTheme.headlineSmall?.copyWith(
-            color: colorScheme.onSurface,
-          ),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: colorScheme.onSurface),
-          onPressed: () => context.go('/home'),
-        ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Game Mode Selection
-            ChoiceChips<GameMode>(
-              label: 'Game Mode',
-              options: const [
-                ChoiceChipOption(
-                  label: 'Local Player',
-                  value: GameMode.local,
-                  description: 'Play with a friend',
+      backgroundColor: colorScheme.surface,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Setup Header
+              Text(
+                'Game Setup',
+                style: theme.textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: colorScheme.onSurface,
                 ),
-                ChoiceChipOption(
-                  label: 'Robot',
-                  value: GameMode.robot,
-                  description: 'Challenge the computer',
-                ),
-              ],
-              selectedOption: setup.mode,
-              onOptionSelected: setupNotifier.setMode,
-            ),
-
-            const SizedBox(height: 32),
-
-            // Player Names Section
-            Text(
-              'Player Names',
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: colorScheme.onSurface,
               ),
-            ),
-            const SizedBox(height: 16),
+              const SizedBox(height: 24),
 
-            CustomTextField(
-              label: 'Player 1',
-              value: setup.player1Name,
-              onChanged: setupNotifier.setPlayer1Name,
-              maxLength: 12,
-              autoCapitalize: true,
-            ),
-
-            const SizedBox(height: 16),
-
-            CustomTextField(
-              label: 'Player 2',
-              value: setup.player2Name,
-              onChanged: setupNotifier.setPlayer2Name,
-              maxLength: 12,
-              autoCapitalize: true,
-              enabled: setup.mode == GameMode.local,
-              hintText: setup.mode == GameMode.robot
-                  ? 'CPU'
-                  : 'Enter player name',
-            ),
-
-            const SizedBox(height: 32),
-
-            // First Move Selection
-            ChoiceChips<FirstMove>(
-              label: 'First Move',
-              options: const [
-                ChoiceChipOption(label: 'X', value: FirstMove.x),
-                ChoiceChipOption(label: 'O', value: FirstMove.o),
-                ChoiceChipOption(label: 'Random', value: FirstMove.random),
-              ],
-              selectedOption: setup.firstMove,
-              onOptionSelected: setupNotifier.setFirstMove,
-            ),
-
-            const SizedBox(height: 32),
-
-            // Difficulty Selection (Robot mode only)
-            if (setup.mode == GameMode.robot) ...[
-              ChoiceChips<Difficulty>(
-                label: 'Difficulty',
+              // Game Mode Selection
+              ChoiceChips<GameMode>(
+                label: 'Game Mode',
                 options: const [
                   ChoiceChipOption(
-                    label: 'Easy',
-                    value: Difficulty.easy,
-                    description: 'Random moves with occasional blunders',
+                    label: 'Local Player',
+                    value: GameMode.local,
+                    description: 'Play with a friend',
                   ),
                   ChoiceChipOption(
-                    label: 'Medium',
-                    value: Difficulty.medium,
-                    description: 'Strategic play with limited depth',
-                  ),
-                  ChoiceChipOption(
-                    label: 'Hard',
-                    value: Difficulty.hard,
-                    description: 'Optimal play with full analysis',
+                    label: 'Robot',
+                    value: GameMode.robot,
+                    description: 'Challenge the computer',
                   ),
                 ],
-                selectedOption: setup.difficulty,
-                onOptionSelected: setupNotifier.setDifficulty,
+                selectedOption: setup.mode,
+                onOptionSelected: setupNotifier.setMode,
               ),
 
               const SizedBox(height: 32),
-            ],
 
-            // Board Size Carousel
-            BoardCarousel(
-              selectedBoardSize: setup.boardSize,
-              onBoardSizeChanged: setupNotifier.setBoardSize,
-            ),
+              // Player Names Section
+              Text(
+                'Player Names',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: colorScheme.onSurface,
+                ),
+              ),
+              const SizedBox(height: 16),
 
-            const SizedBox(height: 32),
+              CustomTextField(
+                label: 'Player 1',
+                value: setup.player1Name,
+                onChanged: setupNotifier.setPlayer1Name,
+                maxLength: 12,
+                autoCapitalize: true,
+              ),
 
-            // Win Condition Carousel
-            WinCarousel(
-              selectedWinCondition: setup.winCondition,
-              onWinConditionChanged: setupNotifier.setWinCondition,
-              boardSize: setup.boardSize,
-            ),
+              const SizedBox(height: 16),
 
-            const SizedBox(height: 48),
+              CustomTextField(
+                label: 'Player 2',
+                value: setup.player2Name,
+                onChanged: setupNotifier.setPlayer2Name,
+                maxLength: 12,
+                autoCapitalize: true,
+                enabled: setup.mode == GameMode.local,
+                hintText: setup.mode == GameMode.robot
+                    ? 'CPU'
+                    : 'Enter player name',
+              ),
 
-            // Start Button
-            SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: FilledButton(
-                onPressed: (setupNotifier.isValid && !_isNavigating)
-                    ? () async {
-                        // Prevent multiple navigation calls
-                        if (mounted && !_isNavigating) {
-                          setState(() {
-                            _isNavigating = true;
-                          });
+              const SizedBox(height: 32),
 
-                          try {
-                            // Store context before async operation
-                            final navigatorContext = context;
+              // First Move Selection
+              ChoiceChips<FirstMove>(
+                label: 'First Move',
+                options: const [
+                  ChoiceChipOption(label: 'X', value: FirstMove.x),
+                  ChoiceChipOption(label: 'O', value: FirstMove.o),
+                  ChoiceChipOption(label: 'Random', value: FirstMove.random),
+                ],
+                selectedOption: setup.firstMove,
+                onOptionSelected: setupNotifier.setFirstMove,
+              ),
 
-                            // Add a small delay to prevent rapid navigation calls
-                            await Future.delayed(
-                              const Duration(milliseconds: 100),
-                            );
+              const SizedBox(height: 32),
+
+              // Difficulty Selection (Robot mode only)
+              if (setup.mode == GameMode.robot) ...[
+                ChoiceChips<Difficulty>(
+                  label: 'Difficulty',
+                  options: const [
+                    ChoiceChipOption(
+                      label: 'Easy',
+                      value: Difficulty.easy,
+                      description: 'Random moves with occasional blunders',
+                    ),
+                    ChoiceChipOption(
+                      label: 'Medium',
+                      value: Difficulty.medium,
+                      description: 'Strategic play with limited depth',
+                    ),
+                    ChoiceChipOption(
+                      label: 'Hard',
+                      value: Difficulty.hard,
+                      description: 'Optimal play with full analysis',
+                    ),
+                  ],
+                  selectedOption: setup.difficulty,
+                  onOptionSelected: setupNotifier.setDifficulty,
+                ),
+
+                const SizedBox(height: 32),
+              ],
+
+              // Board Size Carousel
+              BoardCarousel(
+                selectedBoardSize: setup.boardSize,
+                onBoardSizeChanged: setupNotifier.setBoardSize,
+              ),
+
+              const SizedBox(height: 32),
+
+              // Win Condition Carousel
+              WinCarousel(
+                selectedWinCondition: setup.winCondition,
+                onWinConditionChanged: setupNotifier.setWinCondition,
+                boardSize: setup.boardSize,
+              ),
+
+              const SizedBox(height: 48),
+
+              // Start Button
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: FilledButton(
+                  onPressed: (setupNotifier.isValid && !_isNavigating)
+                      ? () {
+                          // Prevent multiple navigation calls
+                          if (mounted && !_isNavigating) {
+                            setState(() {
+                              _isNavigating = true;
+                            });
 
                             // Navigate to game screen with setup data
                             final gameRoute = AppRoutes.getGameRoute(
@@ -318,54 +307,49 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                               firstMove: setupNotifier.firstMoveValue,
                             );
 
-                            // Use pushReplacement to avoid navigation stack issues
-                            if (mounted) {
-                              navigatorContext.pushReplacement(gameRoute);
-                            }
-                          } catch (e) {
-                            // Fallback navigation if there's an error
-                            debugPrint('Navigation error: $e');
-                            if (mounted) {
-                              context.go(AppRoutes.game);
-                            }
-                          } finally {
-                            if (mounted) {
-                              setState(() {
-                                _isNavigating = false;
-                              });
-                            }
+                            // Use go to navigate to game route
+                            GoRouter.of(context).go(gameRoute);
+
+                            // Reset navigation state after a short delay
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              if (mounted) {
+                                setState(() {
+                                  _isNavigating = false;
+                                });
+                              }
+                            });
                           }
                         }
-                      }
-                    : null,
-                style: FilledButton.styleFrom(
-                  backgroundColor: colorScheme.primary,
-                  foregroundColor: colorScheme.onPrimary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+                      : null,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: colorScheme.primary,
+                    foregroundColor: colorScheme.onPrimary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                   ),
-                ),
-                child: _isNavigating
-                    ? SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            colorScheme.onPrimary,
+                  child: _isNavigating
+                      ? SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              colorScheme.onPrimary,
+                            ),
+                          ),
+                        )
+                      : Text(
+                          'Start Game',
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            color: colorScheme.onPrimary,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                      )
-                    : Text(
-                        'Start Game',
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          color: colorScheme.onPrimary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
