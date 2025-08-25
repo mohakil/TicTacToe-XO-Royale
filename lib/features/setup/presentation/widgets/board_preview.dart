@@ -1,0 +1,126 @@
+import 'package:flutter/material.dart';
+import 'package:tictactoe_xo_royale/features/setup/providers/setup_provider.dart';
+
+class BoardPreview extends StatelessWidget {
+  const BoardPreview({
+    super.key,
+    required this.boardSize,
+    this.showWinLine = false,
+    this.winCondition = WinCondition.threeInRow,
+  });
+
+  final BoardSize boardSize;
+  final bool showWinLine;
+  final WinCondition winCondition;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Container(
+      width: 120,
+      height: 120,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colorScheme.outline, width: 1),
+        color: colorScheme.surfaceContainer,
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: CustomPaint(
+          painter: BoardPreviewPainter(
+            boardSize: boardSize,
+            showWinLine: showWinLine,
+            winCondition: winCondition,
+            colorScheme: colorScheme,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class BoardPreviewPainter extends CustomPainter {
+  BoardPreviewPainter({
+    required this.boardSize,
+    required this.showWinLine,
+    required this.winCondition,
+    required this.colorScheme,
+  });
+
+  final BoardSize boardSize;
+  final bool showWinLine;
+  final WinCondition winCondition;
+  final ColorScheme colorScheme;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = colorScheme.outline
+      ..strokeWidth = 1.5
+      ..style = PaintingStyle.stroke;
+
+    final cellSize = size.width / _getGridSize();
+    final gridSize = _getGridSize();
+
+    // Draw grid lines
+    for (int i = 1; i < gridSize; i++) {
+      final x = i * cellSize;
+      final y = i * cellSize;
+
+      // Vertical lines
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
+
+      // Horizontal lines
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
+    }
+
+    // Draw win line if requested
+    if (showWinLine) {
+      _drawWinLine(canvas, size, cellSize, gridSize);
+    }
+  }
+
+  void _drawWinLine(Canvas canvas, Size size, double cellSize, int gridSize) {
+    final winPaint = Paint()
+      ..color = colorScheme.primary
+      ..strokeWidth = 3
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    final winLength = _getWinLength();
+
+    // Draw horizontal win line
+    final startX = cellSize * 0.5;
+    final endX = startX + (winLength - 1) * cellSize;
+    final centerY = size.height / 2;
+
+    canvas.drawLine(Offset(startX, centerY), Offset(endX, centerY), winPaint);
+  }
+
+  int _getGridSize() {
+    switch (boardSize) {
+      case BoardSize.threeByThree:
+        return 3;
+      case BoardSize.fourByFour:
+        return 4;
+      case BoardSize.fiveByFive:
+        return 5;
+    }
+  }
+
+  int _getWinLength() {
+    switch (winCondition) {
+      case WinCondition.threeInRow:
+        return 3;
+      case WinCondition.fourInRow:
+        return 4;
+      case WinCondition.fiveInRow:
+        return 5;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}

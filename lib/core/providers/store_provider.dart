@@ -16,7 +16,7 @@ class StoreState {
   });
 
   final List<StoreItem> items;
-  final StoreCategory selectedCategory;
+  final StoreItemCategory selectedCategory;
   final bool isLoading;
   final String? error;
   final List<String> purchaseHistory;
@@ -25,7 +25,7 @@ class StoreState {
   // Copy with method for immutable updates
   StoreState copyWith({
     List<StoreItem>? items,
-    StoreCategory? selectedCategory,
+    StoreItemCategory? selectedCategory,
     bool? isLoading,
     String? error,
     List<String>? purchaseHistory,
@@ -45,7 +45,7 @@ class StoreState {
   // Initial state
   factory StoreState.initial() => StoreState(
     items: [],
-    selectedCategory: StoreCategory.theme,
+    selectedCategory: StoreItemCategory.theme,
     isLoading: true,
     error: null,
     purchaseHistory: [],
@@ -55,7 +55,7 @@ class StoreState {
   // Success state
   factory StoreState.success(List<StoreItem> items) => StoreState(
     items: items,
-    selectedCategory: StoreCategory.theme,
+    selectedCategory: StoreItemCategory.theme,
     isLoading: false,
     error: null,
     purchaseHistory: [],
@@ -65,7 +65,7 @@ class StoreState {
   // Error state
   factory StoreState.error(String error) => StoreState(
     items: [],
-    selectedCategory: StoreCategory.theme,
+    selectedCategory: StoreItemCategory.theme,
     isLoading: false,
     error: error,
     purchaseHistory: [],
@@ -75,7 +75,7 @@ class StoreState {
   // Loading state
   factory StoreState.loading() => const StoreState(
     items: [],
-    selectedCategory: StoreCategory.theme,
+    selectedCategory: StoreItemCategory.theme,
     isLoading: true,
     error: null,
     purchaseHistory: [],
@@ -110,40 +110,6 @@ class StoreState {
       'StoreState(items: ${items.length}, selectedCategory: $selectedCategory, '
       'isLoading: $isLoading, error: $error, '
       'purchaseHistory: ${purchaseHistory.length}, watchAdCooldown: $watchAdCooldown)';
-}
-
-// Store category enum - aligned with StoreItemCategory
-enum StoreCategory {
-  theme,
-  board,
-  symbol,
-  gems;
-
-  String get displayName {
-    switch (this) {
-      case StoreCategory.theme:
-        return 'Themes';
-      case StoreCategory.board:
-        return 'Board Designs';
-      case StoreCategory.symbol:
-        return 'Symbols';
-      case StoreCategory.gems:
-        return 'Gems';
-    }
-  }
-
-  String get icon {
-    switch (this) {
-      case StoreCategory.theme:
-        return 'palette';
-      case StoreCategory.board:
-        return 'grid_4x4';
-      case StoreCategory.symbol:
-        return 'star';
-      case StoreCategory.gems:
-        return 'diamond';
-    }
-  }
 }
 
 // Store notifier
@@ -185,7 +151,7 @@ class StoreNotifier extends StateNotifier<StoreState> {
 
       state = StoreState(
         items: updatedItems,
-        selectedCategory: StoreCategory.theme,
+        selectedCategory: StoreItemCategory.theme,
         isLoading: false,
         error: null,
         purchaseHistory: purchaseHistoryJson,
@@ -224,35 +190,35 @@ class StoreNotifier extends StateNotifier<StoreState> {
   }
 
   // Select category
-  void selectCategory(StoreCategory category) {
+  void selectCategory(StoreItemCategory category) {
     state = state.copyWith(selectedCategory: category);
   }
 
   // Get items by category
-  List<StoreItem> getItemsByCategory(StoreCategory category) {
+  List<StoreItem> getItemsByCategory(StoreItemCategory category) {
     return state.items.where((item) {
       switch (category) {
-        case StoreCategory.theme:
+        case StoreItemCategory.theme:
           return item.category == StoreItemCategory.theme;
-        case StoreCategory.board:
+        case StoreItemCategory.board:
           return item.category == StoreItemCategory.board;
-        case StoreCategory.symbol:
+        case StoreItemCategory.symbol:
           return item.category == StoreItemCategory.symbol;
-        case StoreCategory.gems:
+        case StoreItemCategory.gems:
           return item.category == StoreItemCategory.gems;
       }
     }).toList();
   }
 
   // Get unlocked items by category
-  List<StoreItem> getUnlockedItemsByCategory(StoreCategory category) {
+  List<StoreItem> getUnlockedItemsByCategory(StoreItemCategory category) {
     return state.items
         .where((item) => item.category == category && !item.locked)
         .toList();
   }
 
   // Get locked items by category
-  List<StoreItem> getLockedItemsByCategory(StoreCategory category) {
+  List<StoreItem> getLockedItemsByCategory(StoreItemCategory category) {
     return state.items
         .where((item) => item.category == category && item.locked)
         .toList();
@@ -363,7 +329,7 @@ class StoreNotifier extends StateNotifier<StoreState> {
   List<StoreItem> get currentItems => state.items;
 
   // Get current category
-  StoreCategory get currentCategory => state.selectedCategory;
+  StoreItemCategory get currentCategory => state.selectedCategory;
 
   // Get items for current category
   List<StoreItem> get currentCategoryItems =>
@@ -402,7 +368,7 @@ final storeItemsProvider = Provider.autoDispose<List<StoreItem>>((ref) {
   return ref.watch(storeProvider.select((state) => state.items));
 });
 
-final storeSelectedCategoryProvider = Provider.autoDispose<StoreCategory>((
+final storeSelectedCategoryProvider = Provider.autoDispose<StoreItemCategory>((
   ref,
 ) {
   return ref.watch(storeProvider.select((state) => state.selectedCategory));
@@ -431,7 +397,7 @@ final storeThemesProvider = Provider.autoDispose<List<StoreItem>>((ref) {
   );
   final items = ref.watch(storeProvider.select((state) => state.items));
 
-  if (selectedCategory == StoreCategory.theme) {
+  if (selectedCategory == StoreItemCategory.theme) {
     return items
         .where((item) => item.category == StoreItemCategory.theme)
         .toList();
@@ -445,7 +411,7 @@ final storeBoardDesignsProvider = Provider.autoDispose<List<StoreItem>>((ref) {
   );
   final items = ref.watch(storeProvider.select((state) => state.items));
 
-  if (selectedCategory == StoreCategory.board) {
+  if (selectedCategory == StoreItemCategory.board) {
     return items
         .where((item) => item.category == StoreItemCategory.board)
         .toList();
@@ -459,7 +425,7 @@ final storeSymbolsProvider = Provider.autoDispose<List<StoreItem>>((ref) {
   );
   final items = ref.watch(storeProvider.select((state) => state.items));
 
-  if (selectedCategory == StoreCategory.symbol) {
+  if (selectedCategory == StoreItemCategory.symbol) {
     return items
         .where((item) => item.category == StoreItemCategory.symbol)
         .toList();
@@ -473,7 +439,7 @@ final storeGemsProvider = Provider.autoDispose<List<StoreItem>>((ref) {
   );
   final items = ref.watch(storeProvider.select((state) => state.items));
 
-  if (selectedCategory == StoreCategory.gems) {
+  if (selectedCategory == StoreItemCategory.gems) {
     return items
         .where((item) => item.category == StoreItemCategory.gems)
         .toList();
@@ -549,7 +515,7 @@ extension StoreProviderExtension on WidgetRef {
 
   // Get individual store data using select for granular rebuilds
   List<StoreItem> get storeItems => watch(storeItemsProvider);
-  StoreCategory get storeSelectedCategory =>
+  StoreItemCategory get storeSelectedCategory =>
       watch(storeSelectedCategoryProvider);
   bool get storeIsLoading => watch(storeIsLoadingProvider);
   String? get storeError => watch(storeErrorProvider);

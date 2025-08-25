@@ -1,85 +1,117 @@
-import 'package:json_annotation/json_annotation.dart';
+import 'package:flutter/foundation.dart';
 
-part 'game_config.g.dart';
+enum GameMode { local, cpu, online }
 
-enum GameMode { local, cpu }
+enum FirstMove { player1, player2, random }
 
-enum FirstMove { X, O, random }
+enum Difficulty { easy, medium, hard, impossible }
 
-enum Difficulty { easy, medium, hard }
-
-@JsonSerializable()
+@immutable
 class GameConfig {
-  const GameConfig({
-    required this.mode,
-    required this.firstMove,
-    this.difficulty,
-    required this.boardSize,
-    required this.winCondition,
-    required this.players,
-  });
-
-  final GameMode mode;
-  final FirstMove firstMove;
-  final Difficulty? difficulty;
   final int boardSize;
   final int winCondition;
-  final List<String> players;
+  final GameMode gameMode;
+  final FirstMove firstMove;
+  final Difficulty difficulty;
+  final String player1Name;
+  final String player2Name;
+  final bool isRobotMode;
 
-  factory GameConfig.fromJson(Map<String, dynamic> json) =>
-      _$GameConfigFromJson(json);
+  const GameConfig({
+    required this.boardSize,
+    required this.winCondition,
+    required this.gameMode,
+    required this.firstMove,
+    required this.difficulty,
+    required this.player1Name,
+    required this.player2Name,
+    required this.isRobotMode,
+  });
 
-  Map<String, dynamic> toJson() => _$GameConfigToJson(this);
-
-  factory GameConfig.defaultConfig() => const GameConfig(
-    mode: GameMode.local,
-    firstMove: FirstMove.random,
-    boardSize: 3,
-    winCondition: 3,
-    players: ['Player 1', 'Player 2'],
-  );
+  factory GameConfig.defaultConfig() {
+    return const GameConfig(
+      boardSize: 3,
+      winCondition: 3,
+      gameMode: GameMode.local,
+      firstMove: FirstMove.player1,
+      difficulty: Difficulty.medium,
+      player1Name: 'Player 1',
+      player2Name: 'Player 2',
+      isRobotMode: false,
+    );
+  }
 
   factory GameConfig.cpuConfig({
-    Difficulty difficulty = Difficulty.medium,
+    required Difficulty difficulty,
     int boardSize = 3,
     int winCondition = 3,
-  }) => GameConfig(
-    mode: GameMode.cpu,
-    firstMove: FirstMove.random,
-    difficulty: difficulty,
-    boardSize: boardSize,
-    winCondition: winCondition,
-    players: ['Player', 'Computer'],
-  );
+    String player1Name = 'You',
+    String player2Name = 'CPU',
+  }) {
+    return GameConfig(
+      boardSize: boardSize,
+      winCondition: winCondition,
+      gameMode: GameMode.cpu,
+      firstMove: FirstMove.player1,
+      difficulty: difficulty,
+      player1Name: player1Name,
+      player2Name: player2Name,
+      isRobotMode: true,
+    );
+  }
 
-  bool get isCpuMode => mode == GameMode.cpu;
-  bool get isLocalMode => mode == GameMode.local;
-  bool get hasRandomFirstMove => firstMove == FirstMove.random;
+  GameConfig copyWith({
+    int? boardSize,
+    int? winCondition,
+    GameMode? gameMode,
+    FirstMove? firstMove,
+    Difficulty? difficulty,
+    String? player1Name,
+    String? player2Name,
+    bool? isRobotMode,
+  }) {
+    return GameConfig(
+      boardSize: boardSize ?? this.boardSize,
+      winCondition: winCondition ?? this.winCondition,
+      gameMode: gameMode ?? this.gameMode,
+      firstMove: firstMove ?? this.firstMove,
+      difficulty: difficulty ?? this.difficulty,
+      player1Name: player1Name ?? this.player1Name,
+      player2Name: player2Name ?? this.player2Name,
+      isRobotMode: isRobotMode ?? this.isRobotMode,
+    );
+  }
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is GameConfig &&
-          runtimeType == other.runtimeType &&
-          mode == other.mode &&
-          firstMove == other.firstMove &&
-          difficulty == other.difficulty &&
-          boardSize == other.boardSize &&
-          winCondition == other.winCondition &&
-          players == other.players;
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is GameConfig &&
+        other.boardSize == boardSize &&
+        other.winCondition == winCondition &&
+        other.gameMode == gameMode &&
+        other.firstMove == firstMove &&
+        other.difficulty == difficulty &&
+        other.player1Name == player1Name &&
+        other.player2Name == player2Name &&
+        other.isRobotMode == isRobotMode;
+  }
 
   @override
-  int get hashCode => Object.hash(
-    runtimeType,
-    mode,
-    firstMove,
-    difficulty,
-    boardSize,
-    winCondition,
-    players,
-  );
+  int get hashCode {
+    return Object.hash(
+      boardSize,
+      winCondition,
+      gameMode,
+      firstMove,
+      difficulty,
+      player1Name,
+      player2Name,
+      isRobotMode,
+    );
+  }
 
   @override
-  String toString() =>
-      'GameConfig(mode: $mode, firstMove: $firstMove, difficulty: $difficulty, boardSize: $boardSize, winCondition: $winCondition, players: $players)';
+  String toString() {
+    return 'GameConfig(boardSize: $boardSize, winCondition: $winCondition, gameMode: $gameMode, firstMove: $firstMove, difficulty: $difficulty, player1Name: $player1Name, player2Name: $player2Name, isRobotMode: $isRobotMode)';
+  }
 }

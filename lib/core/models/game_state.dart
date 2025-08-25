@@ -1,112 +1,99 @@
-import 'package:json_annotation/json_annotation.dart';
-import 'game_config.dart';
+import 'package:flutter/foundation.dart';
 
-part 'game_state.g.dart';
+enum GameStatus { waiting, playing, finished }
 
-enum GameStatus { waiting, playing, paused, finished }
+enum PlayerMark { x, o }
 
-enum PlayerMark { X, O, none }
-
-enum GameResult { win, loss, draw, ongoing }
-
-@JsonSerializable()
+@immutable
 class GameState {
+  final List<List<String?>> boardState;
+  final String currentPlayer;
+  final bool isGameOver;
+  final List<int>? winningLine;
+  final GameStatus status;
+  final int player1Wins;
+  final int player2Wins;
+  final int draws;
+
   const GameState({
-    required this.status,
-    required this.board,
+    required this.boardState,
     required this.currentPlayer,
-    required this.players,
-    required this.config,
-    this.result,
-    this.winner,
+    required this.isGameOver,
     this.winningLine,
-    required this.startTime,
-    this.endTime,
-    this.moveCount,
+    required this.status,
+    required this.player1Wins,
+    required this.player2Wins,
+    required this.draws,
   });
 
-  final GameStatus status;
-  final List<List<PlayerMark>> board;
-  final PlayerMark currentPlayer;
-  final List<String> players;
-  final GameConfig config;
-  final GameResult? result;
-  final String? winner;
-  final List<List<int>>? winningLine;
-  final DateTime startTime;
-  final DateTime? endTime;
-  final int? moveCount;
-
-  factory GameState.fromJson(Map<String, dynamic> json) =>
-      _$GameStateFromJson(json);
-
-  Map<String, dynamic> toJson() => _$GameStateToJson(this);
-
-  factory GameState.initial(GameConfig config) {
-    final boardSize = config.boardSize;
-    final board = List.generate(
-      boardSize,
-      (i) => List.generate(boardSize, (j) => PlayerMark.none),
-    );
-
+  factory GameState.initial(int boardSize) {
     return GameState(
+      boardState: List.generate(boardSize, (_) => List.filled(boardSize, null)),
+      currentPlayer: 'X',
+      isGameOver: false,
+      winningLine: null,
       status: GameStatus.waiting,
-      board: board,
-      currentPlayer: PlayerMark.X,
-      players: config.players,
-      config: config,
-      startTime: DateTime.now(),
-      moveCount: 0,
+      player1Wins: 0,
+      player2Wins: 0,
+      draws: 0,
     );
   }
 
-  bool get isGameOver => status == GameStatus.finished;
-  bool get isPlaying => status == GameStatus.playing;
-  bool get hasWinner => result == GameResult.win;
-  bool get isDraw => result == GameResult.draw;
-  bool get isOngoing => result == GameResult.ongoing;
+  GameState copyWith({
+    List<List<String?>>? boardState,
+    String? currentPlayer,
+    bool? isGameOver,
+    List<int>? winningLine,
+    GameStatus? status,
+    int? player1Wins,
+    int? player2Wins,
+    int? draws,
+  }) {
+    return GameState(
+      boardState: boardState ?? this.boardState,
+      currentPlayer: currentPlayer ?? this.currentPlayer,
+      isGameOver: isGameOver ?? this.isGameOver,
+      winningLine: winningLine ?? this.winningLine,
+      status: status ?? this.status,
+      player1Wins: player1Wins ?? this.player1Wins,
+      player2Wins: player2Wins ?? this.player2Wins,
+      draws: draws ?? this.draws,
+    );
+  }
 
-  int get totalCells => board.length * board[0].length;
-  int get filledCells => board
-      .expand((row) => row)
-      .where((cell) => cell != PlayerMark.none)
-      .length;
-  bool get isBoardFull => filledCells == totalCells;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is GameState &&
-          runtimeType == other.runtimeType &&
-          status == other.status &&
-          board == other.board &&
-          currentPlayer == other.currentPlayer &&
-          players == other.players &&
-          config == other.config &&
-          result == other.result &&
-          winner == other.winner &&
-          winningLine == other.winningLine &&
-          startTime == other.startTime &&
-          endTime == other.endTime &&
-          moveCount == other.moveCount;
+  bool get isDraw => isGameOver && winningLine == null;
+  bool get hasWinner => winningLine != null;
 
   @override
-  int get hashCode => Object.hash(
-    runtimeType,
-    status,
-    board,
-    currentPlayer,
-    players,
-    config,
-    result,
-    winner,
-    winningLine,
-    startTime,
-    endTime,
-    moveCount,
-  );
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is GameState &&
+        listEquals(other.boardState, boardState) &&
+        other.currentPlayer == currentPlayer &&
+        other.isGameOver == isGameOver &&
+        listEquals(other.winningLine, winningLine) &&
+        other.status == status &&
+        other.player1Wins == player1Wins &&
+        other.player2Wins == player2Wins &&
+        other.draws == draws;
+  }
 
   @override
-  String toString() =>
-      'GameState(status: $status, board: $board, currentPlayer: $currentPlayer, players: $players, config: $config, result: $result, winner: $winner, winningLine: $winningLine, startTime: $startTime, endTime: $endTime, moveCount: $moveCount)';
+  int get hashCode {
+    return Object.hash(
+      Object.hashAll(boardState),
+      currentPlayer,
+      isGameOver,
+      Object.hashAll(winningLine ?? []),
+      status,
+      player1Wins,
+      player2Wins,
+      draws,
+    );
+  }
+
+  @override
+  String toString() {
+    return 'GameState(boardState: $boardState, currentPlayer: $currentPlayer, isGameOver: $isGameOver, winningLine: $winningLine, status: $status, player1Wins: $player1Wins, player2Wins: $player2Wins, draws: $draws)';
+  }
 }

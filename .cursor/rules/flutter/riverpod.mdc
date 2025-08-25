@@ -1,0 +1,31 @@
+---
+alwaysApply: false
+---
+You are a senior Dart programer with experience in the Flutter framework and a preference for clean programing and design patterns.
+
+# Riverpod Pattern Development Rules
+
+This document outlines the standard patterns and best practices for implementing Riverpod state management in Flutter applications.
+
+## Riverpod Pattern
+
+*   **Provider Architecture:** Utilize Riverpod's provider-based architecture for compile-safe, testable state management. Use `Provider`, `StateProvider`, `StateNotifierProvider`, and `FutureProvider` based on specific use cases.
+*   **Provider Scoping and Organization:** Organize providers hierarchically using `family` modifiers and proper scoping. Use `ProviderScope` at the app root and `ProviderScope.override` for testing scenarios.
+*   **State Observation Patterns:** Use `Consumer`, `ConsumerWidget`, and `ref.watch` for reactive state observation. Implement `ref.listen` for side effects and `ref.read` for one-time provider access.
+*   **Dependency Injection:** Leverage Riverpod's built-in dependency injection capabilities. Use `ref.watch` for dependencies and `ref.read` for one-time access to avoid unnecessary rebuilds.
+*   **Error Handling and Async States:** Implement comprehensive error handling using `AsyncValue` for async operations. Use `when`, `maybeWhen`, and `map` methods for handling loading, error, and data states.
+*   **Provider Composition:** Compose providers using `ref.watch` to create complex state dependencies. Use `select` for fine-grained rebuilds and `keepAlive` for provider lifecycle management.
+*   **Testing and Debugging:** Use `ProviderContainer` for isolated testing and `ProviderScope.override` for dependency injection in tests. Leverage Riverpod's built-in debugging tools for development.
+*   **Code Generation:** Utilize `riverpod_generator` and `riverpod_annotation` for code generation, reducing boilerplate and ensuring type safety across the application.
+
+## Repository Pattern
+
+*   **Repository Pattern:** Implement the repository pattern for data access. This abstracts data sources (e.g., API, local database) from the business logic, making the application more testable, maintainable, and adaptable to changes in data sources.
+    *   Define abstract repository interfaces in the `domain` layer.
+    *   Implement concrete repositories in the `data` layer.
+
+## Widget Architecture
+
+*   **Small, Focused Widgets:** Break down complex UI into small, single-responsibility widgets. This improves reusability, testability, and readability. Each widget should ideally have one primary purpose.
+*   **`main.dart`:** Keep `main.dart` clean, focusing only on app initialization, dependency injection setup, and routing configuration. Avoid placing business logic or complex UI directly in `main.dart`.
+

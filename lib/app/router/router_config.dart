@@ -8,6 +8,11 @@ import 'routes.dart';
 import 'route_transitions.dart';
 import '../../features/loading/loading.dart';
 import '../../features/home/home.dart';
+import '../../features/setup/setup.dart';
+import '../../features/game/game.dart';
+import '../../features/store/store.dart';
+import '../../features/profile/profile.dart';
+import '../../features/settings/settings.dart';
 
 /// Comprehensive router configuration for the Tic Tac Toe XO Royale app
 /// Integrates all advanced features: ShellRoute, deep linking, navigation state, etc.
@@ -139,18 +144,20 @@ class RouterConfig {
             builder: (context, state) {
               final queryParams = state.uri.queryParameters;
               return GameScreen(
-                gameId: queryParams['gameId'],
-                boardSize: int.tryParse(
-                  queryParams[AppRoutes.boardSizeParam] ?? '',
-                ),
-                winCondition: int.tryParse(
-                  queryParams[AppRoutes.winConditionParam] ?? '',
-                ),
-                gameMode: queryParams[AppRoutes.gameModeParam],
-                difficulty: queryParams[AppRoutes.difficultyParam],
-                player1: queryParams[AppRoutes.player1Param],
-                player2: queryParams[AppRoutes.player2Param],
-                firstMove: queryParams[AppRoutes.firstMoveParam],
+                boardSize:
+                    int.tryParse(
+                      queryParams[AppRoutes.boardSizeParam] ?? '3',
+                    ) ??
+                    3,
+                winCondition:
+                    int.tryParse(
+                      queryParams[AppRoutes.winConditionParam] ?? '3',
+                    ) ??
+                    3,
+                player1Name: queryParams[AppRoutes.player1Param] ?? 'Player 1',
+                player2Name: queryParams[AppRoutes.player2Param] ?? 'Player 2',
+                isRobotMode: queryParams[AppRoutes.gameModeParam] == 'robot',
+                difficulty: queryParams[AppRoutes.difficultyParam] ?? 'medium',
               );
             },
             pageBuilder: (context, state) {
@@ -158,18 +165,23 @@ class RouterConfig {
               return CustomTransitionPage(
                 key: state.pageKey,
                 child: GameScreen(
-                  gameId: queryParams['gameId'],
-                  boardSize: int.tryParse(
-                    queryParams[AppRoutes.boardSizeParam] ?? '',
-                  ),
-                  winCondition: int.tryParse(
-                    queryParams[AppRoutes.winConditionParam] ?? '',
-                  ),
-                  gameMode: queryParams[AppRoutes.gameModeParam],
-                  difficulty: queryParams[AppRoutes.difficultyParam],
-                  player1: queryParams[AppRoutes.player1Param],
-                  player2: queryParams[AppRoutes.player2Param],
-                  firstMove: queryParams[AppRoutes.firstMoveParam],
+                  boardSize:
+                      int.tryParse(
+                        queryParams[AppRoutes.boardSizeParam] ?? '3',
+                      ) ??
+                      3,
+                  winCondition:
+                      int.tryParse(
+                        queryParams[AppRoutes.winConditionParam] ?? '3',
+                      ) ??
+                      3,
+                  player1Name:
+                      queryParams[AppRoutes.player1Param] ?? 'Player 1',
+                  player2Name:
+                      queryParams[AppRoutes.player2Param] ?? 'Player 2',
+                  isRobotMode: queryParams[AppRoutes.gameModeParam] == 'robot',
+                  difficulty:
+                      queryParams[AppRoutes.difficultyParam] ?? 'medium',
                 ),
                 transitionsBuilder:
                     (context, animation, secondaryAnimation, child) {
@@ -191,34 +203,22 @@ class RouterConfig {
             path: AppRoutes.store,
             name: AppRoutes.storeName,
             parentNavigatorKey: AdvancedRouter.shellNavigatorKey,
-            builder: (context, state) {
-              final queryParams = state.uri.queryParameters;
-              return StoreScreen(
-                category: queryParams['category'],
-                itemId: queryParams['itemId'],
-              );
-            },
-            pageBuilder: (context, state) {
-              final queryParams = state.uri.queryParameters;
-              return CustomTransitionPage(
-                key: state.pageKey,
-                child: StoreScreen(
-                  category: queryParams['category'],
-                  itemId: queryParams['itemId'],
-                ),
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) {
-                      return AppRouteTransitions.sharedAxisHorizontal(
-                        child: child,
-                      ).transitionsBuilder(
-                        context,
-                        animation,
-                        secondaryAnimation,
-                        child,
-                      );
-                    },
-              );
-            },
+            builder: (context, state) => const StoreScreen(),
+            pageBuilder: (context, state) => CustomTransitionPage(
+              key: state.pageKey,
+              child: const StoreScreen(),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return AppRouteTransitions.sharedAxisHorizontal(
+                      child: child,
+                    ).transitionsBuilder(
+                      context,
+                      animation,
+                      secondaryAnimation,
+                      child,
+                    );
+                  },
+            ),
           ),
 
           // Profile route
@@ -226,34 +226,22 @@ class RouterConfig {
             path: AppRoutes.profile,
             name: AppRoutes.profileName,
             parentNavigatorKey: AdvancedRouter.shellNavigatorKey,
-            builder: (context, state) {
-              final queryParams = state.uri.queryParameters;
-              return ProfileScreen(
-                userId: queryParams['userId'],
-                leaderboardId: queryParams['leaderboardId'],
-              );
-            },
-            pageBuilder: (context, state) {
-              final queryParams = state.uri.queryParameters;
-              return CustomTransitionPage(
-                key: state.pageKey,
-                child: ProfileScreen(
-                  userId: queryParams['userId'],
-                  leaderboardId: queryParams['leaderboardId'],
-                ),
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) {
-                      return AppRouteTransitions.sharedAxisHorizontal(
-                        child: child,
-                      ).transitionsBuilder(
-                        context,
-                        animation,
-                        secondaryAnimation,
-                        child,
-                      );
-                    },
-              );
-            },
+            builder: (context, state) => const ProfileScreen(),
+            pageBuilder: (context, state) => CustomTransitionPage(
+              key: state.pageKey,
+              child: const ProfileScreen(),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return AppRouteTransitions.sharedAxisHorizontal(
+                      child: child,
+                    ).transitionsBuilder(
+                      context,
+                      animation,
+                      secondaryAnimation,
+                      child,
+                    );
+                  },
+            ),
           ),
 
           // Settings route
@@ -286,19 +274,8 @@ class RouterConfig {
         path: '/game/:gameId',
         name: 'game-deep-link',
         parentNavigatorKey: AdvancedRouter.rootNavigatorKey,
-        builder: (context, state) {
-          final gameId = state.pathParameters['gameId'];
-          return GameScreen(gameId: gameId);
-        },
-        redirect: (context, state) {
-          // Handle deep link redirects
-          final gameId = state.pathParameters['gameId'];
-          if (gameId != null) {
-            // Redirect to game screen with proper parameters
-            return '${AppRoutes.game}?gameId=$gameId';
-          }
-          return null;
-        },
+        builder: (context, state) => const GameScreen(),
+        redirect: (context, state) => AppRoutes.game,
       ),
 
       // Store item deep link
@@ -306,20 +283,8 @@ class RouterConfig {
         path: '/store/:category/:itemId',
         name: 'store-item-deep-link',
         parentNavigatorKey: AdvancedRouter.rootNavigatorKey,
-        builder: (context, state) {
-          final category = state.pathParameters['category'];
-          final itemId = state.pathParameters['itemId'];
-          return StoreItemDetailScreen(category: category, itemId: itemId);
-        },
-        redirect: (context, state) {
-          // Handle store deep link redirects
-          final category = state.pathParameters['category'];
-          final itemId = state.pathParameters['itemId'];
-          if (category != null && itemId != null) {
-            return '${AppRoutes.store}?category=$category&itemId=$itemId';
-          }
-          return AppRoutes.store;
-        },
+        builder: (context, state) => const StoreScreen(),
+        redirect: (context, state) => AppRoutes.store,
       ),
 
       // Challenge deep link
@@ -327,17 +292,8 @@ class RouterConfig {
         path: '/challenge/:challengeId',
         name: 'challenge-deep-link',
         parentNavigatorKey: AdvancedRouter.rootNavigatorKey,
-        builder: (context, state) {
-          final challengeId = state.pathParameters['challengeId'];
-          return SetupScreen(challengeId: challengeId);
-        },
-        redirect: (context, state) {
-          final challengeId = state.pathParameters['challengeId'];
-          if (challengeId != null) {
-            return '${AppRoutes.setup}?challengeId=$challengeId';
-          }
-          return AppRoutes.setup;
-        },
+        builder: (context, state) => const SetupScreen(),
+        redirect: (context, state) => AppRoutes.setup,
       ),
 
       // Tournament deep link
@@ -345,17 +301,8 @@ class RouterConfig {
         path: '/tournament/:tournamentId',
         name: 'tournament-deep-link',
         parentNavigatorKey: AdvancedRouter.rootNavigatorKey,
-        builder: (context, state) {
-          final tournamentId = state.pathParameters['tournamentId'];
-          return SetupScreen(tournamentId: tournamentId);
-        },
-        redirect: (context, state) {
-          final tournamentId = state.pathParameters['tournamentId'];
-          if (tournamentId != null) {
-            return '${AppRoutes.setup}?tournamentId=$tournamentId';
-          }
-          return AppRoutes.setup;
-        },
+        builder: (context, state) => const SetupScreen(),
+        redirect: (context, state) => AppRoutes.setup,
       ),
 
       // Profile deep link
@@ -363,17 +310,8 @@ class RouterConfig {
         path: '/profile/:userId',
         name: 'profile-deep-link',
         parentNavigatorKey: AdvancedRouter.rootNavigatorKey,
-        builder: (context, state) {
-          final userId = state.pathParameters['userId'];
-          return ProfileScreen(userId: userId);
-        },
-        redirect: (context, state) {
-          final userId = state.pathParameters['userId'];
-          if (userId != null) {
-            return '${AppRoutes.profile}?userId=$userId';
-          }
-          return AppRoutes.profile;
-        },
+        builder: (context, state) => const ProfileScreen(),
+        redirect: (context, state) => AppRoutes.profile,
       ),
 
       // Leaderboard deep link
@@ -381,17 +319,8 @@ class RouterConfig {
         path: '/leaderboard/:boardId',
         name: 'leaderboard-deep-link',
         parentNavigatorKey: AdvancedRouter.rootNavigatorKey,
-        builder: (context, state) {
-          final boardId = state.pathParameters['boardId'];
-          return ProfileScreen(leaderboardId: boardId);
-        },
-        redirect: (context, state) {
-          final boardId = state.pathParameters['boardId'];
-          if (boardId != null) {
-            return '${AppRoutes.profile}?leaderboardId=$boardId';
-          }
-          return AppRoutes.profile;
-        },
+        builder: (context, state) => const ProfileScreen(),
+        redirect: (context, state) => AppRoutes.profile,
       ),
 
       // Share deep link
@@ -531,202 +460,3 @@ class _RouterRefreshStream extends ChangeNotifier {
 final comprehensiveRouterProvider = Provider<GoRouter>((ref) {
   return RouterConfig.createRouter(ref);
 });
-
-// Placeholder screen widgets with enhanced parameters
-
-class SetupScreen extends StatelessWidget {
-  final String? challengeId;
-  final String? tournamentId;
-  final int? boardSize;
-  final int? winCondition;
-  final String? gameMode;
-  final String? difficulty;
-  final String? player1;
-  final String? player2;
-  final String? firstMove;
-
-  const SetupScreen({
-    super.key,
-    this.challengeId,
-    this.tournamentId,
-    this.boardSize,
-    this.winCondition,
-    this.gameMode,
-    this.difficulty,
-    this.player1,
-    this.player2,
-    this.firstMove,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Game Setup'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => NavigationService.navigateBack(context),
-        ),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('Setup Screen'),
-            if (challengeId != null) Text('Challenge ID: $challengeId'),
-            if (tournamentId != null) Text('Tournament ID: $tournamentId'),
-            if (boardSize != null) Text('Board Size: $boardSize'),
-            if (winCondition != null) Text('Win Condition: $winCondition'),
-            if (gameMode != null) Text('Game Mode: $gameMode'),
-            if (difficulty != null) Text('Difficulty: $difficulty'),
-            if (player1 != null) Text('Player 1: $player1'),
-            if (player2 != null) Text('Player 2: $player2'),
-            if (firstMove != null) Text('First Move: $firstMove'),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class GameScreen extends StatelessWidget {
-  final String? gameId;
-  final int? boardSize;
-  final int? winCondition;
-  final String? gameMode;
-  final String? difficulty;
-  final String? player1;
-  final String? player2;
-  final String? firstMove;
-
-  const GameScreen({
-    super.key,
-    this.gameId,
-    this.boardSize,
-    this.winCondition,
-    this.gameMode,
-    this.difficulty,
-    this.player1,
-    this.player2,
-    this.firstMove,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Game'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => NavigationService.navigateBack(context),
-        ),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('Game Screen'),
-            if (gameId != null) Text('Game ID: $gameId'),
-            if (boardSize != null) Text('Board Size: $boardSize'),
-            if (winCondition != null) Text('Win Condition: $winCondition'),
-            if (gameMode != null) Text('Game Mode: $gameMode'),
-            if (difficulty != null) Text('Difficulty: $difficulty'),
-            if (player1 != null) Text('Player 1: $player1'),
-            if (player2 != null) Text('Player 2: $player2'),
-            if (firstMove != null) Text('First Move: $firstMove'),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class StoreScreen extends StatelessWidget {
-  final String? category;
-  final String? itemId;
-
-  const StoreScreen({super.key, this.category, this.itemId});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Store')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('Store Screen'),
-            if (category != null) Text('Category: $category'),
-            if (itemId != null) Text('Item ID: $itemId'),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class ProfileScreen extends StatelessWidget {
-  final String? userId;
-  final String? leaderboardId;
-
-  const ProfileScreen({super.key, this.userId, this.leaderboardId});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('Profile Screen'),
-            if (userId != null) Text('User ID: $userId'),
-            if (leaderboardId != null) Text('Leaderboard ID: $leaderboardId'),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
-      body: const Center(child: Text('Settings Screen')),
-    );
-  }
-}
-
-class StoreItemDetailScreen extends StatelessWidget {
-  final String? category;
-  final String? itemId;
-
-  const StoreItemDetailScreen({super.key, this.category, this.itemId});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Store Item - ${category ?? 'Unknown'}'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => NavigationService.navigateToStore(context),
-        ),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('Store Item Detail'),
-            if (category != null) Text('Category: $category'),
-            if (itemId != null) Text('Item ID: $itemId'),
-          ],
-        ),
-      ),
-    );
-  }
-}

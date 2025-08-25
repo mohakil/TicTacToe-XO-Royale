@@ -1,0 +1,84 @@
+---
+alwaysApply: false
+---
+
+You are a senior Dart programer with experience in the Flutter framework and a preference for clean programing and design patterns.
+
+# Flutter Development Rules - Advanced Testing Strategies
+
+This document covers advanced testing strategies for Flutter applications.
+
+> Advanced Testing Strategies  
+> **Last Updated:** August 2025  
+> **Flutter Version:** 3.35.1
+
+## Advanced Testing Strategies
+
+### Performance Testing
+
+*   **Frame Rate Monitoring:** Use `flutter_driver` or `integration_test` to measure frame rates during user interactions. Ensure the app maintains 60 FPS (or 120 FPS on high refresh rate devices) during critical flows.
+*   **Memory Leak Detection:** Implement tests that check for memory leaks by monitoring memory usage over time during specific operations. Use tools like `flutter_test` with memory profiling.
+*   **Startup Time:** Measure app startup time from launch to first frame rendered. Optimize critical path initialization to minimize this time.
+*   **Battery Usage:** For mobile apps, consider battery usage tests to ensure the app doesn't drain battery excessively, especially for background processes.
+
+### Accessibility Testing
+
+*   **Screen Readers:** Test with screen readers (TalkBack on Android, VoiceOver on iOS) to ensure all UI elements are properly labeled and navigable.
+*   **Keyboard Navigation:** Ensure full keyboard navigation support for web and desktop applications.
+*   **Color Contrast:** Verify color contrast ratios meet WCAG guidelines (minimum 4.5:1 for normal text, 3:1 for large text).
+*   **Font Scaling:** Test with different font scaling settings to ensure UI adapts gracefully.
+
+### Internationalization Testing
+
+*   **Text Expansion:** Test with languages that have longer text (like German) to ensure UI doesn't break.
+*   **RTL Support:** Test Right-to-Left languages (Arabic, Hebrew) to ensure proper layout mirroring.
+*   **Date/Time Formats:** Verify correct display of dates, times, and numbers across different locales.
+*   **Currency and Units:** Ensure proper formatting of currencies, measurements, and units.
+
+### UI Automation Testing
+
+*   **Critical User Flows:** Automate testing of the most critical user journeys (login, purchase, core functionality).
+*   **Edge Cases:** Test edge cases like network failures, low battery, and interruptions (phone calls, notifications).
+*   **Cross-Platform Consistency:** Ensure behavior is consistent across iOS and Android (and web if applicable).
+*   **Data Persistence:** Test data saving/loading across app restarts and updates.
+
+### State Management Testing
+
+*   **State Consistency:** Verify state remains consistent across app lifecycle events (background/foreground, rotation).
+*   **State Restoration:** Test state restoration after process death (Android) or app termination.
+*   **Performance Impact:** Measure the performance impact of state management solutions on app responsiveness.
+*   **Race Conditions:** Test for race conditions in async state updates, especially with multiple concurrent operations.
+
+### Fuzz Testing
+
+*   **Input Fuzzing:** Test with random, unexpected, or malformed inputs to ensure graceful handling.
+*   **API Fuzzing:** Test API endpoints with various edge case inputs and error conditions.
+*   **UI Fuzzing:** Randomly interact with UI elements to discover crashes or unexpected behavior.
+
+### Security Testing
+
+*   **Data Encryption:** Verify sensitive data is properly encrypted at rest and in transit.
+*   **Authentication Flows:** Test authentication and authorization flows thoroughly, including token refresh and expiration.
+*   **API Security:** Test API endpoints for common vulnerabilities (SQL injection, XSS, CSRF).
+*   **Certificate Pinning:** Verify SSL certificate pinning is properly implemented.
+
+### Load Testing
+
+*   **Concurrent Users:** Test how the app behaves with multiple concurrent users (for backend-dependent features).
+*   **Large Datasets:** Test performance with large amounts of data (lists, images, files).
+*   **Memory Pressure:** Test behavior under memory pressure conditions.
+
+### Regression Testing
+
+*   **Automated Regression Suite:** Maintain a comprehensive automated regression test suite that runs on every code change.
+*   **Visual Regression:** Use golden file testing to catch unintended UI changes. Automate the generation and comparison of golden images in your CI/CD pipeline to ensure pixel-perfect UI consistency.
+*   **Performance Regression:** Monitor for performance regressions in CI/CD pipeline.
+*   **Feature Regression:** Ensure new features don't break existing functionality.
+
+### Beta Testing
+
+*   **TestFlight/Google Play Beta:** Use platform beta testing programs to gather real-world feedback.
+*   **A/B Testing:** Implement A/B testing for new features to measure impact before full rollout.
+*   **Crash Analytics:** Monitor crash reports from beta users to catch issues before production.
+*   **User Feedback:** Collect and analyze user feedback from beta testers.
+

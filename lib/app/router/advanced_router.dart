@@ -5,7 +5,11 @@ import 'routes.dart';
 import 'route_transitions.dart';
 import '../../features/loading/loading.dart';
 import '../../features/home/home.dart';
-import 'app_router.dart';
+import '../../features/setup/setup.dart';
+import '../../features/game/game.dart';
+import '../../features/store/store.dart';
+import '../../features/profile/profile.dart';
+import '../../features/settings/settings.dart';
 
 /// Advanced GoRouter configuration with ShellRoute and nested navigation
 class AdvancedRouter {

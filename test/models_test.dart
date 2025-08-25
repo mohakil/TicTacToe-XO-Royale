@@ -72,51 +72,51 @@ void main() {
     test('should create default config', () {
       final config = GameConfig.defaultConfig();
 
-      expect(config.mode, GameMode.local);
-      expect(config.firstMove, FirstMove.random);
+      expect(config.gameMode, GameMode.local);
+      expect(config.firstMove, FirstMove.player1);
       expect(config.boardSize, 3);
       expect(config.winCondition, 3);
-      expect(config.players, ['Player 1', 'Player 2']);
+      expect(config.player1Name, 'Player 1');
+      expect(config.player2Name, 'Player 2');
     });
 
     test('should create CPU config', () {
       final config = GameConfig.cpuConfig(difficulty: Difficulty.hard);
 
-      expect(config.mode, GameMode.cpu);
+      expect(config.gameMode, GameMode.cpu);
       expect(config.difficulty, Difficulty.hard);
-      expect(config.isCpuMode, true);
-      expect(config.isLocalMode, false);
+      expect(config.isRobotMode, true);
     });
 
     test('should handle computed properties', () {
       final config = GameConfig.defaultConfig();
 
-      expect(config.hasRandomFirstMove, true);
-      expect(config.isLocalMode, true);
+      expect(config.firstMove, FirstMove.player1);
+      expect(config.gameMode, GameMode.local);
     });
   });
 
   group('GameState Model Tests', () {
     test('should create initial state', () {
-      final config = GameConfig.defaultConfig();
-      final state = GameState.initial(config);
+      final state = GameState.initial(3);
 
       expect(state.status, GameStatus.waiting);
-      expect(state.board.length, 3);
-      expect(state.board[0].length, 3);
-      expect(state.currentPlayer, PlayerMark.X);
-      expect(state.moveCount, 0);
+      expect(state.boardState.length, 3);
+      expect(state.boardState[0].length, 3);
+      expect(state.currentPlayer, 'X');
+      expect(state.player1Wins, 0);
     });
 
     test('should handle computed properties', () {
-      final config = GameConfig.defaultConfig();
-      final state = GameState.initial(config);
+      final state = GameState.initial(3);
 
       expect(state.isGameOver, false);
-      expect(state.isPlaying, false);
-      expect(state.totalCells, 9);
-      expect(state.filledCells, 0);
-      expect(state.isBoardFull, false);
+      expect(state.status, GameStatus.waiting);
+      expect(state.boardState.length * state.boardState[0].length, 9);
+      expect(
+        state.boardState.every((row) => row.every((cell) => cell == null)),
+        true,
+      );
     });
   });
 

@@ -1,0 +1,189 @@
+---
+alwaysApply: false
+---
+
+You are a senior Dart programer with experience in the Flutter framework and a preference for clean programing and design patterns.
+
+# Flutter Development Rules - Web & Cross-Platform Guidelines
+
+This document covers web-specific guidelines and cross-platform compatibility for Flutter applications.
+
+> Web & Cross-Platform Guidelines  
+> **Last Updated:** August 2025  
+> **Flutter Version:** 3.35.1
+
+## Web-Specific Guidelines
+
+When developing Flutter apps for the web, consider web-specific behaviors, performance characteristics, and user expectations.
+
+### Web Design and UX Guidelines
+
+*   **Responsive Design:**
+    *   Ensure the app adapts to different screen sizes and orientations.
+    *   Use responsive layout techniques like `MediaQuery`, `LayoutBuilder`, and responsive widgets.
+    *   Test on various screen sizes from mobile to desktop.
+*   **Navigation Patterns:**
+    *   Use URL-based navigation with `go_router` or `auto_route` for proper web navigation.
+    *   Ensure browser back/forward buttons work correctly.
+    *   Implement proper URL structures for SEO and user experience.
+*   **Touch and Mouse Input:**
+    *   Ensure all interactive elements work with both touch and mouse input.
+    *   Provide appropriate hover states for desktop users.
+    *   Consider touch target sizes for mobile web users.
+*   **Keyboard Navigation:**
+    *   Ensure full keyboard navigation support for accessibility.
+    *   Implement proper tab order and focus management.
+*   **Performance:**
+    *   Optimize for fast initial load times and smooth interactions.
+    *   Use lazy loading for images and content.
+    *   Minimize JavaScript bundle size.
+*   **SEO Considerations:**
+    *   Use proper semantic HTML elements where possible.
+    *   Ensure meta tags and structured data are properly set.
+    *   Consider server-side rendering (SSR) for better SEO.
+
+### Web Platform Integration
+
+*   **Progressive Web App (PWA):**
+    *   Implement PWA features like offline support, install prompts, and push notifications.
+    *   Configure `web/manifest.json` for proper PWA setup.
+    *   Use service workers for caching and offline functionality.
+*   **Browser APIs:**
+    *   Use web-specific packages for browser APIs (camera, geolocation, notifications).
+    *   Handle browser compatibility issues gracefully.
+*   **URL Handling:**
+    *   Implement proper URL routing and deep linking.
+    *   Handle query parameters and URL fragments correctly.
+*   **Local Storage:**
+    *   Use `shared_preferences` or `hive` for web storage.
+    *   Handle storage limitations and privacy considerations.
+*   **File Upload/Download:**
+    *   Implement proper file upload/download functionality.
+    *   Handle browser security restrictions for file access.
+
+### Web Build and Deployment
+
+*   **Build Configuration:**
+    *   Use `flutter build web --release` for production builds.
+    *   Configure build modes for different environments.
+*   **Deployment Options:**
+    *   **Static Hosting:** Deploy to GitHub Pages, Netlify, Vercel, Firebase Hosting.
+    *   **CDN:** Use CDN for faster global delivery.
+    *   **Docker:** Containerize web app for consistent deployment.
+*   **Performance Optimization:**
+    *   Enable tree shaking and minification.
+    *   Use code splitting for larger applications.
+    *   Optimize images and assets for web delivery.
+*   **HTTPS:** Ensure all deployments use HTTPS for security.
+*   **Custom Domain:** Configure custom domains with proper SSL certificates.
+
+## Cross-Platform Compatibility
+
+Ensure your Flutter app works seamlessly across all target platforms while respecting platform-specific conventions.
+
+### Design System Consistency
+
+*   **Platform Adaptation:**
+    *   Use platform-specific widgets (`Cupertino` for iOS, `Material` for Android) where appropriate.
+    *   Implement adaptive layouts that feel native on each platform.
+    *   Respect platform-specific navigation patterns and gestures.
+*   **Theme Consistency:**
+    *   Create platform-aware themes that adapt to each platform's design language.
+    *   Use platform-specific color schemes and typography.
+*   **Iconography:**
+    *   Use platform-appropriate icons (SF Symbols for iOS, Material icons for Android).
+    *   Ensure icon meanings are consistent across platforms.
+
+### Feature Parity
+
+*   **Core Features:**
+    *   Ensure core features work identically across all platforms.
+    *   Handle platform-specific limitations gracefully.
+*   **Platform-Specific Features:**
+    *   Implement platform-specific features when beneficial (e.g., iOS widgets, Android shortcuts).
+    *   Provide fallbacks or alternative implementations for unsupported features.
+*   **Performance Targets:**
+    *   Maintain consistent performance standards across platforms.
+    *   Optimize for each platform's characteristics (mobile vs. web vs. desktop).
+
+### Testing Strategy
+
+*   **Cross-Platform Testing:**
+    *   Test on all target platforms during development.
+    *   Use platform-specific emulators/simulators and real devices.
+*   **Automated Testing:**
+    *   Run automated tests on all platforms in CI/CD pipeline.
+    *   Use platform-specific test configurations where needed.
+*   **User Testing:**
+    *   Conduct user testing on each platform to ensure usability.
+    *   Gather platform-specific feedback and iterate accordingly.
+
+### Code Organization
+
+*   **Platform-Specific Code:**
+    *   Use platform channels for platform-specific functionality.
+    *   Organize platform-specific code in separate files or packages.
+*   **Shared Code:**
+    *   Maximize code sharing across platforms for business logic and UI.
+    *   Use dependency injection for platform-specific implementations.
+*   **Configuration Management:**
+    *   Use environment-specific configurations for different platforms.
+    *   Handle platform-specific build configurations and settings.
+
+### Deployment Strategy
+
+*   **Staged Rollouts:**
+    *   Implement staged rollouts for each platform separately.
+    *   Monitor metrics and user feedback for each platform.
+*   **Platform-Specific Stores:**
+    *   Follow each platform's store guidelines and requirements.
+    *   Optimize store listings for each platform's audience.
+*   **Version Management:**
+    *   Maintain consistent versioning across platforms.
+    *   Handle platform-specific release schedules and requirements.
+
+### Maintenance and Updates
+
+*   **Platform Updates:**
+    *   Stay updated with platform-specific SDK updates and deprecations.
+    *   Test compatibility with new OS versions across all platforms.
+
+### Flutter 3.35.0 Multi-Window Support
+
+*   **Multi-Window Foundation (Experimental):**
+    *   **New Feature:** Foundational logic for creating and updating windows in Windows and macOS.
+    *   **Status:** Still experimental, but points to future multi-window capabilities.
+    *   **Use Case:** Future support for desktop applications with multiple windows.
+    *   **Platform Support:** Windows and macOS (experimental).
+    *   **Future Considerations:** Prepare for multi-window Flutter applications on desktop platforms.
+*   **Bug Tracking:**
+    *   Track platform-specific bugs separately.
+    *   Prioritize fixes based on platform impact and user base.
+*   **Documentation:**
+    *   Maintain platform-specific documentation for development and deployment.
+    *   Document platform-specific behaviors and limitations.
+
+### Performance Optimization
+
+*   **Platform-Specific Optimizations:**
+    *   Optimize for each platform's rendering pipeline.
+    *   Use platform-specific performance monitoring tools.
+*   **Resource Management:**
+    *   Optimize image and asset sizes for each platform.
+    *   Use platform-specific caching strategies.
+*   **Battery and Power:**
+    *   Optimize for battery usage on mobile platforms.
+    *   Consider power consumption for background processes.
+
+### Security Considerations
+
+*   **Platform-Specific Security:**
+    *   Implement platform-specific security measures (Keychain for iOS, Keystore for Android).
+    *   Follow platform-specific security best practices.
+*   **Data Protection:**
+    *   Ensure data encryption standards are consistent across platforms.
+    *   Handle platform-specific data storage requirements.
+*   **Authentication:**
+    *   Use platform-specific authentication methods where appropriate.
+    *   Ensure secure token storage and refresh across platforms.
+

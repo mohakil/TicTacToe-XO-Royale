@@ -31,27 +31,22 @@ class _AmbientParticlesState extends State<AmbientParticles>
   @override
   void initState() {
     super.initState();
-    
+
     _controllers = List.generate(
       widget.particleCount,
       (index) => AnimationController(
-        duration: Duration(
-          milliseconds: (8000 + index * 500).toInt(),
-        ),
+        duration: Duration(milliseconds: (8000 + index * 500).toInt()),
         vsync: this,
       ),
     );
-    
+
     _animations = _controllers.map((controller) {
       return Tween<double>(
         begin: 0.0,
         end: 1.0,
-      ).animate(CurvedAnimation(
-        parent: controller,
-        curve: Curves.easeInOut,
-      ));
+      ).animate(CurvedAnimation(parent: controller, curve: Curves.easeInOut));
     }).toList();
-    
+
     _positions = List.generate(
       widget.particleCount,
       (index) => Offset(
@@ -59,22 +54,22 @@ class _AmbientParticlesState extends State<AmbientParticles>
         math.Random().nextDouble() * 400 - 200,
       ),
     );
-    
+
     _isX = List.generate(
       widget.particleCount,
       (index) => math.Random().nextBool(),
     );
-    
+
     _sizes = List.generate(
       widget.particleCount,
       (index) => 20 + math.Random().nextDouble() * 30,
     );
-    
+
     _speeds = List.generate(
       widget.particleCount,
       (index) => widget.movementSpeed * (0.5 + math.Random().nextDouble()),
     );
-    
+
     // Start all animations
     for (final controller in _controllers) {
       controller.repeat();
@@ -100,19 +95,21 @@ class _AmbientParticlesState extends State<AmbientParticles>
             builder: (context, child) {
               final animation = _animations[index];
               final progress = animation.value;
-              
+
               // Calculate position with gentle floating movement
-              final x = _positions[index].dx + 
+              final x =
+                  _positions[index].dx +
                   math.sin(progress * 2 * math.pi) * 50 * _speeds[index];
-              final y = _positions[index].dy + 
+              final y =
+                  _positions[index].dy +
                   math.cos(progress * 2 * math.pi) * 30 * _speeds[index];
-              
+
               return Positioned(
                 left: x,
                 top: y,
                 child: Opacity(
                   opacity: widget.opacity,
-                  child: _isX[index] 
+                  child: _isX[index]
                       ? _buildX(_sizes[index])
                       : _buildO(_sizes[index]),
                 ),
@@ -125,17 +122,11 @@ class _AmbientParticlesState extends State<AmbientParticles>
   }
 
   Widget _buildX(double size) {
-    return CustomPaint(
-      size: Size(size, size),
-      painter: _XPainter(),
-    );
+    return CustomPaint(size: Size(size, size), painter: _XPainter());
   }
 
   Widget _buildO(double size) {
-    return CustomPaint(
-      size: Size(size, size),
-      painter: _OPainter(),
-    );
+    return CustomPaint(size: Size(size, size), painter: _OPainter());
   }
 }
 
@@ -147,24 +138,16 @@ class _XPainter extends CustomPainter {
       ..color = Colors.white
       ..strokeWidth = 2
       ..strokeCap = StrokeCap.round;
-    
+
     final padding = size.width * 0.2;
     final startX = padding;
     final endX = size.width - padding;
     final startY = padding;
     final endY = size.height - padding;
-    
+
     // Draw X
-    canvas.drawLine(
-      Offset(startX, startY),
-      Offset(endX, endY),
-      paint,
-    );
-    canvas.drawLine(
-      Offset(startX, endY),
-      Offset(endX, startY),
-      paint,
-    );
+    canvas.drawLine(Offset(startX, startY), Offset(endX, endY), paint);
+    canvas.drawLine(Offset(startX, endY), Offset(endX, startY), paint);
   }
 
   @override
@@ -179,10 +162,10 @@ class _OPainter extends CustomPainter {
       ..color = Colors.white
       ..strokeWidth = 2
       ..style = PaintingStyle.stroke;
-    
+
     final center = Offset(size.width / 2, size.height / 2);
     final radius = (size.width - size.width * 0.4) / 2;
-    
+
     canvas.drawCircle(center, radius, paint);
   }
 

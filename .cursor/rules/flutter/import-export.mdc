@@ -1,0 +1,57 @@
+---
+alwaysApply: false
+---
+
+You are a senior Dart programer with experience in the Flutter framework and a preference for clean programing and design patterns.
+
+# Flutter Development Rules - Import/Export Management
+
+This document covers import/export management best practices for Flutter applications.
+
+> Import/Export Management  
+> **Last Updated:** August 2025  
+> **Flutter Version:** 3.35.1
+
+## Import/Export Management
+
+Proper import/export management is crucial for maintaining clean, maintainable, and performant Flutter applications. This section covers best practices for organizing and managing your imports.
+
+### Import Organization Best Practices
+
+*   **Organize Imports Systematically:**
+    *   **Dart/Flutter SDK imports:** Group all standard Dart and Flutter imports first.
+    *   **Package imports:** Group third-party package imports next.
+    *   **Project imports:** Group your project's own imports last.
+    *   **Relative imports:** Use relative imports for files within the same package.
+    *   **Absolute imports:** Use package imports for files from other packages.
+*   **Avoid Importing Libraries You Don't Use:**
+    *   Regularly run `dart analyze` or `flutter analyze` to detect unused imports.
+    *   Remove unused imports to reduce compilation time and potential conflicts.
+*   **Use Show/Hide for Selective Imports:**
+    *   Use `show` to import only specific identifiers from a library.
+    *   Use `hide` to import all identifiers except specific ones.
+    *   Example: `import 'package:my_package/my_library.dart' show MyClass, MyFunction;`
+*   **Avoid `dart:mirrors`:**
+    *   `dart:mirrors` significantly increases app size and startup time.
+    *   Use code generation (e.g., `json_serializable`, `freezed`) instead of reflection.
+*   **Prefer Explicit Imports Over Wildcards:**
+    *   Avoid `import 'package:my_package/*';` as it makes dependencies unclear.
+    *   Explicitly import only what you need.
+*   **Use Barrel Files (Export Files) Strategically:**
+    *   Create barrel files (e.g., `my_package.dart`) to export multiple files from a package.
+    *   Don't overuse barrel files as they can increase compilation time.
+*   **Import Order Consistency:**
+    *   Establish and follow a consistent import order across your project.
+    *   Use tools like `import_sorter` to automatically sort imports.
+
+### Export Management
+
+*   **Export Only What's Needed:**
+    *   Only export classes, functions, and variables that are part of your package's public API.
+    *   Keep internal implementation details private.
+*   **Use `@Deprecated` for API Changes:**
+    *   Mark deprecated exports with `@Deprecated` before removing them.
+    *   Provide migration guidance in deprecation messages.
+*   **Version Your Public API:**
+    *   Follow semantic versioning for your package's public API.
+    *   Document breaking changes in your package's changelog.
