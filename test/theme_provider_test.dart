@@ -160,9 +160,6 @@ void main() {
 
     group('Theme Extensions', () {
       test('should provide theme name for display', () {
-        final notifier = container.read(themeModeProvider.notifier);
-
-        notifier.state = ThemeMode.light;
         final lightName = container.read(
           themeModeProvider.select((mode) {
             switch (mode) {
@@ -179,9 +176,6 @@ void main() {
       });
 
       test('should provide theme icon for display', () {
-        final notifier = container.read(themeModeProvider.notifier);
-
-        notifier.state = ThemeMode.dark;
         final darkIcon = container.read(
           themeModeProvider.select((mode) {
             switch (mode) {

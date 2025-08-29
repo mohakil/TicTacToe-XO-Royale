@@ -75,17 +75,13 @@ class MotionConstants {
   static Duration getResponsiveDuration(
     Duration baseDuration,
     double scaleFactor,
-  ) {
-    return Duration(
-      milliseconds: (baseDuration.inMilliseconds * scaleFactor).round(),
-    );
-  }
+  ) => Duration(
+    milliseconds: (baseDuration.inMilliseconds * scaleFactor).round(),
+  );
 
-  static Duration getTabletDuration(Duration baseDuration) {
-    return Duration(milliseconds: (baseDuration.inMilliseconds * 1.2).round());
-  }
+  static Duration getTabletDuration(Duration baseDuration) =>
+      Duration(milliseconds: (baseDuration.inMilliseconds * 1.2).round());
 
-  static Duration getLargeTabletDuration(Duration baseDuration) {
-    return Duration(milliseconds: (baseDuration.inMilliseconds * 1.4).round());
-  }
+  static Duration getLargeTabletDuration(Duration baseDuration) =>
+      Duration(milliseconds: (baseDuration.inMilliseconds * 1.4).round());
 }

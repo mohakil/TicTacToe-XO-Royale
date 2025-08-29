@@ -1,7 +1,7 @@
 import 'dart:math';
 
-import '../models/game_config.dart';
-import 'game_logic.dart';
+import 'package:tictactoe_xo_royale/core/models/game_config.dart';
+import 'package:tictactoe_xo_royale/core/services/game_logic.dart';
 
 /// Robot AI service for different difficulty levels
 class RobotLogic {
@@ -28,7 +28,9 @@ class RobotLogic {
   /// Easy AI: Random with light heuristics and 10-20% intentional blunders
   Position _getEasyMove(CellState robotPlayer) {
     final availableMoves = gameLogic.getAvailableMoves();
-    if (availableMoves.isEmpty) return const Position(0, 0);
+    if (availableMoves.isEmpty) {
+      return const Position(0, 0);
+    }
 
     // 15% chance to make an intentional blunder
     if (_random.nextDouble() < 0.15) {
@@ -79,17 +81,13 @@ class RobotLogic {
     }
 
     final corners = PositionExtensions.getCorners(gameLogic.boardSize);
-    final availableCorners = availableMoves
-        .where((move) => corners.contains(move))
-        .toList();
+    final availableCorners = availableMoves.where(corners.contains).toList();
     if (availableCorners.isNotEmpty) {
       return availableCorners[_random.nextInt(availableCorners.length)];
     }
 
     final edges = PositionExtensions.getEdges(gameLogic.boardSize);
-    final availableEdges = availableMoves
-        .where((move) => edges.contains(move))
-        .toList();
+    final availableEdges = availableMoves.where(edges.contains).toList();
     if (availableEdges.isNotEmpty) {
       return availableEdges[_random.nextInt(availableEdges.length)];
     }
@@ -101,12 +99,14 @@ class RobotLogic {
   /// Medium AI: Minimax with limited depth, avoid obvious traps
   Position _getMediumMove(CellState robotPlayer) {
     final availableMoves = gameLogic.getAvailableMoves();
-    if (availableMoves.isEmpty) return const Position(0, 0);
+    if (availableMoves.isEmpty) {
+      return const Position(0, 0);
+    }
 
     // Use minimax with limited depth (3-4 moves ahead)
     final maxDepth = min(4, availableMoves.length);
     Position? bestMove;
-    int bestScore = -1000;
+    var bestScore = -1000;
 
     for (final move in availableMoves) {
       gameLogic.makeMove(move, robotPlayer);
@@ -131,14 +131,16 @@ class RobotLogic {
   /// Hard AI: Full optimal strategy with alpha-beta pruning
   Position _getHardMove(CellState robotPlayer) {
     final availableMoves = gameLogic.getAvailableMoves();
-    if (availableMoves.isEmpty) return const Position(0, 0);
+    if (availableMoves.isEmpty) {
+      return const Position(0, 0);
+    }
 
     // Use minimax with alpha-beta pruning for optimal play
     final maxDepth = availableMoves.length; // Look ahead as far as possible
     Position? bestMove;
-    int bestScore = -1000;
-    int alpha = -1000;
-    const int beta = 1000;
+    var bestScore = -1000;
+    var alpha = -1000;
+    const beta = 1000;
 
     for (final move in availableMoves) {
       gameLogic.makeMove(move, robotPlayer);
@@ -157,7 +159,9 @@ class RobotLogic {
       }
 
       alpha = max(alpha, score);
-      if (alpha >= beta) break; // Alpha-beta pruning
+      if (alpha >= beta) {
+        break; // Alpha-beta pruning
+      }
     }
 
     return bestMove ?? availableMoves[0];
@@ -171,6 +175,9 @@ class RobotLogic {
     int alpha,
     int beta,
   ) {
+    var localAlpha = alpha;
+    var localBeta = beta;
+
     final result = gameLogic.checkGameState();
 
     // Terminal conditions
@@ -189,39 +196,43 @@ class RobotLogic {
     final availableMoves = gameLogic.getAvailableMoves();
 
     if (isMaximizing) {
-      int maxScore = -1000;
+      var maxScore = -1000;
       for (final move in availableMoves) {
         gameLogic.makeMove(move, player);
         final score = _minimax(
           GameLogic.getOpponent(player),
           depth - 1,
           false,
-          alpha,
-          beta,
+          localAlpha,
+          localBeta,
         );
         gameLogic.undoMove(move);
 
         maxScore = max(maxScore, score);
-        alpha = max(alpha, score);
-        if (alpha >= beta) break; // Alpha-beta pruning
+        localAlpha = max(localAlpha, score);
+        if (localAlpha >= localBeta) {
+          break; // Alpha-beta pruning
+        }
       }
       return maxScore;
     } else {
-      int minScore = 1000;
+      var minScore = 1000;
       for (final move in availableMoves) {
         gameLogic.makeMove(move, player);
         final score = _minimax(
           GameLogic.getOpponent(player),
           depth - 1,
           true,
-          alpha,
-          beta,
+          localAlpha,
+          localBeta,
         );
         gameLogic.undoMove(move);
 
         minScore = min(minScore, score);
-        beta = min(beta, score);
-        if (alpha >= beta) break; // Alpha-beta pruning
+        localBeta = min(localBeta, score);
+        if (localAlpha >= localBeta) {
+          break; // Alpha-beta pruning
+        }
       }
       return minScore;
     }
@@ -230,7 +241,9 @@ class RobotLogic {
   /// Get hint for the current player (immediate win > block opponent > center > corners > edges)
   Position getHint(CellState currentPlayer) {
     final availableMoves = gameLogic.getAvailableMoves();
-    if (availableMoves.isEmpty) return const Position(0, 0);
+    if (availableMoves.isEmpty) {
+      return const Position(0, 0);
+    }
 
     // 1. Check for immediate win
     for (final move in availableMoves) {
@@ -263,18 +276,14 @@ class RobotLogic {
 
     // 4. Prefer corners
     final corners = PositionExtensions.getCorners(gameLogic.boardSize);
-    final availableCorners = availableMoves
-        .where((move) => corners.contains(move))
-        .toList();
+    final availableCorners = availableMoves.where(corners.contains).toList();
     if (availableCorners.isNotEmpty) {
       return availableCorners[0]; // Return first available corner
     }
 
     // 5. Prefer edges
     final edges = PositionExtensions.getEdges(gameLogic.boardSize);
-    final availableEdges = availableMoves
-        .where((move) => edges.contains(move))
-        .toList();
+    final availableEdges = availableMoves.where(edges.contains).toList();
     if (availableEdges.isNotEmpty) {
       return availableEdges[0]; // Return first available edge
     }
@@ -288,7 +297,9 @@ class RobotLogic {
     final hints = <Position>[];
     final availableMoves = gameLogic.getAvailableMoves();
 
-    if (availableMoves.isEmpty) return hints;
+    if (availableMoves.isEmpty) {
+      return hints;
+    }
 
     // Get the best hint first
     final bestHint = getHint(currentPlayer);
@@ -340,23 +351,21 @@ class RobotLogic {
     }
 
     // Heuristic evaluation for non-terminal positions
-    int score = 0;
+    var score = 0;
     final opponent = GameLogic.getOpponent(player);
 
     // Evaluate rows, columns, and diagonals
-    score += _evaluateLines(player, opponent);
-
-    return score;
+    return score += _evaluateLines(player, opponent);
   }
 
   /// Evaluate all lines (rows, columns, diagonals) for scoring
   int _evaluateLines(CellState player, CellState opponent) {
-    int score = 0;
+    var score = 0;
     final boardSize = gameLogic.boardSize;
     final winCondition = gameLogic.winCondition;
 
     // Evaluate rows
-    for (int row = 0; row < boardSize; row++) {
+    for (var row = 0; row < boardSize; row++) {
       score += _evaluateLine(
         start: Position(row, 0),
         direction: const Position(0, 1),
@@ -367,7 +376,7 @@ class RobotLogic {
     }
 
     // Evaluate columns
-    for (int col = 0; col < boardSize; col++) {
+    for (var col = 0; col < boardSize; col++) {
       score += _evaluateLine(
         start: Position(0, col),
         direction: const Position(1, 0),
@@ -410,28 +419,32 @@ class RobotLogic {
     required CellState opponent,
   }) {
     final boardSize = gameLogic.boardSize;
-    int score = 0;
+    var score = 0;
 
     // Check all possible starting positions for this line
-    for (int i = 0; i <= boardSize - length; i++) {
+    for (var i = 0; i <= boardSize - length; i++) {
       final startPos = Position(
         start.row + i * direction.row,
         start.col + i * direction.col,
       );
 
-      if (!gameLogic.isValidPosition(startPos)) continue;
+      if (!gameLogic.isValidPosition(startPos)) {
+        continue;
+      }
 
-      int playerCount = 0;
-      int opponentCount = 0;
+      var playerCount = 0;
+      var opponentCount = 0;
 
       // Count pieces in this line
-      for (int j = 0; j < length; j++) {
+      for (var j = 0; j < length; j++) {
         final pos = Position(
           startPos.row + j * direction.row,
           startPos.col + j * direction.col,
         );
 
-        if (!gameLogic.isValidPosition(pos)) continue;
+        if (!gameLogic.isValidPosition(pos)) {
+          continue;
+        }
 
         final cellState = gameLogic.getCellState(pos);
         switch (cellState) {

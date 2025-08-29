@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 /// Used for the hero section in the home screen
 class TypewriterText extends StatefulWidget {
   const TypewriterText({
-    super.key,
     required this.text,
+    super.key,
     this.style,
     this.speed = const Duration(milliseconds: 40),
     this.caretBlinkDuration = const Duration(milliseconds: 600),
@@ -52,7 +52,7 @@ class _TypewriterTextState extends State<TypewriterText>
       CurvedAnimation(parent: _typewriterController, curve: Curves.easeInOut),
     );
 
-    _caretAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
+    _caretAnimation = Tween<double>(begin: 1, end: 0).animate(
       CurvedAnimation(parent: _caretController, curve: Curves.easeInOut),
     );
 
@@ -83,36 +83,32 @@ class _TypewriterTextState extends State<TypewriterText>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          widget.text.substring(0, _currentLength),
-          style: widget.style,
-          textAlign: widget.textAlign,
-        ),
-        if (_showCaret && _currentLength < widget.text.length)
-          AnimatedBuilder(
-            animation: _caretAnimation,
-            builder: (context, child) {
-              return Opacity(
-                opacity: _caretAnimation.value,
-                child: Container(
-                  width: 2,
-                  height: (widget.style?.fontSize ?? 16) * 1.2,
-                  margin: const EdgeInsets.only(left: 2),
-                  decoration: BoxDecoration(
-                    color:
-                        widget.style?.color ??
-                        Theme.of(context).colorScheme.onSurface,
-                    borderRadius: BorderRadius.circular(1),
-                  ),
-                ),
-              );
-            },
+  Widget build(BuildContext context) => Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Text(
+        widget.text.substring(0, _currentLength),
+        style: widget.style,
+        textAlign: widget.textAlign,
+      ),
+      if (_showCaret && _currentLength < widget.text.length)
+        AnimatedBuilder(
+          animation: _caretAnimation,
+          builder: (context, child) => Opacity(
+            opacity: _caretAnimation.value,
+            child: Container(
+              width: 2,
+              height: (widget.style?.fontSize ?? 16) * 1.2,
+              margin: const EdgeInsets.only(left: 2),
+              decoration: BoxDecoration(
+                color:
+                    widget.style?.color ??
+                    Theme.of(context).colorScheme.onSurface,
+                borderRadius: BorderRadius.circular(1),
+              ),
+            ),
           ),
-      ],
-    );
-  }
+        ),
+    ],
+  );
 }

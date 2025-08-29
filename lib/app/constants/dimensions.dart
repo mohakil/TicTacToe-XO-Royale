@@ -5,7 +5,7 @@ class AppDimensions {
   AppDimensions._();
 
   // Base spacing unit (4-pt system)
-  static const double _baseUnit = 4.0;
+  static const double _baseUnit = 4;
 
   // Spacing tokens
   static const double spacing4 = _baseUnit;
@@ -45,144 +45,135 @@ class AppDimensions {
   static const double buttonHeight48 = _baseUnit * 12;
   static const double buttonHeight56 = _baseUnit * 14;
   static const double buttonHeight64 = _baseUnit * 16;
-  static const double buttonMinWidth = 120.0;
-  static const double buttonMaxWidth = 400.0;
+  static const double buttonMinWidth = 120;
+  static const double buttonMaxWidth = 400;
 
   // Input field sizes
   static const double inputHeight48 = _baseUnit * 12;
   static const double inputHeight56 = _baseUnit * 14;
   static const double inputHeight64 = _baseUnit * 16;
-  static const double inputMinWidth = 200.0;
-  static const double inputMaxWidth = 400.0;
+  static const double inputMinWidth = 200;
+  static const double inputMaxWidth = 400;
 
   // Card sizes
-  static const double cardMinHeight = 120.0;
-  static const double cardMaxHeight = 400.0;
-  static const double cardMinWidth = 200.0;
-  static const double cardMaxWidth = 600.0;
+  static const double cardMinHeight = 120;
+  static const double cardMaxHeight = 400;
+  static const double cardMinWidth = 200;
+  static const double cardMaxWidth = 600;
 
   // Game board dimensions
-  static const double boardMinSize = 280.0;
-  static const double boardMaxSize = 600.0;
-  static const double boardAspectRatio = 1.0; // Square
-  static const double cellMinSize = 80.0;
-  static const double cellMaxSize = 120.0;
-  static const double cellBorderWidth = 2.0;
-  static const double cellCornerRadius = 8.0;
+  static const double boardMinSize = 280;
+  static const double boardMaxSize = 600;
+  static const double boardAspectRatio = 1; // Square
+  static const double cellMinSize = 80;
+  static const double cellMaxSize = 120;
+  static const double cellBorderWidth = 2;
+  static const double cellCornerRadius = 8;
 
   // Screen breakpoints
-  static const double phoneBreakpoint = 600.0;
-  static const double tabletBreakpoint = 900.0;
-  static const double desktopBreakpoint = 1200.0;
-  static const double largeTabletBreakpoint = 1200.0;
+  static const double phoneBreakpoint = 600;
+  static const double tabletBreakpoint = 900;
+  static const double desktopBreakpoint = 1200;
+  static const double largeTabletBreakpoint = 1200;
 
   // Responsive sizing multipliers
-  static const double phoneMultiplier = 1.0;
+  static const double phoneMultiplier = 1;
   static const double tabletMultiplier = 1.2;
   static const double largeTabletMultiplier = 1.4;
   static const double desktopMultiplier = 1.6;
 
   // Safe area insets
-  static const double safeAreaTop = 24.0;
-  static const double safeAreaBottom = 24.0;
-  static const double safeAreaLeft = 16.0;
-  static const double safeAreaRight = 16.0;
+  static const double safeAreaTop = 24;
+  static const double safeAreaBottom = 24;
+  static const double safeAreaLeft = 16;
+  static const double safeAreaRight = 16;
 
   // App bar dimensions
-  static const double appBarHeight = 56.0;
-  static const double appBarHeightLarge = 64.0;
-  static const double appBarElevation = 0.0;
+  static const double appBarHeight = 56;
+  static const double appBarHeightLarge = 64;
+  static const double appBarElevation = 0;
 
   // Bottom navigation dimensions
-  static const double bottomNavHeight = 80.0;
-  static const double bottomNavHeightLarge = 96.0;
-  static const double bottomNavElevation = 8.0;
+  static const double bottomNavHeight = 80;
+  static const double bottomNavHeightLarge = 96;
+  static const double bottomNavElevation = 8;
 
   // Navigation rail dimensions
-  static const double navRailWidth = 72.0;
-  static const double navRailWidthExpanded = 200.0;
-  static const double navRailElevation = 1.0;
+  static const double navRailWidth = 72;
+  static const double navRailWidthExpanded = 200;
+  static const double navRailElevation = 1;
 
   // Dialog dimensions
-  static const double dialogMinWidth = 280.0;
-  static const double dialogMaxWidth = 560.0;
-  static const double dialogMinHeight = 200.0;
-  static const double dialogMaxHeight = 600.0;
-  static const double dialogElevation = 24.0;
+  static const double dialogMinWidth = 280;
+  static const double dialogMaxWidth = 560;
+  static const double dialogMinHeight = 200;
+  static const double dialogMaxHeight = 600;
+  static const double dialogElevation = 24;
 
   // Snackbar dimensions
-  static const double snackbarHeight = 48.0;
-  static const double snackbarElevation = 6.0;
-  static const double snackbarMargin = 16.0;
+  static const double snackbarHeight = 48;
+  static const double snackbarElevation = 6;
+  static const double snackbarMargin = 16;
 
   // Tooltip dimensions
-  static const double tooltipMaxWidth = 200.0;
-  static const double tooltipElevation = 6.0;
-  static const double tooltipMargin = 8.0;
+  static const double tooltipMaxWidth = 200;
+  static const double tooltipElevation = 6;
+  static const double tooltipMargin = 8;
 
   // Floating action button dimensions
-  static const double fabSize = 56.0;
-  static const double fabSizeLarge = 64.0;
-  static const double fabSizeSmall = 40.0;
-  static const double fabElevation = 6.0;
+  static const double fabSize = 56;
+  static const double fabSizeLarge = 64;
+  static const double fabSizeSmall = 40;
+  static const double fabElevation = 6;
 
   // Progress indicator dimensions
-  static const double progressIndicatorSize = 40.0;
-  static const double progressIndicatorSizeLarge = 56.0;
-  static const double progressIndicatorStrokeWidth = 4.0;
+  static const double progressIndicatorSize = 40;
+  static const double progressIndicatorSizeLarge = 56;
+  static const double progressIndicatorStrokeWidth = 4;
 
   // Divider dimensions
-  static const double dividerThickness = 1.0;
-  static const double dividerIndent = 16.0;
-  static const double dividerEndIndent = 16.0;
+  static const double dividerThickness = 1;
+  static const double dividerIndent = 16;
+  static const double dividerEndIndent = 16;
 
   // List tile dimensions
-  static const double listTileHeight = 56.0;
-  static const double listTileHeightDense = 48.0;
-  static const double listTileHeightLarge = 72.0;
-  static const double listTileLeadingWidth = 40.0;
-  static const double listTileTrailingWidth = 40.0;
+  static const double listTileHeight = 56;
+  static const double listTileHeightDense = 48;
+  static const double listTileHeightLarge = 72;
+  static const double listTileLeadingWidth = 40;
+  static const double listTileTrailingWidth = 40;
 
   // Chip dimensions
-  static const double chipHeight = 32.0;
-  static const double chipHeightLarge = 40.0;
-  static const double chipMinWidth = 80.0;
+  static const double chipHeight = 32;
+  static const double chipHeightLarge = 40;
+  static const double chipMinWidth = 80;
 
   // Avatar dimensions
-  static const double avatarSize = 40.0;
-  static const double avatarSizeLarge = 56.0;
-  static const double avatarSizeSmall = 32.0;
+  static const double avatarSize = 40;
+  static const double avatarSizeLarge = 56;
+  static const double avatarSizeSmall = 32;
 
   // Badge dimensions
-  static const double badgeSize = 16.0;
-  static const double badgeSizeLarge = 20.0;
-  static const double badgeSizeSmall = 12.0;
+  static const double badgeSize = 16;
+  static const double badgeSizeLarge = 20;
+  static const double badgeSizeSmall = 12;
 
   // Helper methods for responsive sizing
-  static double getResponsiveSize(double baseSize, double scaleFactor) {
-    return baseSize * scaleFactor;
-  }
+  static double getResponsiveSize(double baseSize, double scaleFactor) =>
+      baseSize * scaleFactor;
 
-  static double getPhoneSize(double baseSize) {
-    return baseSize * phoneMultiplier;
-  }
+  static double getPhoneSize(double baseSize) => baseSize * phoneMultiplier;
 
-  static double getTabletSize(double baseSize) {
-    return baseSize * tabletMultiplier;
-  }
+  static double getTabletSize(double baseSize) => baseSize * tabletMultiplier;
 
-  static double getLargeTabletSize(double baseSize) {
-    return baseSize * largeTabletMultiplier;
-  }
+  static double getLargeTabletSize(double baseSize) =>
+      baseSize * largeTabletMultiplier;
 
-  static double getDesktopSize(double baseSize) {
-    return baseSize * desktopMultiplier;
-  }
+  static double getDesktopSize(double baseSize) => baseSize * desktopMultiplier;
 
   // Helper methods for screen size detection
-  static bool isPhone(BuildContext context) {
-    return MediaQuery.of(context).size.width < phoneBreakpoint;
-  }
+  static bool isPhone(BuildContext context) =>
+      MediaQuery.of(context).size.width < phoneBreakpoint;
 
   static bool isTablet(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -194,18 +185,15 @@ class AppDimensions {
     return width >= tabletBreakpoint && width < largeTabletBreakpoint;
   }
 
-  static bool isDesktop(BuildContext context) {
-    return MediaQuery.of(context).size.width >= desktopBreakpoint;
-  }
+  static bool isDesktop(BuildContext context) =>
+      MediaQuery.of(context).size.width >= desktopBreakpoint;
 
   // Helper methods for orientation detection
-  static bool isPortrait(BuildContext context) {
-    return MediaQuery.of(context).orientation == Orientation.portrait;
-  }
+  static bool isPortrait(BuildContext context) =>
+      MediaQuery.of(context).orientation == Orientation.portrait;
 
-  static bool isLandscape(BuildContext context) {
-    return MediaQuery.of(context).orientation == Orientation.landscape;
-  }
+  static bool isLandscape(BuildContext context) =>
+      MediaQuery.of(context).orientation == Orientation.landscape;
 
   // Helper methods for safe area handling
   static EdgeInsets getSafeAreaInsets(BuildContext context) {
@@ -213,21 +201,17 @@ class AppDimensions {
     return mediaQuery.padding;
   }
 
-  static double getTopSafeArea(BuildContext context) {
-    return MediaQuery.of(context).padding.top;
-  }
+  static double getTopSafeArea(BuildContext context) =>
+      MediaQuery.of(context).padding.top;
 
-  static double getBottomSafeArea(BuildContext context) {
-    return MediaQuery.of(context).padding.bottom;
-  }
+  static double getBottomSafeArea(BuildContext context) =>
+      MediaQuery.of(context).padding.bottom;
 
-  static double getLeftSafeArea(BuildContext context) {
-    return MediaQuery.of(context).padding.left;
-  }
+  static double getLeftSafeArea(BuildContext context) =>
+      MediaQuery.of(context).padding.left;
 
-  static double getRightSafeArea(BuildContext context) {
-    return MediaQuery.of(context).padding.right;
-  }
+  static double getRightSafeArea(BuildContext context) =>
+      MediaQuery.of(context).padding.right;
 
   // Helper methods for game board sizing
   static double getBoardSize(BuildContext context) {

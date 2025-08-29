@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../app/theme/app_theme.dart';
+import 'package:tictactoe_xo_royale/app/theme/app_theme.dart';
 
 // ✅ OPTIMIZED: Provider for theme mode with KeepAlive for persistence
 final themeModeProvider = StateNotifierProvider<ThemeModeNotifier, ThemeMode>(
@@ -66,7 +66,7 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
           themeModeIndex < ThemeMode.values.length) {
         state = ThemeMode.values[themeModeIndex];
       }
-    } catch (e) {
+    } on Exception catch (e) {
       // If loading fails, keep default system theme
       debugPrint('Failed to load theme mode: $e');
       // Don't change state, keep the default system theme
@@ -78,7 +78,7 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt(_storageKey, themeMode.index);
-    } catch (e) {
+    } on Exception catch (e) {
       debugPrint('Failed to save theme mode: $e');
       // Don't throw error, just log it
     }
@@ -89,7 +89,7 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
     try {
       state = themeMode;
       await _saveThemeMode(themeMode);
-    } catch (e) {
+    } on Exception catch (e) {
       debugPrint('Failed to set theme mode: $e');
       // Revert to previous state if save fails
       // Note: In a production app, you might want to show a user-friendly error
@@ -103,7 +103,7 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
           ? ThemeMode.dark
           : ThemeMode.light;
       await setThemeMode(newThemeMode);
-    } catch (e) {
+    } on Exception catch (e) {
       debugPrint('Failed to toggle theme: $e');
     }
   }
@@ -228,7 +228,7 @@ extension ThemeContextExtension on BuildContext {
   ThemeMode? get themeMode {
     try {
       return ProviderScope.containerOf(this).read(themeModeProvider);
-    } catch (e) {
+    } on Exception catch (e) {
       debugPrint('Failed to read theme mode: $e');
       return null;
     }
@@ -238,7 +238,7 @@ extension ThemeContextExtension on BuildContext {
   ThemeData? get themeData {
     try {
       return ProviderScope.containerOf(this).read(themeDataProvider);
-    } catch (e) {
+    } on Exception catch (e) {
       debugPrint('Failed to read theme data: $e');
       return null;
     }
@@ -248,7 +248,7 @@ extension ThemeContextExtension on BuildContext {
   ThemeModeNotifier? get themeNotifier {
     try {
       return ProviderScope.containerOf(this).read(themeModeProvider.notifier);
-    } catch (e) {
+    } on Exception catch (e) {
       debugPrint('Failed to read theme notifier: $e');
       return null;
     }

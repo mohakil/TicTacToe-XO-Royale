@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:tictactoe_xo_royale/features/setup/providers/setup_provider.dart';
 import 'package:tictactoe_xo_royale/features/setup/presentation/widgets/board_preview.dart';
+import 'package:tictactoe_xo_royale/features/setup/providers/setup_provider.dart';
 
 class BoardCarousel extends StatelessWidget {
   const BoardCarousel({
-    super.key,
     required this.selectedBoardSize,
     required this.onBoardSizeChanged,
+    super.key,
   });
 
   final BoardSize selectedBoardSize;

@@ -85,7 +85,9 @@ class SetupNotifier extends StateNotifier<GameSetup> {
   }
 
   bool get isValid {
-    if (state.player1Name.trim().isEmpty) return false;
+    if (state.player1Name.trim().isEmpty) {
+      return false;
+    }
     if (state.mode == GameMode.local && state.player2Name.trim().isEmpty) {
       return false;
     }
@@ -115,9 +117,7 @@ class SetupNotifier extends StateNotifier<GameSetup> {
     }
   }
 
-  String get gameModeValue {
-    return state.mode == GameMode.robot ? 'robot' : 'local';
-  }
+  String get gameModeValue => state.mode == GameMode.robot ? 'robot' : 'local';
 
   String get difficultyValue {
     switch (state.difficulty) {
@@ -142,6 +142,6 @@ class SetupNotifier extends StateNotifier<GameSetup> {
   }
 }
 
-final setupProvider = StateNotifierProvider<SetupNotifier, GameSetup>((ref) {
-  return SetupNotifier();
-});
+final setupProvider = StateNotifierProvider<SetupNotifier, GameSetup>(
+  (ref) => SetupNotifier(),
+);

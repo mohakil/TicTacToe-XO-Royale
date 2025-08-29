@@ -1,5 +1,5 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tictactoe_xo_royale/core/providers/settings_provider.dart';
 
@@ -49,7 +49,7 @@ void main() {
     group('Settings Update Tests', () {
       test('Should update sound settings', () async {
         final notifier = container.read(settingsProvider.notifier);
-        await notifier.setSoundEnabled(false);
+        await notifier.setSoundEnabled(enabled: false);
 
         final settings = container.read(settingsProvider);
         expect(settings.soundEnabled, isFalse);
@@ -57,7 +57,7 @@ void main() {
 
       test('Should update music settings', () async {
         final notifier = container.read(settingsProvider.notifier);
-        await notifier.setMusicEnabled(false);
+        await notifier.setMusicEnabled(enabled: false);
 
         final settings = container.read(settingsProvider);
         expect(settings.musicEnabled, isFalse);
@@ -65,7 +65,7 @@ void main() {
 
       test('Should update haptic feedback settings', () async {
         final notifier = container.read(settingsProvider.notifier);
-        await notifier.setHapticFeedbackEnabled(false);
+        await notifier.setHapticFeedbackEnabled(enabled: false);
 
         final settings = container.read(settingsProvider);
         expect(settings.hapticFeedbackEnabled, isFalse);
@@ -73,7 +73,7 @@ void main() {
 
       test('Should update auto save settings', () async {
         final notifier = container.read(settingsProvider.notifier);
-        await notifier.setAutoSaveEnabled(false);
+        await notifier.setAutoSaveEnabled(enabled: false);
 
         final settings = container.read(settingsProvider);
         expect(settings.autoSaveEnabled, isFalse);
@@ -105,8 +105,8 @@ void main() {
         final notifier = container.read(settingsProvider.notifier);
 
         // Change some settings first
-        await notifier.setSoundEnabled(false);
-        await notifier.setMusicEnabled(false);
+        await notifier.setSoundEnabled(enabled: false);
+        await notifier.setMusicEnabled(enabled: false);
 
         // Reset to defaults
         await notifier.resetToDefaults();
@@ -119,7 +119,7 @@ void main() {
       test('Should handle settings reset gracefully', () async {
         final notifier = container.read(settingsProvider.notifier);
 
-        expect(() => notifier.resetToDefaults(), returnsNormally);
+        expect(notifier.resetToDefaults, returnsNormally);
 
         final settings = container.read(settingsProvider);
         expect(settings, isA<AppSettings>());

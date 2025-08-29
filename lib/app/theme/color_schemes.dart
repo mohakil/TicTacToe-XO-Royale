@@ -97,8 +97,7 @@ class AppColorSchemes {
   );
 
   static const RadialGradient deepSpace = RadialGradient(
-    center: Alignment.center,
-    radius: 1.0,
+    radius: 1,
     colors: [Color(0xFFF7F8FB), Color(0xFFEDEFF5)],
   );
 }

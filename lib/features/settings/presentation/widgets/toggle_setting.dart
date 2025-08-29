@@ -4,12 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// A custom toggle setting widget for the settings screen
 class ToggleSetting extends ConsumerWidget {
   const ToggleSetting({
-    super.key,
     required this.title,
     required this.subtitle,
     required this.icon,
     required this.value,
     required this.onChanged,
+    super.key,
     this.enabled = true,
   });
 

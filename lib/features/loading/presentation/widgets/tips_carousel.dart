@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
 import 'dart:async';
+
+import 'package:flutter/material.dart';
 
 class TipsCarousel extends StatefulWidget {
   const TipsCarousel({super.key});
@@ -77,33 +78,29 @@ class _TipsCarouselState extends State<TipsCarousel> {
             controller: _pageController,
             onPageChanged: _onPageChanged,
             itemCount: _tips.length,
-            itemBuilder: (context, index) {
-              return Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 16,
-                ),
-                child: Center(
-                  child: Text(
-                    _tips[index],
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w500,
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                    textAlign: TextAlign.center,
+            itemBuilder: (context, index) => Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              child: Center(
+                child: Text(
+                  _tips[index],
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w500,
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
+                  textAlign: TextAlign.center,
                 ),
-              );
-            },
+              ),
+            ),
           ),
         ),
         const SizedBox(height: 16),
         // Page indicator dots
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(_tips.length, (index) {
-            return AnimatedContainer(
+          children: List.generate(
+            _tips.length,
+            (index) => AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               margin: const EdgeInsets.symmetric(horizontal: 4),
               width: index == _currentIndex ? 12 : 8,
@@ -114,8 +111,8 @@ class _TipsCarouselState extends State<TipsCarousel> {
                     ? theme.colorScheme.primary
                     : theme.colorScheme.outline.withValues(alpha: 0.3),
               ),
-            );
-          }),
+            ),
+          ),
         ),
       ],
     );

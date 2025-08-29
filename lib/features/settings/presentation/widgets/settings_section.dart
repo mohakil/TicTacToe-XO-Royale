@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 /// A settings section widget for grouping related settings
 class SettingsSection extends StatelessWidget {
   const SettingsSection({
-    super.key,
     required this.title,
     required this.children,
+    super.key,
     this.subtitle,
   });
 

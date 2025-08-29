@@ -4,9 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// A theme selector widget for switching between light and dark themes
 class ThemeSelector extends ConsumerWidget {
   const ThemeSelector({
-    super.key,
     required this.currentTheme,
     required this.onThemeChanged,
+    super.key,
   });
 
   final ThemeMode currentTheme;

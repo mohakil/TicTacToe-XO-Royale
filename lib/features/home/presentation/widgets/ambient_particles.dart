@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
 import 'dart:math' as math;
+
+import 'package:flutter/material.dart';
 
 /// Ambient floating X/O shapes with subtle animations
 /// Creates a background effect with floating game symbols
@@ -40,12 +41,13 @@ class _AmbientParticlesState extends State<AmbientParticles>
       ),
     );
 
-    _animations = _controllers.map((controller) {
-      return Tween<double>(
-        begin: 0.0,
-        end: 1.0,
-      ).animate(CurvedAnimation(parent: controller, curve: Curves.easeInOut));
-    }).toList();
+    _animations = _controllers
+        .map(
+          (controller) => Tween<double>(begin: 0, end: 1).animate(
+            CurvedAnimation(parent: controller, curve: Curves.easeInOut),
+          ),
+        )
+        .toList();
 
     _positions = List.generate(
       widget.particleCount,
@@ -85,49 +87,45 @@ class _AmbientParticlesState extends State<AmbientParticles>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return SizedBox.expand(
-      child: Stack(
-        children: List.generate(
-          widget.particleCount,
-          (index) => AnimatedBuilder(
-            animation: _animations[index],
-            builder: (context, child) {
-              final animation = _animations[index];
-              final progress = animation.value;
+  Widget build(BuildContext context) => SizedBox.expand(
+    child: Stack(
+      children: List.generate(
+        widget.particleCount,
+        (index) => AnimatedBuilder(
+          animation: _animations[index],
+          builder: (context, child) {
+            final animation = _animations[index];
+            final progress = animation.value;
 
-              // Calculate position with gentle floating movement
-              final x =
-                  _positions[index].dx +
-                  math.sin(progress * 2 * math.pi) * 50 * _speeds[index];
-              final y =
-                  _positions[index].dy +
-                  math.cos(progress * 2 * math.pi) * 30 * _speeds[index];
+            // Calculate position with gentle floating movement
+            final x =
+                _positions[index].dx +
+                math.sin(progress * 2 * math.pi) * 50 * _speeds[index];
+            final y =
+                _positions[index].dy +
+                math.cos(progress * 2 * math.pi) * 30 * _speeds[index];
 
-              return Positioned(
-                left: x,
-                top: y,
-                child: Opacity(
-                  opacity: widget.opacity,
-                  child: _isX[index]
-                      ? _buildX(_sizes[index])
-                      : _buildO(_sizes[index]),
-                ),
-              );
-            },
-          ),
+            return Positioned(
+              left: x,
+              top: y,
+              child: Opacity(
+                opacity: widget.opacity,
+                child: _isX[index]
+                    ? _buildX(_sizes[index])
+                    : _buildO(_sizes[index]),
+              ),
+            );
+          },
         ),
       ),
-    );
-  }
+    ),
+  );
 
-  Widget _buildX(double size) {
-    return CustomPaint(size: Size(size, size), painter: _XPainter());
-  }
+  Widget _buildX(double size) =>
+      CustomPaint(size: Size(size, size), painter: _XPainter());
 
-  Widget _buildO(double size) {
-    return CustomPaint(size: Size(size, size), painter: _OPainter());
-  }
+  Widget _buildO(double size) =>
+      CustomPaint(size: Size(size, size), painter: _OPainter());
 }
 
 /// Custom painter for X symbol
@@ -146,8 +144,9 @@ class _XPainter extends CustomPainter {
     final endY = size.height - padding;
 
     // Draw X
-    canvas.drawLine(Offset(startX, startY), Offset(endX, endY), paint);
-    canvas.drawLine(Offset(startX, endY), Offset(endX, startY), paint);
+    canvas
+      ..drawLine(Offset(startX, startY), Offset(endX, endY), paint)
+      ..drawLine(Offset(startX, endY), Offset(endX, startY), paint);
   }
 
   @override

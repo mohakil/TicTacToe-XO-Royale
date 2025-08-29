@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/providers/profile_provider.dart';
+import 'package:tictactoe_xo_royale/core/providers/profile_provider.dart';
 
 class GemBalance extends ConsumerWidget {
   const GemBalance({super.key});

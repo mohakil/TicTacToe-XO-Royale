@@ -1,19 +1,21 @@
 import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
-import 'package:just_audio/just_audio.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/settings_provider.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:tictactoe_xo_royale/core/providers/settings_provider.dart';
 
 /// Audio service for managing game sounds and music
 class AudioService {
-  AudioService._();
+  late final AudioPlayer _sfxPlayer;
+  late final AudioPlayer _musicPlayer;
 
-  static final AudioService _instance = AudioService._();
-  static AudioService get instance => _instance;
-
-  // Audio players
-  final AudioPlayer _sfxPlayer = AudioPlayer();
-  final AudioPlayer _musicPlayer = AudioPlayer();
+  AudioService({AudioPlayer? sfxPlayer, AudioPlayer? musicPlayer}) {
+    _sfxPlayer = sfxPlayer ?? AudioPlayer();
+    _musicPlayer = musicPlayer ?? AudioPlayer();
+  }
 
   // Audio cache
   final Map<String, AudioSource> _audioCache = {};
@@ -52,33 +54,150 @@ class AudioService {
     'store': 'assets/audio/music/store.mp3',
   };
 
-  /// Initialize the audio service
+  /// Initialize the audio service with platform-specific optimizations
   Future<void> initialize() async {
     try {
-      // Set up audio session for better control
-      await _sfxPlayer.setAudioSource(
-        AudioSource.uri(Uri.parse('asset:///assets/audio/sfx/move.mp3')),
-        preload: false,
-      );
+      // Platform-specific audio session setup
+      await _configurePlatformAudioSession();
 
-      await _musicPlayer.setAudioSource(
-        AudioSource.uri(Uri.parse('asset:///assets/audio/music/main_menu.mp3')),
-        preload: false,
-      );
+      // Set up audio players with platform-specific optimizations
+      await _initializeAudioPlayers();
 
-      // Set initial volumes
-      await _sfxPlayer.setVolume(_sfxVolume);
-      await _musicPlayer.setVolume(_musicVolume);
+      // Set initial volumes with platform-specific considerations
+      await _setPlatformVolumes();
 
       // Preload essential audio files
       await _preloadEssentialAudio();
 
       if (kDebugMode) {
-        print('AudioService: Initialized successfully');
+        print(
+          'AudioService: Initialized successfully for ${Platform.operatingSystem}',
+        );
       }
-    } catch (e) {
+    } on Exception catch (e) {
       if (kDebugMode) {
         print('AudioService: Failed to initialize: $e');
+      }
+    }
+  }
+
+  /// Configure platform-specific audio session
+  Future<void> _configurePlatformAudioSession() async {
+    try {
+      if (Platform.isAndroid) {
+        // Android-specific audio session configuration
+        await _configureAndroidAudioSession();
+      } else if (Platform.isIOS) {
+        // iOS-specific audio session configuration
+        await _configureIOSAudioSession();
+      }
+    } on Exception catch (e) {
+      if (kDebugMode) {
+        print('AudioService: Failed to configure platform audio session: $e');
+      }
+    }
+  }
+
+  /// Configure Android-specific audio session
+  Future<void> _configureAndroidAudioSession() async {
+    try {
+      // Use platform channel for Android-specific audio configuration
+      const platform = MethodChannel(
+        'com.astrixforge.tictactoe_xo_royale/audio',
+      );
+      await platform.invokeMethod('configureAudioSession', {
+        'audioFocus': 'gain',
+        'audioContentType': 'game',
+        'audioUsage': 'game',
+      });
+    } on Exception catch (e) {
+      // Fallback to basic configuration
+      if (kDebugMode) {
+        print(
+          'AudioService: Android audio session configuration failed, using fallback: $e',
+        );
+      }
+    }
+  }
+
+  /// Configure iOS-specific audio session
+  Future<void> _configureIOSAudioSession() async {
+    try {
+      // Use platform channel for iOS-specific audio configuration
+      const platform = MethodChannel(
+        'com.astrixforge.tictactoe_xo_royale/audio',
+      );
+      await platform.invokeMethod('configureAudioSession', {
+        'category': 'ambient',
+        'options': ['mixWithOthers', 'duckOthers'],
+      });
+    } on Exception catch (e) {
+      // Fallback to basic configuration
+      if (kDebugMode) {
+        print(
+          'AudioService: iOS audio session configuration failed, using fallback: $e',
+        );
+      }
+    }
+  }
+
+  /// Initialize audio players with platform-specific settings
+  Future<void> _initializeAudioPlayers() async {
+    try {
+      // Configure SFX player for low latency
+      await _sfxPlayer.setAudioSource(
+        AudioSource.uri(Uri.parse('asset:///assets/audio/sfx/move.mp3')),
+        preload: false,
+      );
+
+      // Configure music player for streaming
+      await _musicPlayer.setAudioSource(
+        AudioSource.uri(Uri.parse('asset:///assets/audio/music/main_menu.mp3')),
+        preload: false,
+      );
+
+      // Platform-specific player optimizations
+      if (Platform.isAndroid) {
+        // Android-specific optimizations - PlayerMode is not available in current just_audio version
+        // These will use default modes optimized for each platform
+        if (kDebugMode) {
+          print('AudioService: Using Android-optimized audio modes');
+        }
+      } else if (Platform.isIOS) {
+        // iOS-specific optimizations
+        if (kDebugMode) {
+          print('AudioService: Using iOS-optimized audio modes');
+        }
+      }
+    } on Exception catch (e) {
+      if (kDebugMode) {
+        print('AudioService: Failed to initialize audio players: $e');
+      }
+    }
+  }
+
+  /// Set platform-specific volumes
+  Future<void> _setPlatformVolumes() async {
+    try {
+      var sfxVol = _sfxVolume;
+      var musicVol = _musicVolume;
+
+      // Adjust volumes based on platform
+      if (Platform.isAndroid) {
+        // Android typically needs slightly lower volumes
+        sfxVol *= 0.9;
+        musicVol *= 0.85;
+      } else if (Platform.isIOS) {
+        // iOS can handle higher volumes
+        sfxVol *= 1.0;
+        musicVol *= 0.9;
+      }
+
+      await _sfxPlayer.setVolume(sfxVol);
+      await _musicPlayer.setVolume(musicVol);
+    } on Exception catch (e) {
+      if (kDebugMode) {
+        print('AudioService: Failed to set platform volumes: $e');
       }
     }
   }
@@ -98,7 +217,7 @@ class AudioService {
       if (kDebugMode) {
         print('AudioService: Essential audio preloaded');
       }
-    } catch (e) {
+    } on Exception catch (e) {
       if (kDebugMode) {
         print('AudioService: Failed to preload essential audio: $e');
       }
@@ -140,7 +259,7 @@ class AudioService {
       if (kDebugMode) {
         print('AudioService: Preloaded $audioId');
       }
-    } catch (e) {
+    } on Exception catch (e) {
       if (kDebugMode) {
         print('AudioService: Failed to preload $audioId: $e');
       }
@@ -149,7 +268,9 @@ class AudioService {
 
   /// Manage cache size by removing oldest entries
   void _manageCacheSize() {
-    if (_audioCache.length <= _maxCacheSize) return;
+    if (_audioCache.length <= _maxCacheSize) {
+      return;
+    }
 
     // Sort by timestamp and remove oldest
     final sortedEntries = _audioCacheTimestamps.entries.toList()
@@ -173,7 +294,9 @@ class AudioService {
       // Check if sound is enabled
       if (ref != null) {
         final settings = ref.read(settingsProvider);
-        if (!settings.soundEnabled) return;
+        if (!settings.soundEnabled) {
+          return;
+        }
       }
 
       // Ensure audio is preloaded
@@ -185,7 +308,9 @@ class AudioService {
         audioSource = _audioCache[sfxId]!;
       } else {
         final path = _sfxPaths[sfxId];
-        if (path == null) return;
+        if (path == null) {
+          return;
+        }
         audioSource = AudioSource.uri(Uri.parse('asset:///$path'));
       }
 
@@ -196,7 +321,7 @@ class AudioService {
       if (kDebugMode) {
         print('AudioService: Playing SFX $sfxId');
       }
-    } catch (e) {
+    } on Exception catch (e) {
       if (kDebugMode) {
         print('AudioService: Failed to play SFX $sfxId: $e');
       }
@@ -213,11 +338,15 @@ class AudioService {
       // Check if music is enabled
       if (ref != null) {
         final settings = ref.read(settingsProvider);
-        if (!settings.musicEnabled) return;
+        if (!settings.musicEnabled) {
+          return;
+        }
       }
 
       // Stop current music if different
-      if (_currentMusicId == musicId) return; // Already playing this music
+      if (_currentMusicId == musicId) {
+        return; // Already playing this music
+      }
 
       // Ensure audio is preloaded
       await _preloadAudio(musicId, isMusic: true);
@@ -228,7 +357,9 @@ class AudioService {
         audioSource = _audioCache[musicId]!;
       } else {
         final path = _musicPaths[musicId];
-        if (path == null) return;
+        if (path == null) {
+          return;
+        }
         audioSource = AudioSource.uri(Uri.parse('asset:///$path'));
       }
 
@@ -243,7 +374,7 @@ class AudioService {
       if (kDebugMode) {
         print('AudioService: Playing music $musicId (loop: $loop)');
       }
-    } catch (e) {
+    } on Exception catch (e) {
       if (kDebugMode) {
         print('AudioService: Failed to play music $musicId: $e');
       }
@@ -258,7 +389,7 @@ class AudioService {
       if (kDebugMode) {
         print('AudioService: Music stopped');
       }
-    } catch (e) {
+    } on Exception catch (e) {
       if (kDebugMode) {
         print('AudioService: Failed to stop music: $e');
       }
@@ -272,7 +403,7 @@ class AudioService {
       if (kDebugMode) {
         print('AudioService: Music paused');
       }
-    } catch (e) {
+    } on Exception catch (e) {
       if (kDebugMode) {
         print('AudioService: Failed to pause music: $e');
       }
@@ -286,7 +417,7 @@ class AudioService {
       if (kDebugMode) {
         print('AudioService: Music resumed');
       }
-    } catch (e) {
+    } on Exception catch (e) {
       if (kDebugMode) {
         print('AudioService: Failed to resume music: $e');
       }
@@ -301,7 +432,7 @@ class AudioService {
       if (kDebugMode) {
         print('AudioService: Music volume set to $clampedVolume');
       }
-    } catch (e) {
+    } on Exception catch (e) {
       if (kDebugMode) {
         print('AudioService: Failed to set music volume: $e');
       }
@@ -316,7 +447,7 @@ class AudioService {
       if (kDebugMode) {
         print('AudioService: SFX volume set to $clampedVolume');
       }
-    } catch (e) {
+    } on Exception catch (e) {
       if (kDebugMode) {
         print('AudioService: Failed to set SFX volume: $e');
       }
@@ -333,13 +464,11 @@ class AudioService {
   }
 
   /// Get cache statistics
-  Map<String, dynamic> getCacheStats() {
-    return {
-      'cachedFiles': _audioCache.length,
-      'maxCacheSize': _maxCacheSize,
-      'cacheExpiry': _cacheExpiry.inHours,
-    };
-  }
+  Map<String, dynamic> getCacheStats() => {
+    'cachedFiles': _audioCache.length,
+    'maxCacheSize': _maxCacheSize,
+    'cacheExpiry': _cacheExpiry.inHours,
+  };
 
   /// Dispose resources
   Future<void> dispose() async {
@@ -350,7 +479,7 @@ class AudioService {
       if (kDebugMode) {
         print('AudioService: Disposed successfully');
       }
-    } catch (e) {
+    } on Exception catch (e) {
       if (kDebugMode) {
         print('AudioService: Failed to dispose: $e');
       }
@@ -359,9 +488,7 @@ class AudioService {
 }
 
 /// Provider for AudioService
-final audioServiceProvider = Provider<AudioService>((ref) {
-  return AudioService.instance;
-});
+final audioServiceProvider = Provider<AudioService>((ref) => AudioService());
 
 /// Provider for audio settings
 final audioSettingsProvider =

@@ -67,24 +67,24 @@ class GameColors extends ThemeExtension<GameColors> {
     Color? cellPressed,
     Color? glowCyan,
     Color? glowMagenta,
-  }) {
-    return GameColors(
-      win: win ?? this.win,
-      loss: loss ?? this.loss,
-      draw: draw ?? this.draw,
-      gem: gem ?? this.gem,
-      hint: hint ?? this.hint,
-      boardLine: boardLine ?? this.boardLine,
-      cellHover: cellHover ?? this.cellHover,
-      cellPressed: cellPressed ?? this.cellPressed,
-      glowCyan: glowCyan ?? this.glowCyan,
-      glowMagenta: glowMagenta ?? this.glowMagenta,
-    );
-  }
+  }) => GameColors(
+    win: win ?? this.win,
+    loss: loss ?? this.loss,
+    draw: draw ?? this.draw,
+    gem: gem ?? this.gem,
+    hint: hint ?? this.hint,
+    boardLine: boardLine ?? this.boardLine,
+    cellHover: cellHover ?? this.cellHover,
+    cellPressed: cellPressed ?? this.cellPressed,
+    glowCyan: glowCyan ?? this.glowCyan,
+    glowMagenta: glowMagenta ?? this.glowMagenta,
+  );
 
   @override
   ThemeExtension<GameColors> lerp(ThemeExtension<GameColors>? other, double t) {
-    if (other is! GameColors) return this;
+    if (other is! GameColors) {
+      return this;
+    }
 
     return GameColors(
       win: Color.lerp(win, other.win, t)!,
@@ -132,22 +132,22 @@ class MotionDurations extends ThemeExtension<MotionDurations> {
     Duration? emphasized,
     Duration? extended,
     Duration? celebration,
-  }) {
-    return MotionDurations(
-      micro: micro ?? this.micro,
-      standard: standard ?? this.standard,
-      emphasized: emphasized ?? this.emphasized,
-      extended: extended ?? this.extended,
-      celebration: celebration ?? this.celebration,
-    );
-  }
+  }) => MotionDurations(
+    micro: micro ?? this.micro,
+    standard: standard ?? this.standard,
+    emphasized: emphasized ?? this.emphasized,
+    extended: extended ?? this.extended,
+    celebration: celebration ?? this.celebration,
+  );
 
   @override
   ThemeExtension<MotionDurations> lerp(
     ThemeExtension<MotionDurations>? other,
     double t,
   ) {
-    if (other is! MotionDurations) return this;
+    if (other is! MotionDurations) {
+      return this;
+    }
 
     return MotionDurations(
       micro: _lerpDuration(micro, other.micro, t),
@@ -202,25 +202,25 @@ class MotionEasings extends ThemeExtension<MotionEasings> {
     Curve? carouselSnap,
     Curve? markDraw,
     Curve? winningLine,
-  }) {
-    return MotionEasings(
-      standard: standard ?? this.standard,
-      emphasized: emphasized ?? this.emphasized,
-      celebration: celebration ?? this.celebration,
-      buttonPress: buttonPress ?? this.buttonPress,
-      cardHover: cardHover ?? this.cardHover,
-      carouselSnap: carouselSnap ?? this.carouselSnap,
-      markDraw: markDraw ?? this.markDraw,
-      winningLine: winningLine ?? this.winningLine,
-    );
-  }
+  }) => MotionEasings(
+    standard: standard ?? this.standard,
+    emphasized: emphasized ?? this.emphasized,
+    celebration: celebration ?? this.celebration,
+    buttonPress: buttonPress ?? this.buttonPress,
+    cardHover: cardHover ?? this.cardHover,
+    carouselSnap: carouselSnap ?? this.carouselSnap,
+    markDraw: markDraw ?? this.markDraw,
+    winningLine: winningLine ?? this.winningLine,
+  );
 
   @override
   ThemeExtension<MotionEasings> lerp(
     ThemeExtension<MotionEasings>? other,
     double t,
   ) {
-    if (other is! MotionEasings) return this;
+    if (other is! MotionEasings) {
+      return this;
+    }
     // For curves, we'll just return the current instance since lerping curves is complex
     return this;
   }
@@ -243,11 +243,11 @@ class GameElevations extends ThemeExtension<GameElevations> {
   });
 
   static const GameElevations defaultElevations = GameElevations(
-    card: 1.0,
-    floating: 3.0,
-    modal: 8.0,
-    tooltip: 6.0,
-    overlay: 12.0,
+    card: 1,
+    floating: 3,
+    modal: 8,
+    tooltip: 6,
+    overlay: 12,
   );
 
   @override
@@ -257,22 +257,22 @@ class GameElevations extends ThemeExtension<GameElevations> {
     double? modal,
     double? tooltip,
     double? overlay,
-  }) {
-    return GameElevations(
-      card: card ?? this.card,
-      floating: floating ?? this.floating,
-      modal: modal ?? this.modal,
-      tooltip: tooltip ?? this.tooltip,
-      overlay: overlay ?? this.overlay,
-    );
-  }
+  }) => GameElevations(
+    card: card ?? this.card,
+    floating: floating ?? this.floating,
+    modal: modal ?? this.modal,
+    tooltip: tooltip ?? this.tooltip,
+    overlay: overlay ?? this.overlay,
+  );
 
   @override
   ThemeExtension<GameElevations> lerp(
     ThemeExtension<GameElevations>? other,
     double t,
   ) {
-    if (other is! GameElevations) return this;
+    if (other is! GameElevations) {
+      return this;
+    }
 
     return GameElevations(
       card: lerpDouble(card, other.card, t)!,
@@ -296,12 +296,10 @@ extension ThemeExtensionX on ThemeData {
 }
 
 // Helper function to interpolate between Duration objects
-Duration _lerpDuration(Duration a, Duration b, double t) {
-  return Duration(
-    microseconds: lerpDouble(
-      a.inMicroseconds.toDouble(),
-      b.inMicroseconds.toDouble(),
-      t,
-    )!.round(),
-  );
-}
+Duration _lerpDuration(Duration a, Duration b, double t) => Duration(
+  microseconds: lerpDouble(
+    a.inMicroseconds.toDouble(),
+    b.inMicroseconds.toDouble(),
+    t,
+  )!.round(),
+);

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tictactoe_xo_royale/app/constants/dimensions.dart';
-import 'responsive_builder.dart';
+import 'package:tictactoe_xo_royale/core/utils/responsive_builder.dart';
 
 /// Adaptive padding that adjusts based on screen size and safe areas
 class AdaptivePadding extends StatelessWidget {
@@ -12,8 +12,8 @@ class AdaptivePadding extends StatelessWidget {
   final EdgeInsets? minimumPadding;
 
   const AdaptivePadding({
-    super.key,
     required this.child,
+    super.key,
     this.padding,
     this.margin,
     this.respectSafeArea = true,
@@ -22,46 +22,44 @@ class AdaptivePadding extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final mediaQuery = MediaQuery.of(context);
-        final size = mediaQuery.size;
-        final safeAreaInsets = mediaQuery.padding;
-        final viewInsets = mediaQuery.viewInsets;
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) {
+      final mediaQuery = MediaQuery.of(context);
+      final size = mediaQuery.size;
+      final safeAreaInsets = mediaQuery.padding;
+      final viewInsets = mediaQuery.viewInsets;
 
-        // Determine screen size category
-        ScreenSize screenSize;
-        if (size.width < AppDimensions.phoneBreakpoint) {
-          screenSize = ScreenSize.phone;
-        } else if (size.width < AppDimensions.tabletBreakpoint) {
-          screenSize = ScreenSize.tablet;
-        } else if (size.width < AppDimensions.largeTabletBreakpoint) {
-          screenSize = ScreenSize.largeTablet;
-        } else {
-          screenSize = ScreenSize.desktop;
-        }
+      // Determine screen size category
+      ScreenSize screenSize;
+      if (size.width < AppDimensions.phoneBreakpoint) {
+        screenSize = ScreenSize.phone;
+      } else if (size.width < AppDimensions.tabletBreakpoint) {
+        screenSize = ScreenSize.tablet;
+      } else if (size.width < AppDimensions.largeTabletBreakpoint) {
+        screenSize = ScreenSize.largeTablet;
+      } else {
+        screenSize = ScreenSize.desktop;
+      }
 
-        // Calculate adaptive padding
-        final adaptivePadding = _calculateAdaptivePadding(
-          screenSize,
-          safeAreaInsets,
-          viewInsets,
-          padding,
-          minimumPadding,
-        );
+      // Calculate adaptive padding
+      final adaptivePadding = _calculateAdaptivePadding(
+        screenSize,
+        safeAreaInsets,
+        viewInsets,
+        padding,
+        minimumPadding,
+      );
 
-        // Calculate adaptive margin
-        final adaptiveMargin = _calculateAdaptiveMargin(screenSize, margin);
+      // Calculate adaptive margin
+      final adaptiveMargin = _calculateAdaptiveMargin(screenSize, margin);
 
-        return Container(
-          margin: adaptiveMargin,
-          padding: adaptivePadding,
-          child: child,
-        );
-      },
-    );
-  }
+      return Container(
+        margin: adaptiveMargin,
+        padding: adaptivePadding,
+        child: child,
+      );
+    },
+  );
 
   /// Calculate adaptive padding based on screen size and safe areas
   EdgeInsets _calculateAdaptivePadding(
@@ -75,16 +73,16 @@ class AdaptivePadding extends StatelessWidget {
     EdgeInsets basePadding;
     switch (screenSize) {
       case ScreenSize.phone:
-        basePadding = const EdgeInsets.all(16.0);
+        basePadding = const EdgeInsets.all(16);
         break;
       case ScreenSize.tablet:
-        basePadding = const EdgeInsets.all(24.0);
+        basePadding = const EdgeInsets.all(24);
         break;
       case ScreenSize.largeTablet:
-        basePadding = const EdgeInsets.all(32.0);
+        basePadding = const EdgeInsets.all(32);
         break;
       case ScreenSize.desktop:
-        basePadding = const EdgeInsets.all(40.0);
+        basePadding = const EdgeInsets.all(40);
         break;
     }
 
@@ -94,7 +92,7 @@ class AdaptivePadding extends StatelessWidget {
     }
 
     // Apply safe area adjustments
-    EdgeInsets finalPadding = basePadding;
+    var finalPadding = basePadding;
     if (respectSafeArea) {
       finalPadding = EdgeInsets.only(
         left: basePadding.left + safeAreaInsets.left,
@@ -138,13 +136,13 @@ class AdaptivePadding extends StatelessWidget {
 
     switch (screenSize) {
       case ScreenSize.phone:
-        return const EdgeInsets.all(8.0);
+        return const EdgeInsets.all(8);
       case ScreenSize.tablet:
-        return const EdgeInsets.all(16.0);
+        return const EdgeInsets.all(16);
       case ScreenSize.largeTablet:
-        return const EdgeInsets.all(24.0);
+        return const EdgeInsets.all(24);
       case ScreenSize.desktop:
-        return const EdgeInsets.all(32.0);
+        return const EdgeInsets.all(32);
     }
   }
 }
@@ -154,45 +152,82 @@ class AdaptivePadding extends StatelessWidget {
 /// Convenience widgets for common padding patterns
 class AdaptivePaddingWidgets {
   /// Horizontal padding that adapts to screen size
+  Widget horizontalAdaptivePadding({
+    required BuildContext context,
+    required Widget child,
+    double? left,
+    double? right,
+    bool respectSafeArea = true,
+  }) => LayoutBuilder(
+    builder: (context, constraints) {
+      final size = constraints.maxWidth;
+      ScreenSize screenSize;
+      if (size < AppDimensions.phoneBreakpoint) {
+        screenSize = ScreenSize.phone;
+      } else if (size < AppDimensions.tabletBreakpoint) {
+        screenSize = ScreenSize.tablet;
+      } else if (size < AppDimensions.largeTabletBreakpoint) {
+        screenSize = ScreenSize.largeTablet;
+      } else {
+        screenSize = ScreenSize.desktop;
+      }
+
+      final padding = _getHorizontalPadding(screenSize, left, right);
+      final mediaQuery = MediaQuery.of(context);
+      final safeAreaInsets = mediaQuery.padding;
+
+      return Padding(
+        padding: EdgeInsets.only(
+          left: respectSafeArea
+              ? padding.left + safeAreaInsets.left
+              : padding.left,
+          right: respectSafeArea
+              ? padding.right + safeAreaInsets.right
+              : padding.right,
+        ),
+        child: child,
+      );
+    },
+  );
+
+  /// Horizontal padding that adapts to screen size
   static Widget horizontal({
     required BuildContext context,
     required Widget child,
     double? left,
     double? right,
     bool respectSafeArea = true,
-  }) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final size = constraints.maxWidth;
-        ScreenSize screenSize;
-        if (size < AppDimensions.phoneBreakpoint) {
-          screenSize = ScreenSize.phone;
-        } else if (size < AppDimensions.tabletBreakpoint) {
-          screenSize = ScreenSize.tablet;
-        } else if (size < AppDimensions.largeTabletBreakpoint) {
-          screenSize = ScreenSize.largeTablet;
-        } else {
-          screenSize = ScreenSize.desktop;
-        }
+  }) => LayoutBuilder(
+    builder: (context, constraints) {
+      final size = constraints.maxWidth;
+      ScreenSize screenSize;
+      if (size < AppDimensions.phoneBreakpoint) {
+        screenSize = ScreenSize.phone;
+      } else if (size < AppDimensions.tabletBreakpoint) {
+        screenSize = ScreenSize.tablet;
+      } else if (size < AppDimensions.largeTabletBreakpoint) {
+        screenSize = ScreenSize.largeTablet;
+      } else {
+        screenSize = ScreenSize.desktop;
+      }
 
-        final padding = _getHorizontalPadding(screenSize, left, right);
-        final mediaQuery = MediaQuery.of(context);
-        final safeAreaInsets = mediaQuery.padding;
+      final padding = _getHorizontalPadding(screenSize, left, right);
+      final mediaQuery = MediaQuery.of(context);
+      final safeAreaInsets = mediaQuery.padding;
 
-        return Padding(
-          padding: EdgeInsets.only(
-            left: respectSafeArea
-                ? padding.left + safeAreaInsets.left
-                : padding.left,
-            right: respectSafeArea
-                ? padding.right + safeAreaInsets.right
-                : padding.right,
-          ),
-          child: child,
-        );
-      },
-    );
-  }
+      return Padding(
+        padding: EdgeInsets.only(
+          left: respectSafeArea
+              ? padding.left + safeAreaInsets.left
+              : padding.left,
+          right: respectSafeArea
+              ? padding.right + safeAreaInsets.right
+              : padding.right,
+        ),
+        child: child,
+      );
+    },
+  );
 
   /// Vertical padding that adapts to screen size
   static Widget vertical({
@@ -201,40 +236,36 @@ class AdaptivePaddingWidgets {
     double? top,
     double? bottom,
     bool respectSafeArea = true,
-  }) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final size = constraints.maxHeight;
-        ScreenSize screenSize;
-        if (size < 600) {
-          // Height-based breakpoint
-          screenSize = ScreenSize.phone;
-        } else if (size < 900) {
-          screenSize = ScreenSize.tablet;
-        } else if (size < 1200) {
-          screenSize = ScreenSize.largeTablet;
-        } else {
-          screenSize = ScreenSize.desktop;
-        }
+  }) => LayoutBuilder(
+    builder: (context, constraints) {
+      final size = constraints.maxHeight;
+      ScreenSize screenSize;
+      if (size < 600) {
+        // Height-based breakpoint
+        screenSize = ScreenSize.phone;
+      } else if (size < 900) {
+        screenSize = ScreenSize.tablet;
+      } else if (size < 1200) {
+        screenSize = ScreenSize.largeTablet;
+      } else {
+        screenSize = ScreenSize.desktop;
+      }
 
-        final padding = _getVerticalPadding(screenSize, top, bottom);
-        final mediaQuery = MediaQuery.of(context);
-        final safeAreaInsets = mediaQuery.padding;
+      final padding = _getVerticalPadding(screenSize, top, bottom);
+      final mediaQuery = MediaQuery.of(context);
+      final safeAreaInsets = mediaQuery.padding;
 
-        return Padding(
-          padding: EdgeInsets.only(
-            top: respectSafeArea
-                ? padding.top + safeAreaInsets.top
-                : padding.top,
-            bottom: respectSafeArea
-                ? padding.bottom + safeAreaInsets.bottom
-                : padding.bottom,
-          ),
-          child: child,
-        );
-      },
-    );
-  }
+      return Padding(
+        padding: EdgeInsets.only(
+          top: respectSafeArea ? padding.top + safeAreaInsets.top : padding.top,
+          bottom: respectSafeArea
+              ? padding.bottom + safeAreaInsets.bottom
+              : padding.bottom,
+        ),
+        child: child,
+      );
+    },
+  );
 
   /// All-around padding that adapts to screen size
   static Widget all({
@@ -242,34 +273,32 @@ class AdaptivePaddingWidgets {
     required Widget child,
     double? padding,
     bool respectSafeArea = true,
-  }) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final size = constraints.maxWidth;
-        ScreenSize screenSize;
-        if (size < AppDimensions.phoneBreakpoint) {
-          screenSize = ScreenSize.phone;
-        } else if (size < AppDimensions.tabletBreakpoint) {
-          screenSize = ScreenSize.tablet;
-        } else if (size < AppDimensions.largeTabletBreakpoint) {
-          screenSize = ScreenSize.largeTablet;
-        } else {
-          screenSize = ScreenSize.desktop;
-        }
+  }) => LayoutBuilder(
+    builder: (context, constraints) {
+      final size = constraints.maxWidth;
+      ScreenSize screenSize;
+      if (size < AppDimensions.phoneBreakpoint) {
+        screenSize = ScreenSize.phone;
+      } else if (size < AppDimensions.tabletBreakpoint) {
+        screenSize = ScreenSize.tablet;
+      } else if (size < AppDimensions.largeTabletBreakpoint) {
+        screenSize = ScreenSize.largeTablet;
+      } else {
+        screenSize = ScreenSize.desktop;
+      }
 
-        final adaptivePadding = padding ?? _getAllPadding(screenSize);
-        final mediaQuery = MediaQuery.of(context);
-        final safeAreaInsets = mediaQuery.padding;
+      final adaptivePadding = padding ?? _getAllPadding(screenSize);
+      final mediaQuery = MediaQuery.of(context);
+      final safeAreaInsets = mediaQuery.padding;
 
-        return Padding(
-          padding: respectSafeArea
-              ? EdgeInsets.all(adaptivePadding) + safeAreaInsets
-              : EdgeInsets.all(adaptivePadding),
-          child: child,
-        );
-      },
-    );
-  }
+      return Padding(
+        padding: respectSafeArea
+            ? EdgeInsets.all(adaptivePadding) + safeAreaInsets
+            : EdgeInsets.all(adaptivePadding),
+        child: child,
+      );
+    },
+  );
 
   /// Get horizontal padding based on screen size
   static EdgeInsets _getHorizontalPadding(
@@ -298,21 +327,20 @@ class AdaptivePaddingWidgets {
   }
 
   /// Get all-around padding based on screen size
-  static double _getAllPadding(ScreenSize screenSize) {
-    return _getBasePadding(screenSize);
-  }
+  static double _getAllPadding(ScreenSize screenSize) =>
+      _getBasePadding(screenSize);
 
   /// Get base padding value for a screen size
   static double _getBasePadding(ScreenSize screenSize) {
     switch (screenSize) {
       case ScreenSize.phone:
-        return 16.0;
+        return 16;
       case ScreenSize.tablet:
-        return 24.0;
+        return 24;
       case ScreenSize.largeTablet:
-        return 32.0;
+        return 32;
       case ScreenSize.desktop:
-        return 40.0;
+        return 40;
     }
   }
 }
@@ -325,15 +353,13 @@ extension AdaptivePaddingExtension on Widget {
     double? left,
     double? right,
     bool respectSafeArea = true,
-  }) {
-    return AdaptivePaddingWidgets.horizontal(
-      context: context,
-      child: this,
-      left: left,
-      right: right,
-      respectSafeArea: respectSafeArea,
-    );
-  }
+  }) => AdaptivePaddingWidgets.horizontal(
+    context: context,
+    child: this,
+    left: left,
+    right: right,
+    respectSafeArea: respectSafeArea,
+  );
 
   /// Add adaptive vertical padding
   Widget adaptiveVerticalPadding(
@@ -341,27 +367,23 @@ extension AdaptivePaddingExtension on Widget {
     double? top,
     double? bottom,
     bool respectSafeArea = true,
-  }) {
-    return AdaptivePaddingWidgets.vertical(
-      context: context,
-      child: this,
-      top: top,
-      bottom: bottom,
-      respectSafeArea: respectSafeArea,
-    );
-  }
+  }) => AdaptivePaddingWidgets.vertical(
+    context: context,
+    child: this,
+    top: top,
+    bottom: bottom,
+    respectSafeArea: respectSafeArea,
+  );
 
   /// Add adaptive all-around padding
   Widget adaptivePadding(
     BuildContext context, {
     double? padding,
     bool respectSafeArea = true,
-  }) {
-    return AdaptivePaddingWidgets.all(
-      context: context,
-      child: this,
-      padding: padding,
-      respectSafeArea: respectSafeArea,
-    );
-  }
+  }) => AdaptivePaddingWidgets.all(
+    context: context,
+    child: this,
+    padding: padding,
+    respectSafeArea: respectSafeArea,
+  );
 }

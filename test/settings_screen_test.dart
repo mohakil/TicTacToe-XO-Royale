@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:tictactoe_xo_royale/features/settings/settings.dart';
 
 void main() {
@@ -20,10 +20,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        ProviderScope(
-          overrides: [],
-          child: const MaterialApp(home: SettingsScreen()),
-        ),
+        const ProviderScope(child: MaterialApp(home: SettingsScreen())),
       );
 
       // Wait for the screen to render
@@ -35,10 +32,7 @@ void main() {
 
     testWidgets('displays settings sections', (WidgetTester tester) async {
       await tester.pumpWidget(
-        ProviderScope(
-          overrides: [],
-          child: const MaterialApp(home: SettingsScreen()),
-        ),
+        const ProviderScope(child: MaterialApp(home: SettingsScreen())),
       );
 
       await tester.pump();
@@ -49,10 +43,7 @@ void main() {
 
     testWidgets('handles theme selection', (WidgetTester tester) async {
       await tester.pumpWidget(
-        ProviderScope(
-          overrides: [],
-          child: const MaterialApp(home: SettingsScreen()),
-        ),
+        const ProviderScope(child: MaterialApp(home: SettingsScreen())),
       );
 
       await tester.pump();
@@ -63,10 +54,7 @@ void main() {
 
     testWidgets('displays about section', (WidgetTester tester) async {
       await tester.pumpWidget(
-        ProviderScope(
-          overrides: [],
-          child: const MaterialApp(home: SettingsScreen()),
-        ),
+        const ProviderScope(child: MaterialApp(home: SettingsScreen())),
       );
 
       await tester.pump();

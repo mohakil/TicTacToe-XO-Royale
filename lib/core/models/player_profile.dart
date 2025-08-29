@@ -1,16 +1,18 @@
+import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'player_profile.g.dart';
 
 @JsonSerializable()
+@immutable
 class PlayerProfile {
   const PlayerProfile({
     required this.id,
     required this.nickname,
-    this.avatarUrlOrProvider,
     required this.stats,
     required this.gems,
     required this.hints,
+    this.avatarUrlOrProvider,
   });
 
   final String id;
@@ -69,6 +71,7 @@ class PlayerProfile {
 }
 
 @JsonSerializable()
+@immutable
 class PlayerStats {
   const PlayerStats({
     required this.wins,

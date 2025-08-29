@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 class ChoiceChips<T> extends StatelessWidget {
   const ChoiceChips({
-    super.key,
     required this.options,
     required this.selectedOption,
     required this.onOptionSelected,
+    super.key,
     this.label,
     this.isMultiSelect = false,
   });
@@ -52,7 +52,6 @@ class ChoiceChips<T> extends StatelessWidget {
               ),
               side: BorderSide(
                 color: isSelected ? colorScheme.primary : colorScheme.outline,
-                width: 1,
               ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),

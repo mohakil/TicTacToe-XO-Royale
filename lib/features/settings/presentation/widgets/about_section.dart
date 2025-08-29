@@ -25,7 +25,7 @@ class _AboutSectionState extends ConsumerState<AboutSection> {
       setState(() {
         _packageInfo = packageInfo;
       });
-    } catch (e) {
+    } on Exception catch (e) {
       debugPrint('Failed to load package info: $e');
     }
   }

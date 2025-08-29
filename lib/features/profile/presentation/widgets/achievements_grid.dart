@@ -6,158 +6,170 @@ class AchievementsGrid extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // TODO: Replace with actual achievements data from provider
+    // TODO(Replace with actual achievements data from provider)
     final mockAchievements = _generateMockAchievements();
 
-    return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainer,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                Icons.workspace_premium,
-                color: Theme.of(context).colorScheme.primary,
-                size: 28,
-              ),
-              const SizedBox(width: 12),
-              Text(
-                'Achievements',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
-              ),
-              const Spacer(),
-              Text(
-                '${mockAchievements.where((a) => a.isUnlocked).length}/${mockAchievements.length}',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.primary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isSmallScreen = constraints.maxWidth < 400;
+        final margin = isSmallScreen ? 12.0 : 16.0;
+        final padding = isSmallScreen ? 16.0 : 20.0;
+        final crossAxisCount = isSmallScreen ? 1 : 2;
 
-          if (mockAchievements.isEmpty)
-            Center(
-              child: Column(
+        return Container(
+          margin: EdgeInsets.all(margin),
+          padding: EdgeInsets.all(padding),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceContainer,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: Theme.of(
+                context,
+              ).colorScheme.outline.withValues(alpha: 0.2),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
                 children: [
                   Icon(
                     Icons.workspace_premium,
-                    size: 64,
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                    color: Theme.of(context).colorScheme.primary,
+                    size: 28,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(width: 12),
                   Text(
-                    'No achievements yet',
+                    'Achievements',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const Spacer(),
+                  Text(
+                    '${mockAchievements.where((a) => a.isUnlocked).length}/${mockAchievements.length}',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.w600,
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Keep playing to unlock achievements!',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
-                    ),
-                    textAlign: TextAlign.center,
                   ),
                 ],
               ),
-            )
-          else
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                childAspectRatio: 1.2,
-              ),
-              itemCount: mockAchievements.length,
-              itemBuilder: (context, index) {
-                final achievement = mockAchievements[index];
-                return _AchievementCard(achievement: achievement);
-              },
-            ),
-        ],
-      ),
+              const SizedBox(height: 20),
+
+              if (mockAchievements.isEmpty)
+                Center(
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.workspace_premium,
+                        size: 64,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No achievements yet',
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant,
+                            ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Keep playing to unlock achievements!',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                )
+              else
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount,
+                    crossAxisSpacing: isSmallScreen ? 12 : 16,
+                    mainAxisSpacing: isSmallScreen ? 12 : 16,
+                    childAspectRatio: isSmallScreen ? 1.4 : 1.2,
+                  ),
+                  itemCount: mockAchievements.length,
+                  itemBuilder: (context, index) {
+                    final achievement = mockAchievements[index];
+                    return _AchievementCard(
+                      achievement: achievement,
+                      isSmallScreen: isSmallScreen,
+                    );
+                  },
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 
-  List<Achievement> _generateMockAchievements() {
-    return [
-      Achievement(
-        id: 'first_win',
-        title: 'First Victory',
-        description: 'Win your first game',
-        icon: Icons.emoji_events,
-        isUnlocked: true,
-        unlockedDate: DateTime.now().subtract(const Duration(days: 5)),
-        rarity: AchievementRarity.common,
-      ),
-      Achievement(
-        id: 'win_streak_5',
-        title: 'Hot Streak',
-        description: 'Win 5 games in a row',
-        icon: Icons.local_fire_department,
-        isUnlocked: true,
-        unlockedDate: DateTime.now().subtract(const Duration(days: 2)),
-        rarity: AchievementRarity.rare,
-      ),
-      Achievement(
-        id: 'robot_master',
-        title: 'Robot Master',
-        description: 'Beat a robot on Hard difficulty',
-        icon: Icons.smart_toy,
-        isUnlocked: false,
-        unlockedDate: null,
-        rarity: AchievementRarity.epic,
-      ),
-      Achievement(
-        id: 'board_explorer',
-        title: 'Board Explorer',
-        description: 'Play on 3 different board sizes',
-        icon: Icons.grid_on,
-        isUnlocked: true,
-        unlockedDate: DateTime.now().subtract(const Duration(days: 1)),
-        rarity: AchievementRarity.common,
-      ),
-      Achievement(
-        id: 'speed_demon',
-        title: 'Speed Demon',
-        description: 'Win a game in under 2 minutes',
-        icon: Icons.speed,
-        isUnlocked: false,
-        unlockedDate: null,
-        rarity: AchievementRarity.rare,
-      ),
-      Achievement(
-        id: 'perfect_game',
-        title: 'Perfect Game',
-        description: 'Win without losing a single piece',
-        icon: Icons.star,
-        isUnlocked: false,
-        unlockedDate: null,
-        rarity: AchievementRarity.legendary,
-      ),
-    ];
-  }
+  List<Achievement> _generateMockAchievements() => [
+    Achievement(
+      id: 'first_win',
+      title: 'First Victory',
+      description: 'Win your first game',
+      icon: Icons.emoji_events,
+      isUnlocked: true,
+      unlockedDate: DateTime.now().subtract(const Duration(days: 5)),
+      rarity: AchievementRarity.common,
+    ),
+    Achievement(
+      id: 'win_streak_5',
+      title: 'Hot Streak',
+      description: 'Win 5 games in a row',
+      icon: Icons.local_fire_department,
+      isUnlocked: true,
+      unlockedDate: DateTime.now().subtract(const Duration(days: 2)),
+      rarity: AchievementRarity.rare,
+    ),
+    const Achievement(
+      id: 'robot_master',
+      title: 'Robot Master',
+      description: 'Beat a robot on Hard difficulty',
+      icon: Icons.smart_toy,
+      isUnlocked: false,
+      rarity: AchievementRarity.epic,
+    ),
+    Achievement(
+      id: 'board_explorer',
+      title: 'Board Explorer',
+      description: 'Play on 3 different board sizes',
+      icon: Icons.grid_on,
+      isUnlocked: true,
+      unlockedDate: DateTime.now().subtract(const Duration(days: 1)),
+      rarity: AchievementRarity.common,
+    ),
+    const Achievement(
+      id: 'speed_demon',
+      title: 'Speed Demon',
+      description: 'Win a game in under 2 minutes',
+      icon: Icons.speed,
+      isUnlocked: false,
+      rarity: AchievementRarity.rare,
+    ),
+    const Achievement(
+      id: 'perfect_game',
+      title: 'Perfect Game',
+      description: 'Win without losing a single piece',
+      icon: Icons.star,
+      isUnlocked: false,
+      rarity: AchievementRarity.legendary,
+    ),
+  ];
 }
 
 class Achievement {
@@ -175,8 +187,8 @@ class Achievement {
     required this.description,
     required this.icon,
     required this.isUnlocked,
-    this.unlockedDate,
     required this.rarity,
+    this.unlockedDate,
   });
 }
 
@@ -184,8 +196,12 @@ enum AchievementRarity { common, rare, epic, legendary }
 
 class _AchievementCard extends StatelessWidget {
   final Achievement achievement;
+  final bool isSmallScreen;
 
-  const _AchievementCard({required this.achievement});
+  const _AchievementCard({
+    required this.achievement,
+    this.isSmallScreen = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -200,8 +216,8 @@ class _AchievementCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isUnlocked
-                      ? rarityColor.withValues(alpha: 0.3)
-        : Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+              ? rarityColor.withValues(alpha: 0.3)
+              : Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
           width: isUnlocked ? 2 : 1,
         ),
         boxShadow: isUnlocked
@@ -218,21 +234,21 @@ class _AchievementCard extends StatelessWidget {
         children: [
           // Main Content
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // Icon
                 Icon(
                   achievement.icon,
-                  size: 48,
+                  size: isSmallScreen ? 40 : 48,
                   color: isUnlocked
                       ? rarityColor
                       : Theme.of(
                           context,
                         ).colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: isSmallScreen ? 8 : 12),
 
                 // Title
                 Text(
@@ -244,12 +260,13 @@ class _AchievementCard extends StatelessWidget {
                         : Theme.of(
                             context,
                           ).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                    fontSize: isSmallScreen ? 14 : null,
                   ),
                   textAlign: TextAlign.center,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: isSmallScreen ? 2 : 4),
 
                 // Description
                 Text(
@@ -260,6 +277,7 @@ class _AchievementCard extends StatelessWidget {
                         : Theme.of(
                             context,
                           ).colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
+                    fontSize: isSmallScreen ? 11 : null,
                   ),
                   textAlign: TextAlign.center,
                   maxLines: 2,
@@ -267,12 +285,13 @@ class _AchievementCard extends StatelessWidget {
                 ),
 
                 if (isUnlocked && achievement.unlockedDate != null) ...[
-                  const SizedBox(height: 8),
+                  SizedBox(height: isSmallScreen ? 4 : 8),
                   Text(
                     'Unlocked ${_formatDate(achievement.unlockedDate!)}',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: rarityColor,
                       fontWeight: FontWeight.w500,
+                      fontSize: isSmallScreen ? 10 : null,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -284,17 +303,17 @@ class _AchievementCard extends StatelessWidget {
           // Lock Overlay
           if (!isUnlocked)
             Positioned(
-              top: 8,
-              right: 8,
+              top: isSmallScreen ? 6 : 8,
+              right: isSmallScreen ? 6 : 8,
               child: Container(
-                padding: const EdgeInsets.all(4),
+                padding: EdgeInsets.all(isSmallScreen ? 3 : 4),
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surfaceDim,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
                   Icons.lock,
-                  size: 16,
+                  size: isSmallScreen ? 14 : 16,
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
@@ -302,10 +321,13 @@ class _AchievementCard extends StatelessWidget {
 
           // Rarity Badge
           Positioned(
-            top: 8,
-            left: 8,
+            top: isSmallScreen ? 6 : 8,
+            left: isSmallScreen ? 6 : 8,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              padding: EdgeInsets.symmetric(
+                horizontal: isSmallScreen ? 4 : 6,
+                vertical: isSmallScreen ? 1 : 2,
+              ),
               decoration: BoxDecoration(
                 color: rarityColor.withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(8),
@@ -315,7 +337,7 @@ class _AchievementCard extends StatelessWidget {
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
-                  fontSize: 10,
+                  fontSize: isSmallScreen ? 9 : 10,
                 ),
               ),
             ),

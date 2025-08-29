@@ -6,130 +6,160 @@ class HistoryList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // TODO: Replace with actual game history data from provider
+    // TODO(Replace with actual game history data from provider)
     final mockHistory = _generateMockHistory();
 
-    return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainer,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                Icons.history,
-                color: Theme.of(context).colorScheme.primary,
-                size: 28,
-              ),
-              const SizedBox(width: 12),
-              Text(
-                'Game History',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
-              ),
-              const Spacer(),
-              TextButton(
-                onPressed: () {
-                  // TODO: Implement view all history
-                },
-                child: const Text('View All'),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isSmallScreen = constraints.maxWidth < 400;
+        final margin = isSmallScreen ? 12.0 : 16.0;
+        final padding = isSmallScreen ? 16.0 : 20.0;
+        final iconSize = isSmallScreen ? 24.0 : 28.0;
+        final spacing = isSmallScreen ? 8.0 : 12.0;
 
-          if (mockHistory.isEmpty)
-            Center(
-              child: Column(
+        return Container(
+          margin: EdgeInsets.all(margin),
+          padding: EdgeInsets.all(padding),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceContainer,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: Theme.of(
+                context,
+              ).colorScheme.outline.withValues(alpha: 0.2),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
                 children: [
                   Icon(
                     Icons.history,
-                    size: 64,
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                    color: Theme.of(context).colorScheme.primary,
+                    size: iconSize,
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No games played yet',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  SizedBox(width: spacing),
+                  Expanded(
+                    child: Text(
+                      'Game History',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        fontSize: isSmallScreen ? 18 : null,
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Start playing to see your game history here!',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                  TextButton(
+                    onPressed: () {
+                      // TODO(Implement view all history)
+                    },
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isSmallScreen ? 8 : 12,
+                        vertical: isSmallScreen ? 4 : 8,
+                      ),
                     ),
-                    textAlign: TextAlign.center,
+                    child: Text(
+                      'View All',
+                      style: TextStyle(fontSize: isSmallScreen ? 12 : null),
+                    ),
                   ),
                 ],
               ),
-            )
-          else
-            ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: mockHistory.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 12),
-              itemBuilder: (context, index) {
-                final game = mockHistory[index];
-                return _HistoryTile(game: game);
-              },
-            ),
-        ],
-      ),
+              const SizedBox(height: 20),
+
+              if (mockHistory.isEmpty)
+                Center(
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.history,
+                        size: isSmallScreen ? 48 : 64,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                      ),
+                      SizedBox(height: isSmallScreen ? 12 : 16),
+                      Text(
+                        'No games played yet',
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant,
+                              fontSize: isSmallScreen ? 16 : null,
+                            ),
+                      ),
+                      SizedBox(height: isSmallScreen ? 6 : 8),
+                      Text(
+                        'Start playing to see your game history here!',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                          fontSize: isSmallScreen ? 12 : null,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                )
+              else
+                ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: mockHistory.length,
+                  separatorBuilder: (context, index) =>
+                      SizedBox(height: isSmallScreen ? 8 : 12),
+                  itemBuilder: (context, index) {
+                    final game = mockHistory[index];
+                    return _HistoryTile(
+                      game: game,
+                      isSmallScreen: isSmallScreen,
+                    );
+                  },
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 
-  List<GameHistoryItem> _generateMockHistory() {
-    return [
-      GameHistoryItem(
-        opponent: 'Robot (Hard)',
-        result: GameResult.win,
-        boardSize: '3x3',
-        date: DateTime.now().subtract(const Duration(hours: 2)),
-        duration: const Duration(minutes: 5),
-        score: '3-0',
-      ),
-      GameHistoryItem(
-        opponent: 'Local Player',
-        result: GameResult.loss,
-        boardSize: '4x4',
-        date: DateTime.now().subtract(const Duration(days: 1)),
-        duration: const Duration(minutes: 8),
-        score: '2-3',
-      ),
-      GameHistoryItem(
-        opponent: 'Robot (Medium)',
-        result: GameResult.draw,
-        boardSize: '3x3',
-        date: DateTime.now().subtract(const Duration(days: 2)),
-        duration: const Duration(minutes: 6),
-        score: '1-1',
-      ),
-      GameHistoryItem(
-        opponent: 'Robot (Easy)',
-        result: GameResult.win,
-        boardSize: '3x3',
-        date: DateTime.now().subtract(const Duration(days: 3)),
-        duration: const Duration(minutes: 3),
-        score: '3-0',
-      ),
-    ];
-  }
+  List<GameHistoryItem> _generateMockHistory() => [
+    GameHistoryItem(
+      opponent: 'Robot (Hard)',
+      result: GameResult.win,
+      boardSize: '3x3',
+      date: DateTime.now().subtract(const Duration(hours: 2)),
+      duration: const Duration(minutes: 5),
+      score: '3-0',
+    ),
+    GameHistoryItem(
+      opponent: 'Local Player',
+      result: GameResult.loss,
+      boardSize: '4x4',
+      date: DateTime.now().subtract(const Duration(days: 1)),
+      duration: const Duration(minutes: 8),
+      score: '2-3',
+    ),
+    GameHistoryItem(
+      opponent: 'Robot (Medium)',
+      result: GameResult.draw,
+      boardSize: '3x3',
+      date: DateTime.now().subtract(const Duration(days: 2)),
+      duration: const Duration(minutes: 6),
+      score: '1-1',
+    ),
+    GameHistoryItem(
+      opponent: 'Robot (Easy)',
+      result: GameResult.win,
+      boardSize: '3x3',
+      date: DateTime.now().subtract(const Duration(days: 3)),
+      duration: const Duration(minutes: 3),
+      score: '3-0',
+    ),
+  ];
 }
 
 class GameHistoryItem {
@@ -154,8 +184,9 @@ enum GameResult { win, loss, draw }
 
 class _HistoryTile extends StatelessWidget {
   final GameHistoryItem game;
+  final bool isSmallScreen;
 
-  const _HistoryTile({required this.game});
+  const _HistoryTile({required this.game, this.isSmallScreen = false});
 
   @override
   Widget build(BuildContext context) {
@@ -163,8 +194,14 @@ class _HistoryTile extends StatelessWidget {
     final resultIcon = _getResultIcon(game.result);
     final resultText = _getResultText(game.result);
 
+    final padding = isSmallScreen ? 12.0 : 16.0;
+    final iconSize = isSmallScreen ? 20.0 : 24.0;
+    final smallIconSize = isSmallScreen ? 14.0 : 16.0;
+    final spacing = isSmallScreen ? 8.0 : 16.0;
+    final smallSpacing = isSmallScreen ? 4.0 : 8.0;
+
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(padding),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
@@ -176,18 +213,15 @@ class _HistoryTile extends StatelessWidget {
         children: [
           // Result Icon
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: EdgeInsets.all(isSmallScreen ? 8 : 12),
             decoration: BoxDecoration(
               color: resultColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: resultColor.withValues(alpha: 0.3),
-                width: 1,
-              ),
+              border: Border.all(color: resultColor.withValues(alpha: 0.3)),
             ),
-            child: Icon(resultIcon, color: resultColor, size: 24),
+            child: Icon(resultIcon, color: resultColor, size: iconSize),
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: spacing),
 
           // Game Details
           Expanded(
@@ -206,9 +240,9 @@ class _HistoryTile extends StatelessWidget {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isSmallScreen ? 6 : 8,
+                        vertical: isSmallScreen ? 2 : 4,
                       ),
                       decoration: BoxDecoration(
                         color: resultColor.withValues(alpha: 0.1),
@@ -219,62 +253,139 @@ class _HistoryTile extends StatelessWidget {
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: resultColor,
                           fontWeight: FontWeight.w600,
+                          fontSize: isSmallScreen ? 10 : null,
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.grid_on,
-                      size: 16,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      game.boardSize,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                SizedBox(height: smallSpacing),
+                if (isSmallScreen) ...[
+                  // Stacked layout for small screens
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.grid_on,
+                            size: smallIconSize,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
+                          ),
+                          SizedBox(width: smallSpacing),
+                          Text(
+                            game.boardSize,
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
+                                  fontSize: 11,
+                                ),
+                          ),
+                          SizedBox(width: spacing),
+                          Icon(
+                            Icons.timer,
+                            size: smallIconSize,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
+                          ),
+                          SizedBox(width: smallSpacing),
+                          Text(
+                            '${game.duration.inMinutes}m',
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
+                                  fontSize: 11,
+                                ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: smallSpacing),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.score,
+                            size: smallIconSize,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
+                          ),
+                          SizedBox(width: smallSpacing),
+                          Text(
+                            game.score,
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 11,
+                                ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ] else ...[
+                  // Original horizontal layout for larger screens
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.grid_on,
+                        size: smallIconSize,
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    Icon(
-                      Icons.timer,
-                      size: 16,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      '${game.duration.inMinutes}m',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      SizedBox(width: smallSpacing),
+                      Text(
+                        game.boardSize,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      SizedBox(width: spacing),
+                      Icon(
+                        Icons.timer,
+                        size: smallIconSize,
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    Icon(
-                      Icons.score,
-                      size: 16,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      game.score,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        fontWeight: FontWeight.w500,
+                      SizedBox(width: smallSpacing),
+                      Text(
+                        '${game.duration.inMinutes}m',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
+                      SizedBox(width: spacing),
+                      Icon(
+                        Icons.score,
+                        size: smallIconSize,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                      SizedBox(width: smallSpacing),
+                      Text(
+                        game.score,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+                SizedBox(height: smallSpacing),
                 Text(
                   _formatDate(game.date),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Theme.of(
                       context,
                     ).colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                    fontSize: isSmallScreen ? 10 : null,
                   ),
                 ),
               ],
@@ -284,11 +395,17 @@ class _HistoryTile extends StatelessWidget {
           // Action Button
           IconButton(
             onPressed: () {
-              // TODO: Implement view game details
+              // TODO(Implement view game details)
             },
             icon: Icon(
               Icons.chevron_right,
               color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+            iconSize: isSmallScreen ? 20 : 24,
+            padding: EdgeInsets.all(isSmallScreen ? 6 : 8),
+            constraints: BoxConstraints(
+              minWidth: isSmallScreen ? 32 : 40,
+              minHeight: isSmallScreen ? 32 : 40,
             ),
           ),
         ],

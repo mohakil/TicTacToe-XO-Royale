@@ -1,4 +1,4 @@
-import 'models.dart';
+import 'package:tictactoe_xo_royale/core/models/models.dart';
 
 class MockData {
   static final List<StoreItem> themes = [
@@ -45,7 +45,7 @@ class MockData {
       name: 'Minimal Grid',
       desc: 'Clean and simple grid design',
       premium: false,
-      locked: false,
+      locked: true,
     ),
     const StoreItem(
       id: 'holo_lines',
@@ -74,7 +74,7 @@ class MockData {
       name: 'Solid Sora',
       desc: 'Bold solid X and O symbols',
       premium: false,
-      locked: false,
+      locked: true,
     ),
     const StoreItem(
       id: 'outline_neon',
@@ -135,9 +135,12 @@ class MockData {
     GameConfig.cpuConfig(difficulty: Difficulty.hard),
   ];
 
-  static List<StoreItem> getAllStoreItems() {
-    return [...themes, ...boardDesigns, ...symbols, ...gemPackages];
-  }
+  static List<StoreItem> getAllStoreItems() => [
+    ...themes,
+    ...boardDesigns,
+    ...symbols,
+    ...gemPackages,
+  ];
 
   static List<StoreItem> getItemsByCategory(StoreItemCategory category) {
     switch (category) {
@@ -156,7 +159,7 @@ class MockData {
     final allItems = getAllStoreItems();
     try {
       return allItems.firstWhere((item) => item.id == id);
-    } catch (e) {
+    } on Exception {
       return null;
     }
   }

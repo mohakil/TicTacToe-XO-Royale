@@ -1,22 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/symbols.dart';
-import '../widgets/game_board/tic_tac_toe_board.dart';
-import '../widgets/game_hud.dart';
-import '../widgets/turn_indicator.dart';
-import '../widgets/control_bar.dart';
-import '../widgets/overlays/result_overlay.dart';
-import '../widgets/overlays/exit_overlay.dart';
-import '../widgets/overlays/settings_overlay.dart';
+import 'package:tictactoe_xo_royale/core/providers/providers.dart';
+import 'package:tictactoe_xo_royale/core/services/game_logic.dart';
+import 'package:tictactoe_xo_royale/features/game/presentation/widgets/game_interface/game_controls.dart';
+import 'package:tictactoe_xo_royale/features/game/presentation/widgets/game_board/game_board.dart';
+import 'package:tictactoe_xo_royale/features/game/presentation/widgets/game_interface/game_header.dart';
+import 'package:tictactoe_xo_royale/features/game/presentation/widgets/overlays/exit_confirmation_overlay.dart';
+import 'package:tictactoe_xo_royale/features/game/presentation/widgets/overlays/game_result_overlay.dart';
+import 'package:tictactoe_xo_royale/features/game/presentation/widgets/overlays/game_settings_overlay.dart';
+import 'package:tictactoe_xo_royale/features/game/presentation/widgets/game_interface/game_status.dart';
 
+/// Main game screen widget for Tic Tac Toe XO Royale
+///
+/// This screen manages the entire game interface including:
+/// - Game board with interactive cells
+/// - Player turn indicator
+/// - Game control bar with settings and hints
+/// - Result overlay for game outcomes
+/// - Exit confirmation dialog
+/// - Settings overlay for game preferences
+///
+/// The screen uses Riverpod for state management and integrates with
+/// the game logic service for move validation and win detection.
 class GameScreen extends ConsumerStatefulWidget {
+  /// Size of the game board (e.g., 3 for 3x3, 4 for 4x4)
   final int boardSize;
+
+  /// Number of consecutive marks needed to win
   final int winCondition;
+
+  /// Name of the first player (X)
   final String player1Name;
+
+  /// Name of the second player (O) or robot name
   final String player2Name;
+
+  /// Whether the game is in robot/AI mode
   final bool isRobotMode;
+
+  /// Difficulty level for robot opponent ('easy', 'medium', 'hard')
   final String difficulty;
+
+  /// Which player makes the first move ('x' or 'o')
+  final String firstMove;
 
   const GameScreen({
     super.key,
@@ -26,6 +53,7 @@ class GameScreen extends ConsumerStatefulWidget {
     this.player2Name = 'Player 2',
     this.isRobotMode = false,
     this.difficulty = 'medium',
+    this.firstMove = 'x',
   });
 
   @override
@@ -33,206 +61,41 @@ class GameScreen extends ConsumerStatefulWidget {
 }
 
 class _GameScreenState extends ConsumerState<GameScreen> {
-  late List<List<String?>> _boardState;
-  late String _currentPlayer;
-  late bool _isGameOver;
-  late List<int>? _winningLine;
-  late int _player1Wins;
-  late int _player2Wins;
-  late int _hintCount;
-
+  // UI state (not game state)
   bool _showExitDialog = false;
   bool _showSettings = false;
   bool _showHint = false;
   bool _showResult = false;
+  int _hintCount = 3;
 
   @override
   void initState() {
     super.initState();
-    _initializeGame();
+    // Initialize game configuration
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeGameConfig();
+    });
   }
 
-  void _initializeGame() {
-    _boardState = List.generate(
-      widget.boardSize,
-      (i) => List.generate(widget.boardSize, (j) => null),
-    );
-    _currentPlayer = 'X';
-    _isGameOver = false;
-    _winningLine = null;
-    _player1Wins = 0;
-    _player2Wins = 0;
-    _hintCount = 3;
-  }
+  void _initializeGameConfig() {}
 
   void _onCellTap(int row, int col) {
-    if (_isGameOver || _boardState[row][col] != null) return;
+    final gameNotifier = ref.read(gameStateProvider.notifier)
+      ..makeMove(row, col);
 
-    setState(() {
-      _boardState[row][col] = _currentPlayer;
-    });
+    // Check game result after move
+    final gameResult = gameNotifier.checkGameResult();
 
-    // Check for win
-    if (_checkWin(row, col)) {
-      _handleGameEnd();
-      return;
-    }
-
-    // Check for draw
-    if (_checkDraw()) {
-      _handleDraw();
-      return;
-    }
-
-    // Switch player
-    setState(() {
-      _currentPlayer = _currentPlayer == 'X' ? 'O' : 'X';
-    });
-
-    // If robot mode and it's robot's turn
-    if (widget.isRobotMode && _currentPlayer == 'O') {
-      _makeRobotMove();
-    }
-  }
-
-  bool _checkWin(int row, int col) {
-    final player = _boardState[row][col]!;
-
-    // Check row
-    if (_checkLine(_boardState[row], player)) {
-      _winningLine = _getWinningLine(row, 0, row, widget.boardSize - 1, true);
-      return true;
-    }
-
-    // Check column
-    final column = List.generate(widget.boardSize, (i) => _boardState[i][col]);
-    if (_checkLine(column, player)) {
-      _winningLine = _getWinningLine(0, col, widget.boardSize - 1, col, false);
-      return true;
-    }
-
-    // Check diagonals
-    if (row == col) {
-      final diagonal = List.generate(
-        widget.boardSize,
-        (i) => _boardState[i][i],
-      );
-      if (_checkLine(diagonal, player)) {
-        _winningLine = _getWinningLine(
-          0,
-          0,
-          widget.boardSize - 1,
-          widget.boardSize - 1,
-          true,
-        );
-        return true;
-      }
-    }
-
-    if (row + col == widget.boardSize - 1) {
-      final diagonal = List.generate(
-        widget.boardSize,
-        (i) => _boardState[i][widget.boardSize - 1 - i],
-      );
-      if (_checkLine(diagonal, player)) {
-        _winningLine = _getWinningLine(
-          0,
-          widget.boardSize - 1,
-          widget.boardSize - 1,
-          0,
-          true,
-        );
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  bool _checkLine(List<String?> line, String player) {
-    int count = 0;
-    for (final cell in line) {
-      if (cell == player) {
-        count++;
-        if (count >= widget.winCondition) return true;
-      } else {
-        count = 0;
-      }
-    }
-    return false;
-  }
-
-  List<int> _getWinningLine(
-    int startRow,
-    int startCol,
-    int endRow,
-    int endCol,
-    bool isHorizontal,
-  ) {
-    final line = <int>[];
-    if (isHorizontal) {
-      for (int i = startCol; i <= endCol; i++) {
-        line.add(startRow);
-        line.add(i);
-      }
-    } else {
-      for (int i = startRow; i <= endRow; i++) {
-        line.add(i);
-        line.add(startCol);
-      }
-    }
-    return line;
-  }
-
-  bool _checkDraw() {
-    for (final row in _boardState) {
-      for (final cell in row) {
-        if (cell == null) return false;
-      }
-    }
-    return true;
-  }
-
-  void _handleGameEnd() {
-    setState(() {
-      _isGameOver = true;
-      if (_currentPlayer == 'X') {
-        _player1Wins++;
-      } else {
-        _player2Wins++;
-      }
-    });
-
-    _showResult = true;
-  }
-
-  void _handleDraw() {
-    setState(() {
-      _isGameOver = true;
-    });
-
-    _showResult = true;
-  }
-
-  void _makeRobotMove() {
-    // Simple robot logic - find first empty cell
-    for (int i = 0; i < widget.boardSize; i++) {
-      for (int j = 0; j < widget.boardSize; j++) {
-        if (_boardState[i][j] == null) {
-          Future.delayed(const Duration(milliseconds: 500), () {
-            if (mounted) {
-              _onCellTap(i, j);
-            }
-          });
-          return;
-        }
-      }
+    // Show result overlay if game is over
+    if (gameResult.isGameOver) {
+      setState(() {
+        _showResult = true;
+      });
     }
   }
 
   void _newGame() {
     setState(() {
-      _initializeGame();
       _showResult = false;
     });
   }
@@ -262,13 +125,14 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   }
 
   void _showSettingsOverlay() {
-    setState(() {
-      _showSettings = true;
-    });
+    setState(() => _showSettings = true);
   }
 
   @override
   Widget build(BuildContext context) {
+    final gameLogic = ref.watch(gameStateProvider);
+    final gameResult = gameLogic.checkGameState();
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: Stack(
@@ -280,16 +144,18 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                 maxWidth: MediaQuery.of(context).size.width * 0.9,
                 maxHeight: MediaQuery.of(context).size.height * 0.6,
               ),
-              child: TicTacToeBoard(
+              child: GameBoard(
                 boardSize: widget.boardSize,
                 winCondition: widget.winCondition,
-                boardState: _boardState,
-                currentPlayer: _currentPlayer,
-                isGameOver: _isGameOver,
-                winningLine: _winningLine,
+                boardState: gameLogic.board,
+                currentPlayer: gameLogic.getNextPlayer(),
+                isGameOver: gameResult.isGameOver,
+                winningLine: gameResult.winningLine,
                 onCellTap: _onCellTap,
                 showHints: _showHint,
-                hintCells: _showHint ? [1, 1] : null, // Example hint cell
+                hintCells: _showHint
+                    ? [const Position(1, 1)]
+                    : null, // Example hint cell
               ),
             ),
           ),
@@ -300,7 +166,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
             left: 16,
             child: IconButton(
               onPressed: _exitGame,
-              icon: const Icon(Symbols.close),
+              icon: const Icon(Icons.close),
               iconSize: 28,
               color: Theme.of(context).colorScheme.onSurface,
             ),
@@ -311,7 +177,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
             right: 16,
             child: IconButton(
               onPressed: _showSettingsOverlay,
-              icon: const Icon(Symbols.settings),
+              icon: const Icon(Icons.settings),
               iconSize: 28,
               color: Theme.of(context).colorScheme.onSurface,
             ),
@@ -322,12 +188,12 @@ class _GameScreenState extends ConsumerState<GameScreen> {
             top: MediaQuery.of(context).padding.top + 80,
             left: 0,
             right: 0,
-            child: GameHUD(
+            child: GameHeader(
               player1Name: widget.player1Name,
               player2Name: widget.player2Name,
-              player1Wins: _player1Wins,
-              player2Wins: _player2Wins,
-              currentPlayer: _currentPlayer,
+              player1Wins: 0, // TODO(Add win tracking to providers)
+              player2Wins: 0, // TODO(Add win tracking to providers)
+              currentPlayer: gameLogic.getNextPlayer().name,
             ),
           ),
 
@@ -336,9 +202,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
             top: MediaQuery.of(context).padding.top + 200,
             left: 0,
             right: 0,
-            child: TurnIndicator(
-              currentPlayer: _currentPlayer,
-              isGameOver: _isGameOver,
+            child: GameStatus(
+              currentPlayer: gameLogic.getNextPlayer().name,
+              isGameOver: gameResult.isGameOver,
             ),
           ),
 
@@ -347,7 +213,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
             bottom: MediaQuery.of(context).padding.bottom + 32,
             left: 24,
             right: 24,
-            child: ControlBar(
+            child: GameControls(
               hintCount: _hintCount,
               onHint: _useHint,
               onNewGame: _newGame,
@@ -356,21 +222,21 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
           // Overlays
           if (_showExitDialog)
-            ExitOverlay(
+            ExitConfirmationOverlay(
               onContinue: () => setState(() => _showExitDialog = false),
               onExit: () => context.go('/home'),
             ),
 
           if (_showSettings)
-            SettingsOverlay(
+            GameSettingsOverlay(
               onClose: () => setState(() => _showSettings = false),
             ),
 
           if (_showResult)
-            ResultOverlay(
-              isWin: _winningLine != null,
-              isDraw: _winningLine == null,
-              winner: _currentPlayer == 'X'
+            GameResultOverlay(
+              isWin: gameResult.isWin,
+              isDraw: gameResult.isDraw,
+              winner: gameResult.winner == CellState.X
                   ? widget.player1Name
                   : widget.player2Name,
               onPlayAgain: _newGame,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:tictactoe_xo_royale/features/setup/setup.dart';
 
 void main() {
@@ -20,10 +20,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        ProviderScope(
-          overrides: [],
-          child: const MaterialApp(home: SetupScreen()),
-        ),
+        const ProviderScope(child: MaterialApp(home: SetupScreen())),
       );
 
       // Wait for the screen to render
@@ -38,14 +35,13 @@ void main() {
 
     testWidgets('accepts initial parameters', (WidgetTester tester) async {
       await tester.pumpWidget(
-        ProviderScope(
-          overrides: [],
-          child: const MaterialApp(
+        const ProviderScope(
+          child: MaterialApp(
             home: SetupScreen(
               player1: 'Player 1',
               player2: 'Player 2',
               gameMode: 'local',
-              boardSize: 3,
+              boardSize: BoardSize.threeByThree,
             ),
           ),
         ),
@@ -59,9 +55,8 @@ void main() {
 
     testWidgets('handles different game modes', (WidgetTester tester) async {
       await tester.pumpWidget(
-        ProviderScope(
-          overrides: [],
-          child: const MaterialApp(home: SetupScreen(gameMode: 'robot')),
+        const ProviderScope(
+          child: MaterialApp(home: SetupScreen(gameMode: 'robot')),
         ),
       );
 
@@ -73,9 +68,10 @@ void main() {
 
     testWidgets('handles different board sizes', (WidgetTester tester) async {
       await tester.pumpWidget(
-        ProviderScope(
-          overrides: [],
-          child: const MaterialApp(home: SetupScreen(boardSize: 4)),
+        const ProviderScope(
+          child: MaterialApp(
+            home: SetupScreen(boardSize: BoardSize.fourByFour),
+          ),
         ),
       );
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'router/app_router.dart';
-import 'theme/app_theme.dart';
+import 'package:tictactoe_xo_royale/app/router/app_router.dart';
+import 'package:tictactoe_xo_royale/app/theme/app_theme.dart';
 
 class MainApp extends ConsumerWidget {
   const MainApp({super.key});

@@ -38,20 +38,16 @@ class _AmbientBackgroundState extends State<AmbientBackground>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _animationController,
-      builder: (context, child) {
-        return CustomPaint(
-          painter: _AmbientBackgroundPainter(
-            fadeValue: _fadeAnimation.value,
-            rotationValue: _rotationAnimation.value,
-          ),
-          size: Size.infinite,
-        );
-      },
-    );
-  }
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: _animationController,
+    builder: (context, child) => CustomPaint(
+      painter: _AmbientBackgroundPainter(
+        fadeValue: _fadeAnimation.value,
+        rotationValue: _rotationAnimation.value,
+      ),
+      size: Size.infinite,
+    ),
+  );
 }
 
 class _AmbientBackgroundPainter extends CustomPainter {
@@ -78,7 +74,7 @@ class _AmbientBackgroundPainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
 
     // Draw subtle geometric shapes
-    for (int i = 0; i < 6; i++) {
+    for (var i = 0; i < 6; i++) {
       final angle = (i * pi / 3) + rotationValue * 0.1;
       final radius = 80.0 + 20.0 * sin(rotationValue * 0.5 + i);
       final x = center.dx + cos(angle) * radius;
@@ -86,7 +82,7 @@ class _AmbientBackgroundPainter extends CustomPainter {
 
       paint.color = Colors.white.withValues(alpha: 0.02 * fadeValue);
 
-      if (i % 2 == 0) {
+      if (i.isEven) {
         // Draw circles
         canvas.drawCircle(Offset(x, y), 8 + 4 * sin(rotationValue + i), paint);
       } else {
@@ -129,7 +125,5 @@ class _AmbientBackgroundPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return true;
-  }
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }

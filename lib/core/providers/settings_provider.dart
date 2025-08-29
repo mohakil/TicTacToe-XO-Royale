@@ -1,9 +1,11 @@
+import 'dart:convert'; // Added missing import for json
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert'; // Added missing import for json
 
 // Settings state class
+@immutable
 class AppSettings {
   const AppSettings({
     required this.soundEnabled,
@@ -32,18 +34,15 @@ class AppSettings {
     bool? autoSaveEnabled,
     bool? notificationsEnabled,
     PerformanceMode? performanceMode,
-  }) {
-    return AppSettings(
-      soundEnabled: soundEnabled ?? this.soundEnabled,
-      musicEnabled: musicEnabled ?? this.musicEnabled,
-      vibrationEnabled: vibrationEnabled ?? this.vibrationEnabled,
-      hapticFeedbackEnabled:
-          hapticFeedbackEnabled ?? this.hapticFeedbackEnabled,
-      autoSaveEnabled: autoSaveEnabled ?? this.autoSaveEnabled,
-      notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
-      performanceMode: performanceMode ?? this.performanceMode,
-    );
-  }
+  }) => AppSettings(
+    soundEnabled: soundEnabled ?? this.soundEnabled,
+    musicEnabled: musicEnabled ?? this.musicEnabled,
+    vibrationEnabled: vibrationEnabled ?? this.vibrationEnabled,
+    hapticFeedbackEnabled: hapticFeedbackEnabled ?? this.hapticFeedbackEnabled,
+    autoSaveEnabled: autoSaveEnabled ?? this.autoSaveEnabled,
+    notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
+    performanceMode: performanceMode ?? this.performanceMode,
+  );
 
   // Default settings
   factory AppSettings.defaults() => const AppSettings(
@@ -159,7 +158,7 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
         );
         state = AppSettings.fromJson(settingsMap);
       }
-    } catch (e) {
+    } on Exception catch (e) {
       debugPrint('Failed to load settings: $e');
       // Keep default settings if loading fails
     }
@@ -171,43 +170,43 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
       final prefs = await SharedPreferences.getInstance();
       final settingsJson = json.encode(state.toJson());
       await prefs.setString(_storageKey, settingsJson);
-    } catch (e) {
+    } on Exception catch (e) {
       debugPrint('Failed to save settings: $e');
     }
   }
 
   // Update sound setting
-  Future<void> setSoundEnabled(bool enabled) async {
+  Future<void> setSoundEnabled({required bool enabled}) async {
     state = state.copyWith(soundEnabled: enabled);
     await _saveSettings();
   }
 
   // Update music setting
-  Future<void> setMusicEnabled(bool enabled) async {
+  Future<void> setMusicEnabled({required bool enabled}) async {
     state = state.copyWith(musicEnabled: enabled);
     await _saveSettings();
   }
 
   // Update vibration setting
-  Future<void> setVibrationEnabled(bool enabled) async {
+  Future<void> setVibrationEnabled({required bool enabled}) async {
     state = state.copyWith(vibrationEnabled: enabled);
     await _saveSettings();
   }
 
   // Update haptic feedback setting
-  Future<void> setHapticFeedbackEnabled(bool enabled) async {
+  Future<void> setHapticFeedbackEnabled({required bool enabled}) async {
     state = state.copyWith(hapticFeedbackEnabled: enabled);
     await _saveSettings();
   }
 
   // Update auto save setting
-  Future<void> setAutoSaveEnabled(bool enabled) async {
+  Future<void> setAutoSaveEnabled({required bool enabled}) async {
     state = state.copyWith(autoSaveEnabled: enabled);
     await _saveSettings();
   }
 
   // Update notifications setting
-  Future<void> setNotificationsEnabled(bool enabled) async {
+  Future<void> setNotificationsEnabled({required bool enabled}) async {
     state = state.copyWith(notificationsEnabled: enabled);
     await _saveSettings();
   }
@@ -220,22 +219,22 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   // Toggle sound
   Future<void> toggleSound() async {
-    await setSoundEnabled(!state.soundEnabled);
+    await setSoundEnabled(enabled: !state.soundEnabled);
   }
 
   // Toggle music
   Future<void> toggleMusic() async {
-    await setMusicEnabled(!state.musicEnabled);
+    await setMusicEnabled(enabled: !state.musicEnabled);
   }
 
   // Toggle vibration
   Future<void> toggleVibration() async {
-    await setVibrationEnabled(!state.vibrationEnabled);
+    await setVibrationEnabled(enabled: !state.vibrationEnabled);
   }
 
   // Toggle haptic feedback
   Future<void> toggleHapticFeedback() async {
-    await setHapticFeedbackEnabled(!state.hapticFeedbackEnabled);
+    await setHapticFeedbackEnabled(enabled: !state.hapticFeedbackEnabled);
   }
 
   // Reset to defaults
@@ -309,21 +308,21 @@ final performanceModeProvider = Provider<PerformanceMode>((ref) {
 });
 
 // ✅ OPTIMIZED: Computed providers using select for better performance
-final isAudioEnabledProvider = Provider<bool>((ref) {
-  return ref.watch(
+final isAudioEnabledProvider = Provider<bool>(
+  (ref) => ref.watch(
     settingsProvider.select(
       (settings) => settings.soundEnabled || settings.musicEnabled,
     ),
-  );
-});
+  ),
+);
 
-final isHapticEnabledProvider = Provider<bool>((ref) {
-  return ref.watch(
+final isHapticEnabledProvider = Provider<bool>(
+  (ref) => ref.watch(
     settingsProvider.select(
       (settings) => settings.vibrationEnabled || settings.hapticFeedbackEnabled,
     ),
-  );
-});
+  ),
+);
 
 // ✅ OPTIMIZED: Extension methods for easy access with select-based providers
 extension SettingsProviderExtension on WidgetRef {
@@ -353,7 +352,7 @@ extension SettingsContextExtension on BuildContext {
   AppSettings? get settings {
     try {
       return ProviderScope.containerOf(this).read(settingsProvider);
-    } catch (e) {
+    } on Exception catch (e) {
       debugPrint('Failed to read settings: $e');
       return null;
     }

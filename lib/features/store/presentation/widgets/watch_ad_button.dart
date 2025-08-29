@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/providers/store_provider.dart';
-import '../../../../core/providers/profile_provider.dart';
+import 'package:tictactoe_xo_royale/core/providers/profile_provider.dart';
+import 'package:tictactoe_xo_royale/core/providers/store_provider.dart';
 
 class WatchAdButton extends ConsumerWidget {
   const WatchAdButton({super.key});
@@ -90,7 +90,7 @@ class WatchAdButton extends ConsumerWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'Watch a short ad to earn 50 gems. Available every 5 minutes.',
+                    'Watch a short ad to earn +10 gems. Available every 5 minutes.',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
@@ -131,7 +131,7 @@ class WatchAdButton extends ConsumerWidget {
 
     if (success) {
       // Add gems to user profile
-      await ref.read(profileProvider.notifier).addGems(50);
+      await ref.read(profileProvider.notifier).addGems(10);
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -143,13 +143,12 @@ class WatchAdButton extends ConsumerWidget {
                   color: Theme.of(context).colorScheme.tertiary,
                 ),
                 const SizedBox(width: 8),
-                const Text('Ad completed! You earned 50 gems!'),
+                const Text('Ad completed! You earned +10 gems!'),
               ],
             ),
             backgroundColor: Theme.of(
               context,
             ).colorScheme.tertiary.withValues(alpha: 0.1),
-            duration: const Duration(seconds: 4),
           ),
         );
       }

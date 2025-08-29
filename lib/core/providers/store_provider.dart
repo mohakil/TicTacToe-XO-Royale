@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../models/store_item.dart';
-import '../models/mock_data.dart';
+import 'package:tictactoe_xo_royale/core/models/mock_data.dart';
+import 'package:tictactoe_xo_royale/core/models/store_item.dart';
 
 // Store state class
+@immutable
 class StoreState {
   const StoreState({
     required this.items,
@@ -31,16 +32,14 @@ class StoreState {
     List<String>? purchaseHistory,
     DateTime? watchAdCooldown,
     bool clearError = false,
-  }) {
-    return StoreState(
-      items: items ?? this.items,
-      selectedCategory: selectedCategory ?? this.selectedCategory,
-      isLoading: isLoading ?? this.isLoading,
-      error: clearError ? null : (error ?? this.error),
-      purchaseHistory: purchaseHistory ?? this.purchaseHistory,
-      watchAdCooldown: watchAdCooldown ?? this.watchAdCooldown,
-    );
-  }
+  }) => StoreState(
+    items: items ?? this.items,
+    selectedCategory: selectedCategory ?? this.selectedCategory,
+    isLoading: isLoading ?? this.isLoading,
+    error: clearError ? null : (error ?? this.error),
+    purchaseHistory: purchaseHistory ?? this.purchaseHistory,
+    watchAdCooldown: watchAdCooldown ?? this.watchAdCooldown,
+  );
 
   // Initial state
   factory StoreState.initial() => const StoreState(
@@ -58,17 +57,17 @@ class StoreState {
     selectedCategory: StoreItemCategory.theme,
     isLoading: false,
     error: null,
-    purchaseHistory: [],
+    purchaseHistory: const [],
     watchAdCooldown: null,
   );
 
   // Error state
   factory StoreState.error(String error) => StoreState(
-    items: [],
+    items: const [],
     selectedCategory: StoreItemCategory.theme,
     isLoading: false,
     error: error,
-    purchaseHistory: [],
+    purchaseHistory: const [],
     watchAdCooldown: null,
   );
 
@@ -157,7 +156,7 @@ class StoreNotifier extends StateNotifier<StoreState> {
         purchaseHistory: purchaseHistoryJson,
         watchAdCooldown: watchAdCooldown,
       );
-    } catch (e) {
+    } on Exception catch (e) {
       state = StoreState.error('Failed to load store data: $e');
     }
   }
@@ -167,7 +166,7 @@ class StoreNotifier extends StateNotifier<StoreState> {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setStringList(_purchaseHistoryKey, state.purchaseHistory);
-    } catch (e) {
+    } on Exception catch (e) {
       state = state.copyWith(error: 'Failed to save purchase history: $e');
     }
   }
@@ -184,7 +183,7 @@ class StoreNotifier extends StateNotifier<StoreState> {
       } else {
         await prefs.remove(_watchAdCooldownKey);
       }
-    } catch (e) {
+    } on Exception catch (e) {
       state = state.copyWith(error: 'Failed to save watch ad cooldown: $e');
     }
   }
@@ -195,39 +194,34 @@ class StoreNotifier extends StateNotifier<StoreState> {
   }
 
   // Get items by category
-  List<StoreItem> getItemsByCategory(StoreItemCategory category) {
-    return state.items.where((item) {
-      switch (category) {
-        case StoreItemCategory.theme:
-          return item.category == StoreItemCategory.theme;
-        case StoreItemCategory.board:
-          return item.category == StoreItemCategory.board;
-        case StoreItemCategory.symbol:
-          return item.category == StoreItemCategory.symbol;
-        case StoreItemCategory.gems:
-          return item.category == StoreItemCategory.gems;
-      }
-    }).toList();
-  }
+  List<StoreItem> getItemsByCategory(StoreItemCategory category) =>
+      state.items.where((item) {
+        switch (category) {
+          case StoreItemCategory.theme:
+            return item.category == StoreItemCategory.theme;
+          case StoreItemCategory.board:
+            return item.category == StoreItemCategory.board;
+          case StoreItemCategory.symbol:
+            return item.category == StoreItemCategory.symbol;
+          case StoreItemCategory.gems:
+            return item.category == StoreItemCategory.gems;
+        }
+      }).toList();
 
   // Get unlocked items by category
-  List<StoreItem> getUnlockedItemsByCategory(StoreItemCategory category) {
-    return state.items
-        .where((item) => item.category == category && !item.locked)
-        .toList();
-  }
+  List<StoreItem> getUnlockedItemsByCategory(StoreItemCategory category) =>
+      state.items
+          .where((item) => item.category == category && !item.locked)
+          .toList();
 
   // Get locked items by category
-  List<StoreItem> getLockedItemsByCategory(StoreItemCategory category) {
-    return state.items
-        .where((item) => item.category == category && item.locked)
-        .toList();
-  }
+  List<StoreItem> getLockedItemsByCategory(StoreItemCategory category) => state
+      .items
+      .where((item) => item.category == category && item.locked)
+      .toList();
 
   // Check if item is unlocked
-  bool isItemUnlocked(String itemId) {
-    return state.purchaseHistory.contains(itemId);
-  }
+  bool isItemUnlocked(String itemId) => state.purchaseHistory.contains(itemId);
 
   // Purchase item with gems
   Future<bool> purchaseItem(String itemId, int gemCost) async {
@@ -260,7 +254,7 @@ class StoreNotifier extends StateNotifier<StoreState> {
 
       await _savePurchaseHistory();
       return true;
-    } catch (e) {
+    } on Exception catch (e) {
       state = state.copyWith(error: 'Failed to purchase item: $e');
       return false;
     }
@@ -287,7 +281,7 @@ class StoreNotifier extends StateNotifier<StoreState> {
       // Return true to indicate successful ad watch
       // The actual gem addition would be handled by profile provider
       return true;
-    } catch (e) {
+    } on Exception catch (e) {
       state = state.copyWith(error: 'Failed to watch ad: $e');
       return false;
     }
@@ -295,7 +289,9 @@ class StoreNotifier extends StateNotifier<StoreState> {
 
   // Check if can watch ad
   bool get canWatchAd {
-    if (state.watchAdCooldown == null) return true;
+    if (state.watchAdCooldown == null) {
+      return true;
+    }
 
     final now = DateTime.now();
     final timeSinceLastAd = now.difference(state.watchAdCooldown!);
@@ -304,13 +300,17 @@ class StoreNotifier extends StateNotifier<StoreState> {
 
   // Get time until next ad
   Duration? get timeUntilNextAd {
-    if (state.watchAdCooldown == null) return null;
+    if (state.watchAdCooldown == null) {
+      return null;
+    }
 
     final now = DateTime.now();
     final timeSinceLastAd = now.difference(state.watchAdCooldown!);
     final remainingMinutes = 5 - timeSinceLastAd.inMinutes;
 
-    if (remainingMinutes <= 0) return null;
+    if (remainingMinutes <= 0) {
+      return null;
+    }
 
     return Duration(minutes: remainingMinutes);
   }
@@ -364,31 +364,29 @@ final storeProvider =
 
 // ✅ OPTIMIZED: Use select for granular rebuilds instead of individual providers
 // Individual store data providers for granular rebuilds
-final storeItemsProvider = Provider.autoDispose<List<StoreItem>>((ref) {
-  return ref.watch(storeProvider.select((state) => state.items));
-});
+final storeItemsProvider = Provider.autoDispose<List<StoreItem>>(
+  (ref) => ref.watch(storeProvider.select((state) => state.items)),
+);
 
-final storeSelectedCategoryProvider = Provider.autoDispose<StoreItemCategory>((
-  ref,
-) {
-  return ref.watch(storeProvider.select((state) => state.selectedCategory));
-});
+final storeSelectedCategoryProvider = Provider.autoDispose<StoreItemCategory>(
+  (ref) => ref.watch(storeProvider.select((state) => state.selectedCategory)),
+);
 
-final storeIsLoadingProvider = Provider.autoDispose<bool>((ref) {
-  return ref.watch(storeProvider.select((state) => state.isLoading));
-});
+final storeIsLoadingProvider = Provider.autoDispose<bool>(
+  (ref) => ref.watch(storeProvider.select((state) => state.isLoading)),
+);
 
-final storeErrorProvider = Provider.autoDispose<String?>((ref) {
-  return ref.watch(storeProvider.select((state) => state.error));
-});
+final storeErrorProvider = Provider.autoDispose<String?>(
+  (ref) => ref.watch(storeProvider.select((state) => state.error)),
+);
 
-final storePurchaseHistoryProvider = Provider.autoDispose<List<String>>((ref) {
-  return ref.watch(storeProvider.select((state) => state.purchaseHistory));
-});
+final storePurchaseHistoryProvider = Provider.autoDispose<List<String>>(
+  (ref) => ref.watch(storeProvider.select((state) => state.purchaseHistory)),
+);
 
-final storeWatchAdCooldownProvider = Provider.autoDispose<DateTime?>((ref) {
-  return ref.watch(storeProvider.select((state) => state.watchAdCooldown));
-});
+final storeWatchAdCooldownProvider = Provider.autoDispose<DateTime?>(
+  (ref) => ref.watch(storeProvider.select((state) => state.watchAdCooldown)),
+);
 
 // ✅ OPTIMIZED: Category-specific providers using select for better performance
 final storeThemesProvider = Provider.autoDispose<List<StoreItem>>((ref) {
@@ -452,7 +450,9 @@ final storeCanWatchAdProvider = Provider.autoDispose<bool>((ref) {
   final cooldown = ref.watch(
     storeProvider.select((state) => state.watchAdCooldown),
   );
-  if (cooldown == null) return true;
+  if (cooldown == null) {
+    return true;
+  }
 
   final now = DateTime.now();
   final timeSinceLastAd = now.difference(cooldown);
@@ -463,13 +463,17 @@ final storeTimeUntilNextAdProvider = Provider.autoDispose<Duration?>((ref) {
   final cooldown = ref.watch(
     storeProvider.select((state) => state.watchAdCooldown),
   );
-  if (cooldown == null) return null;
+  if (cooldown == null) {
+    return null;
+  }
 
   final now = DateTime.now();
   final timeSinceLastAd = now.difference(cooldown);
   final remainingMinutes = 5 - timeSinceLastAd.inMinutes;
 
-  if (remainingMinutes <= 0) return null;
+  if (remainingMinutes <= 0) {
+    return null;
+  }
   return Duration(minutes: remainingMinutes);
 });
 
@@ -548,7 +552,7 @@ extension StoreContextExtension on BuildContext {
   StoreState? get storeState {
     try {
       return ProviderScope.containerOf(this).read(storeProvider);
-    } catch (e) {
+    } on Exception catch (e) {
       debugPrint('Failed to read store state: $e');
       return null;
     }

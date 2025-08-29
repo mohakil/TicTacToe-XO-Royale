@@ -19,25 +19,22 @@ class GameState {
     required this.boardState,
     required this.currentPlayer,
     required this.isGameOver,
-    this.winningLine,
     required this.status,
     required this.player1Wins,
     required this.player2Wins,
     required this.draws,
+    this.winningLine,
   });
 
-  factory GameState.initial(int boardSize) {
-    return GameState(
-      boardState: List.generate(boardSize, (_) => List.filled(boardSize, null)),
-      currentPlayer: 'X',
-      isGameOver: false,
-      winningLine: null,
-      status: GameStatus.waiting,
-      player1Wins: 0,
-      player2Wins: 0,
-      draws: 0,
-    );
-  }
+  factory GameState.initial(int boardSize) => GameState(
+    boardState: List.generate(boardSize, (_) => List.filled(boardSize, null)),
+    currentPlayer: 'X',
+    isGameOver: false,
+    status: GameStatus.waiting,
+    player1Wins: 0,
+    player2Wins: 0,
+    draws: 0,
+  );
 
   GameState copyWith({
     List<List<String?>>? boardState,
@@ -48,25 +45,25 @@ class GameState {
     int? player1Wins,
     int? player2Wins,
     int? draws,
-  }) {
-    return GameState(
-      boardState: boardState ?? this.boardState,
-      currentPlayer: currentPlayer ?? this.currentPlayer,
-      isGameOver: isGameOver ?? this.isGameOver,
-      winningLine: winningLine ?? this.winningLine,
-      status: status ?? this.status,
-      player1Wins: player1Wins ?? this.player1Wins,
-      player2Wins: player2Wins ?? this.player2Wins,
-      draws: draws ?? this.draws,
-    );
-  }
+  }) => GameState(
+    boardState: boardState ?? this.boardState,
+    currentPlayer: currentPlayer ?? this.currentPlayer,
+    isGameOver: isGameOver ?? this.isGameOver,
+    winningLine: winningLine ?? this.winningLine,
+    status: status ?? this.status,
+    player1Wins: player1Wins ?? this.player1Wins,
+    player2Wins: player2Wins ?? this.player2Wins,
+    draws: draws ?? this.draws,
+  );
 
   bool get isDraw => isGameOver && winningLine == null;
   bool get hasWinner => winningLine != null;
 
   @override
   bool operator ==(Object other) {
-    if (identical(this, other)) return true;
+    if (identical(this, other)) {
+      return true;
+    }
     return other is GameState &&
         listEquals(other.boardState, boardState) &&
         other.currentPlayer == currentPlayer &&
@@ -79,21 +76,18 @@ class GameState {
   }
 
   @override
-  int get hashCode {
-    return Object.hash(
-      Object.hashAll(boardState),
-      currentPlayer,
-      isGameOver,
-      Object.hashAll(winningLine ?? []),
-      status,
-      player1Wins,
-      player2Wins,
-      draws,
-    );
-  }
+  int get hashCode => Object.hash(
+    Object.hashAll(boardState),
+    currentPlayer,
+    isGameOver,
+    Object.hashAll(winningLine ?? []),
+    status,
+    player1Wins,
+    player2Wins,
+    draws,
+  );
 
   @override
-  String toString() {
-    return 'GameState(boardState: $boardState, currentPlayer: $currentPlayer, isGameOver: $isGameOver, winningLine: $winningLine, status: $status, player1Wins: $player1Wins, player2Wins: $player2Wins, draws: $draws)';
-  }
+  String toString() =>
+      'GameState(boardState: $boardState, currentPlayer: $currentPlayer, isGameOver: $isGameOver, winningLine: $winningLine, status: $status, player1Wins: $player1Wins, player2Wins: $player2Wins, draws: $draws)';
 }

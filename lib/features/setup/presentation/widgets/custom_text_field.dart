@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 class CustomTextField extends StatelessWidget {
   const CustomTextField({
-    super.key,
     required this.label,
     required this.value,
     required this.onChanged,
+    super.key,
     this.maxLength = 12,
     this.autoCapitalize = true,
     this.enabled = true,
@@ -39,11 +39,11 @@ class CustomTextField extends StatelessWidget {
         counterText: '', // Hide character counter
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: colorScheme.outline, width: 1),
+          borderSide: BorderSide(color: colorScheme.outline),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: colorScheme.outline, width: 1),
+          borderSide: BorderSide(color: colorScheme.outline),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -53,7 +53,6 @@ class CustomTextField extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
             color: colorScheme.outline.withValues(alpha: 0.38),
-            width: 1,
           ),
         ),
         filled: true,

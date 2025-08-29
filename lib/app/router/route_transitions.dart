@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+// ignore: avoid_classes_with_only_static_members
 /// Custom route transitions for the TicTacToe XO Royale app
 /// Implements shared axis and fade transitions as specified in the PRD
 class AppRouteTransitions {
@@ -18,101 +19,100 @@ class AppRouteTransitions {
   static PageRouteBuilder<T> sharedAxisHorizontal<T>({
     required Widget child,
     bool reverse = false,
-  }) {
-    return PageRouteBuilder<T>(
-      pageBuilder: (context, animation, secondaryAnimation) => child,
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        const begin = Offset(1.0, 0.0);
-        const end = Offset.zero;
-        const curve = _easeInOut;
+  }) => PageRouteBuilder<T>(
+    pageBuilder: (context, animation, secondaryAnimation) => child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = Offset(1, 0);
+      const end = Offset.zero;
+      const curve = _easeInOut;
 
-        var tween = Tween(begin: begin, end: end);
-        if (reverse) {
-          tween = Tween(begin: -begin, end: end);
-        }
+      var tween = Tween(begin: begin, end: end);
+      if (reverse) {
+        tween = Tween(begin: -begin, end: end);
+      }
 
-        final offsetAnimation = animation.drive(
-          tween.chain(CurveTween(curve: curve)),
-        );
+      final offsetAnimation = animation.drive(
+        tween.chain(CurveTween(curve: curve)),
+      );
 
-        return SlideTransition(position: offsetAnimation, child: child);
-      },
-      transitionDuration: _mediumDuration,
-      reverseTransitionDuration: _mediumDuration,
-    );
-  }
+      return SlideTransition(position: offsetAnimation, child: child);
+    },
+  );
 
   /// Shared axis transition for vertical navigation
   /// Used for game-related navigation (setup -> game, home -> setup)
   static PageRouteBuilder<T> sharedAxisVertical<T>({
     required Widget child,
     bool reverse = false,
-  }) {
-    return PageRouteBuilder<T>(
-      pageBuilder: (context, animation, secondaryAnimation) => child,
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        const begin = Offset(0.0, 1.0);
-        const end = Offset.zero;
-        const curve = _easeInOut;
+  }) => PageRouteBuilder<T>(
+    pageBuilder: (context, animation, secondaryAnimation) => child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = Offset(0, 1);
+      const end = Offset.zero;
+      const curve = _easeInOut;
 
-        var tween = Tween(begin: begin, end: end);
-        if (reverse) {
-          tween = Tween(begin: -begin, end: end);
-        }
+      var tween = Tween(begin: begin, end: end);
+      if (reverse) {
+        tween = Tween(begin: -begin, end: end);
+      }
 
-        final offsetAnimation = animation.drive(
-          tween.chain(CurveTween(curve: curve)),
-        );
+      final offsetAnimation = animation.drive(
+        tween.chain(CurveTween(curve: curve)),
+      );
 
-        return SlideTransition(position: offsetAnimation, child: child);
-      },
-      transitionDuration: _mediumDuration,
-      reverseTransitionDuration: _mediumDuration,
-    );
-  }
+      return SlideTransition(position: offsetAnimation, child: child);
+    },
+  );
 
   /// Fade transition for loading and utility screens
   /// Used for loading screen and modal overlays
   static PageRouteBuilder<T> fade<T>({
     required Widget child,
     Duration? duration,
-  }) {
-    return PageRouteBuilder<T>(
-      pageBuilder: (context, animation, secondaryAnimation) => child,
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return FadeTransition(
-          opacity: animation.drive(CurveTween(curve: _easeInOut)),
+  }) => PageRouteBuilder<T>(
+    pageBuilder: (context, animation, secondaryAnimation) => child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+        FadeTransition(
+          opacity: animation.drive(
+            Tween<double>(
+              begin: 0,
+              end: 1,
+            ).chain(CurveTween(curve: _easeInOut)),
+          ),
           child: child,
-        );
-      },
-      transitionDuration: duration ?? _shortDuration,
-      reverseTransitionDuration: duration ?? _shortDuration,
-    );
-  }
+        ),
+    transitionDuration: duration ?? _shortDuration,
+    reverseTransitionDuration: duration ?? _shortDuration,
+  );
 
   /// Scale transition for game setup and store items
   /// Used for interactive elements and detailed views
   static PageRouteBuilder<T> scale<T>({
     required Widget child,
     Duration? duration,
-  }) {
-    return PageRouteBuilder<T>(
-      pageBuilder: (context, animation, secondaryAnimation) => child,
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return ScaleTransition(
+  }) => PageRouteBuilder<T>(
+    pageBuilder: (context, animation, secondaryAnimation) => child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+        ScaleTransition(
           scale: animation.drive(
-            Tween(begin: 0.8, end: 1.0).chain(CurveTween(curve: _easeOut)),
+            Tween<double>(
+              begin: 0.8,
+              end: 1,
+            ).chain(CurveTween(curve: _easeOut)),
           ),
           child: FadeTransition(
-            opacity: animation.drive(CurveTween(curve: _easeInOut)),
+            opacity: animation.drive(
+              Tween<double>(
+                begin: 0,
+                end: 1,
+              ).chain(CurveTween(curve: _easeInOut)),
+            ),
             child: child,
           ),
-        );
-      },
-      transitionDuration: duration ?? _mediumDuration,
-      reverseTransitionDuration: duration ?? _mediumDuration,
-    );
-  }
+        ),
+    transitionDuration: duration ?? _mediumDuration,
+    reverseTransitionDuration: duration ?? _mediumDuration,
+  );
 
   /// Hero transition for game board and profile elements
   /// Used for seamless transitions between related screens
@@ -120,52 +120,59 @@ class AppRouteTransitions {
     required Widget child,
     required String tag,
     Duration? duration,
-  }) {
-    return PageRouteBuilder<T>(
-      pageBuilder: (context, animation, secondaryAnimation) =>
-          Hero(tag: tag, child: child),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return FadeTransition(
-          opacity: animation.drive(CurveTween(curve: _easeInOut)),
+  }) => PageRouteBuilder<T>(
+    pageBuilder: (context, animation, secondaryAnimation) =>
+        Hero(tag: tag, child: child),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+        FadeTransition(
+          opacity: animation.drive(
+            Tween<double>(
+              begin: 0,
+              end: 1,
+            ).chain(CurveTween(curve: _easeInOut)),
+          ),
           child: child,
-        );
-      },
-      transitionDuration: duration ?? _longDuration,
-      reverseTransitionDuration: duration ?? _longDuration,
-    );
-  }
+        ),
+    transitionDuration: duration ?? _longDuration,
+    reverseTransitionDuration: duration ?? _longDuration,
+  );
 
   /// Combined transition for complex navigation
   /// Combines multiple transition effects for premium feel
   static PageRouteBuilder<T> combined<T>({
     required Widget child,
     Duration? duration,
-  }) {
-    return PageRouteBuilder<T>(
-      pageBuilder: (context, animation, secondaryAnimation) => child,
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return SlideTransition(
+  }) => PageRouteBuilder<T>(
+    pageBuilder: (context, animation, secondaryAnimation) => child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+        SlideTransition(
           position: animation.drive(
             Tween(
-              begin: const Offset(0.0, 0.1),
+              begin: const Offset(0, 0.1),
               end: Offset.zero,
             ).chain(CurveTween(curve: _easeOut)),
           ),
           child: FadeTransition(
-            opacity: animation.drive(CurveTween(curve: _easeInOut)),
+            opacity: animation.drive(
+              Tween<double>(
+                begin: 0,
+                end: 1,
+              ).chain(CurveTween(curve: _easeInOut)),
+            ),
             child: ScaleTransition(
               scale: animation.drive(
-                Tween(begin: 0.95, end: 1.0).chain(CurveTween(curve: _easeOut)),
+                Tween<double>(
+                  begin: 0.95,
+                  end: 1,
+                ).chain(CurveTween(curve: _easeOut)),
               ),
               child: child,
             ),
           ),
-        );
-      },
-      transitionDuration: duration ?? _longDuration,
-      reverseTransitionDuration: duration ?? _longDuration,
-    );
-  }
+        ),
+    transitionDuration: duration ?? _longDuration,
+    reverseTransitionDuration: duration ?? _longDuration,
+  );
 }
 
 /// Extension methods for GoRouter to use custom transitions
@@ -232,6 +239,7 @@ extension GoRouterTransitionExtension on GoRouter {
     }
   }
 
+  // ignore: prefer_expression_function_bodies
   Widget _buildChild(String location, Object? extra) {
     // This is a simplified implementation
     // In a real app, you'd want to properly resolve the route
@@ -296,8 +304,7 @@ class RouteTransitionConfig {
   };
 
   /// Get transition config for a specific route
-  static RouteTransitionConfig getForRoute(String route) {
-    return defaults[route] ??
-        const RouteTransitionConfig(type: PageTransitionType.fade);
-  }
+  static RouteTransitionConfig getForRoute(String route) =>
+      defaults[route] ??
+      const RouteTransitionConfig(type: PageTransitionType.fade);
 }

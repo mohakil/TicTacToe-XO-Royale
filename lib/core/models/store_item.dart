@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'store_item.g.dart';
@@ -5,16 +6,17 @@ part 'store_item.g.dart';
 enum StoreItemCategory { theme, board, symbol, gems }
 
 @JsonSerializable()
+@immutable
 class StoreItem {
   const StoreItem({
     required this.id,
     required this.category,
     required this.name,
     required this.desc,
-    this.priceGems,
-    this.priceReal,
     required this.premium,
     required this.locked,
+    this.priceGems,
+    this.priceReal,
     this.previewAsset,
   });
 
@@ -44,19 +46,17 @@ class StoreItem {
     bool? premium,
     bool? locked,
     String? previewAsset,
-  }) {
-    return StoreItem(
-      id: id ?? this.id,
-      category: category ?? this.category,
-      name: name ?? this.name,
-      desc: desc ?? this.desc,
-      priceGems: priceGems ?? this.priceGems,
-      priceReal: priceReal ?? this.priceReal,
-      premium: premium ?? this.premium,
-      locked: locked ?? this.locked,
-      previewAsset: previewAsset ?? this.previewAsset,
-    );
-  }
+  }) => StoreItem(
+    id: id ?? this.id,
+    category: category ?? this.category,
+    name: name ?? this.name,
+    desc: desc ?? this.desc,
+    priceGems: priceGems ?? this.priceGems,
+    priceReal: priceReal ?? this.priceReal,
+    premium: premium ?? this.premium,
+    locked: locked ?? this.locked,
+    previewAsset: previewAsset ?? this.previewAsset,
+  );
 
   bool get isPurchasable => !locked && (priceGems != null || priceReal != null);
   bool get isGemPurchase => priceGems != null && !locked;

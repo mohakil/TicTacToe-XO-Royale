@@ -5,11 +5,11 @@ import 'package:flutter/services.dart';
 /// Features hover/press states and slight parallax icon movement
 class GameModeCard extends StatefulWidget {
   const GameModeCard({
-    super.key,
     required this.title,
     required this.subtitle,
     required this.icon,
     required this.onTap,
+    super.key,
     this.isRobotMode = false,
   });
 
@@ -42,7 +42,7 @@ class _GameModeCardState extends State<GameModeCard>
       vsync: this,
     );
 
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.96).animate(
+    _scaleAnimation = Tween<double>(begin: 1, end: 0.96).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
 
@@ -57,7 +57,7 @@ class _GameModeCardState extends State<GameModeCard>
           ),
         );
 
-    _elevationAnimation = Tween<double>(begin: 0.0, end: 8.0).animate(
+    _elevationAnimation = Tween<double>(begin: 0, end: 8).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic),
     );
   }
@@ -114,81 +114,82 @@ class _GameModeCardState extends State<GameModeCard>
         onTap: widget.onTap,
         child: AnimatedBuilder(
           animation: _animationController,
-          builder: (context, child) {
-            return Transform.scale(
-              scale: _isPressed ? 0.96 : _scaleAnimation.value,
-              child: Card(
-                elevation: _elevationAnimation.value,
-                shape: RoundedRectangleBorder(
+          builder: (context, child) => Transform.scale(
+            scale: _isPressed ? 0.96 : _scaleAnimation.value,
+            child: Card(
+              elevation: _elevationAnimation.value,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Container(
+                width: double.infinity,
+                height: 120,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
-                ),
-                child: Container(
-                  width: double.infinity,
-                  height: 120,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        colorScheme.surfaceContainer,
-                        colorScheme.surfaceContainer.withValues(alpha: 0.8),
-                      ],
-                    ),
-                    border: Border.all(
-                      color: _isHovered
-                          ? colorScheme.primary.withValues(alpha: 0.3)
-                          : colorScheme.outline.withValues(alpha: 0.2),
-                      width: 1,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        flex: 3,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              widget.title,
-                              style: theme.textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: colorScheme.onSurface,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              widget.subtitle,
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        flex: 2,
-                        child: Transform.translate(
-                          offset:
-                              _parallaxAnimation.value *
-                              8, // 8px parallax movement
-                          child: Icon(
-                            widget.icon,
-                            size: 48,
-                            color: widget.isRobotMode
-                                ? colorScheme.secondary
-                                : colorScheme.primary,
-                          ),
-                        ),
-                      ),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      colorScheme.surfaceContainer,
+                      colorScheme.surfaceContainer.withValues(alpha: 0.8),
                     ],
                   ),
+                  border: Border.all(
+                    color: _isHovered
+                        ? colorScheme.primary.withValues(alpha: 0.3)
+                        : colorScheme.outline.withValues(alpha: 0.2),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            widget.title,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: colorScheme.onSurface,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            widget.subtitle,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      flex: 2,
+                      child: Transform.translate(
+                        offset:
+                            _parallaxAnimation.value *
+                            8, // 8px parallax movement
+                        child: Icon(
+                          widget.icon,
+                          size: 48,
+                          color: widget.isRobotMode
+                              ? colorScheme.secondary
+                              : colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            );
-          },
+            ),
+          ),
         ),
       ),
     );
@@ -198,63 +199,61 @@ class _GameModeCardState extends State<GameModeCard>
 /// Container for displaying game mode cards in a responsive grid
 class GameModeCards extends StatelessWidget {
   const GameModeCards({
-    super.key,
     required this.onLocalModeSelected,
     required this.onRobotModeSelected,
+    super.key,
   });
 
   final VoidCallback onLocalModeSelected;
   final VoidCallback onRobotModeSelected;
 
   @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // Responsive layout: single column on small screens, side by side on larger screens
-        if (constraints.maxWidth < 600) {
-          return Column(
-            children: [
-              GameModeCard(
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) {
+      // Responsive layout: single column on small screens, side by side on larger screens
+      if (constraints.maxWidth < 600) {
+        return Column(
+          children: [
+            GameModeCard(
+              title: 'Local Player',
+              subtitle: 'Play with a friend',
+              icon: Icons.groups_2,
+              onTap: onLocalModeSelected,
+            ),
+            const SizedBox(height: 16),
+            GameModeCard(
+              title: 'Robot',
+              subtitle: 'Challenge the computer',
+              icon: Icons.smart_toy,
+              onTap: onRobotModeSelected,
+              isRobotMode: true,
+            ),
+          ],
+        );
+      } else {
+        return Row(
+          children: [
+            Expanded(
+              child: GameModeCard(
                 title: 'Local Player',
                 subtitle: 'Play with a friend',
                 icon: Icons.groups_2,
                 onTap: onLocalModeSelected,
               ),
-              const SizedBox(height: 16),
-              GameModeCard(
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: GameModeCard(
                 title: 'Robot',
                 subtitle: 'Challenge the computer',
                 icon: Icons.smart_toy,
                 onTap: onRobotModeSelected,
                 isRobotMode: true,
               ),
-            ],
-          );
-        } else {
-          return Row(
-            children: [
-              Expanded(
-                child: GameModeCard(
-                  title: 'Local Player',
-                  subtitle: 'Play with a friend',
-                  icon: Icons.groups_2,
-                  onTap: onLocalModeSelected,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: GameModeCard(
-                  title: 'Robot',
-                  subtitle: 'Challenge the computer',
-                  icon: Icons.smart_toy,
-                  onTap: onRobotModeSelected,
-                  isRobotMode: true,
-                ),
-              ),
-            ],
-          );
-        }
-      },
-    );
-  }
+            ),
+          ],
+        );
+      }
+    },
+  );
 }

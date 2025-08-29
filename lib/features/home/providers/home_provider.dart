@@ -22,15 +22,13 @@ class HomeState {
     int? gemsCount,
     int? hintCount,
     bool? isLoading,
-  }) {
-    return HomeState(
-      lastResult: lastResult ?? this.lastResult,
-      streak: streak ?? this.streak,
-      gemsCount: gemsCount ?? this.gemsCount,
-      hintCount: hintCount ?? this.hintCount,
-      isLoading: isLoading ?? this.isLoading,
-    );
-  }
+  }) => HomeState(
+    lastResult: lastResult ?? this.lastResult,
+    streak: streak ?? this.streak,
+    gemsCount: gemsCount ?? this.gemsCount,
+    hintCount: hintCount ?? this.hintCount,
+    isLoading: isLoading ?? this.isLoading,
+  );
 }
 
 /// Home screen provider for managing state
@@ -58,7 +56,7 @@ class HomeNotifier extends StateNotifier<HomeState> {
   }
 
   /// Set loading state
-  void setLoading(bool loading) {
+  void setLoading({required bool loading}) {
     state = state.copyWith(isLoading: loading);
   }
 
@@ -69,31 +67,29 @@ class HomeNotifier extends StateNotifier<HomeState> {
 }
 
 /// Provider for home screen state
-final homeProvider = StateNotifierProvider<HomeNotifier, HomeState>((ref) {
-  return HomeNotifier();
-});
+final homeProvider = StateNotifierProvider<HomeNotifier, HomeState>(
+  (ref) => HomeNotifier(),
+);
 
 /// Provider for last result
-final lastResultProvider = Provider<String>((ref) {
-  return ref.watch(homeProvider).lastResult;
-});
+final lastResultProvider = Provider<String>(
+  (ref) => ref.watch(homeProvider).lastResult,
+);
 
 /// Provider for streak
-final streakProvider = Provider<int>((ref) {
-  return ref.watch(homeProvider).streak;
-});
+final streakProvider = Provider<int>((ref) => ref.watch(homeProvider).streak);
 
 /// Provider for gems count
-final gemsCountProvider = Provider<int>((ref) {
-  return ref.watch(homeProvider).gemsCount;
-});
+final gemsCountProvider = Provider<int>(
+  (ref) => ref.watch(homeProvider).gemsCount,
+);
 
 /// Provider for hint count
-final hintCountProvider = Provider<int>((ref) {
-  return ref.watch(homeProvider).hintCount;
-});
+final hintCountProvider = Provider<int>(
+  (ref) => ref.watch(homeProvider).hintCount,
+);
 
 /// Provider for loading state
-final homeLoadingProvider = Provider<bool>((ref) {
-  return ref.watch(homeProvider).isLoading;
-});
+final homeLoadingProvider = Provider<bool>(
+  (ref) => ref.watch(homeProvider).isLoading,
+);

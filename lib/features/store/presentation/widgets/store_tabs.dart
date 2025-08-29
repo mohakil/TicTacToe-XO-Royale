@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/models/store_item.dart';
-import '../../../../core/providers/store_provider.dart';
+import 'package:tictactoe_xo_royale/core/models/store_item.dart';
+import 'package:tictactoe_xo_royale/core/providers/store_provider.dart';
 
 class StoreTabs extends ConsumerWidget {
   const StoreTabs({super.key});
@@ -119,7 +119,9 @@ class _StoreTab extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.2)
+                    ? Theme.of(
+                        context,
+                      ).colorScheme.onPrimary.withValues(alpha: 0.2)
                     : Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -142,13 +144,13 @@ class _StoreTab extends StatelessWidget {
   CategoryInfo _getCategoryInfo(StoreItemCategory category) {
     switch (category) {
       case StoreItemCategory.theme:
-        return CategoryInfo(name: 'Themes', icon: Icons.palette);
+        return const CategoryInfo(name: 'Themes', icon: Icons.palette);
       case StoreItemCategory.board:
-        return CategoryInfo(name: 'Boards', icon: Icons.grid_on);
+        return const CategoryInfo(name: 'Board Designs', icon: Icons.grid_on);
       case StoreItemCategory.symbol:
-        return CategoryInfo(name: 'Symbols', icon: Icons.close);
+        return const CategoryInfo(name: 'X/O Symbols', icon: Icons.close);
       case StoreItemCategory.gems:
-        return CategoryInfo(name: 'Gems', icon: Icons.diamond);
+        return const CategoryInfo(name: 'Gems', icon: Icons.diamond);
     }
   }
 }

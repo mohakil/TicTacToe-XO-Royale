@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tictactoe_xo_royale/core/providers/profile_provider.dart';
 import 'package:tictactoe_xo_royale/core/models/player_profile.dart';
+import 'package:tictactoe_xo_royale/core/providers/profile_provider.dart';
 
 // Mock SharedPreferences for testing
 class MockSharedPreferences implements SharedPreferences {

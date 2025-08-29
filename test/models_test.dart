@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tictactoe_xo_royale/core/models/models.dart';
 import 'package:tictactoe_xo_royale/core/models/mock_data.dart';
+import 'package:tictactoe_xo_royale/core/models/models.dart';
 
 void main() {
   group('PlayerProfile Model Tests', () {
@@ -71,28 +71,44 @@ void main() {
   group('GameConfig Model Tests', () {
     test('should create default config', () {
       final config = GameConfig.defaultConfig();
-
+      expect(config.boardSize, equals(3));
+      expect(config.winCondition, equals(3));
       expect(config.gameMode, GameMode.local);
       expect(config.firstMove, FirstMove.player1);
-      expect(config.boardSize, 3);
-      expect(config.winCondition, 3);
-      expect(config.player1Name, 'Player 1');
-      expect(config.player2Name, 'Player 2');
+      expect(config.difficulty, Difficulty.medium);
+      expect(config.player1Name, equals('Player 1'));
+      expect(config.player2Name, equals('Player 2'));
+      expect(config.isRobotMode, isFalse);
     });
 
-    test('should create CPU config', () {
+    test('should create cpu config', () {
       final config = GameConfig.cpuConfig(difficulty: Difficulty.hard);
-
+      expect(config.boardSize, equals(3));
+      expect(config.winCondition, equals(3));
       expect(config.gameMode, GameMode.cpu);
+      expect(config.firstMove, FirstMove.player1);
       expect(config.difficulty, Difficulty.hard);
-      expect(config.isRobotMode, true);
+      expect(config.player1Name, equals('You'));
+      expect(config.player2Name, equals('CPU'));
+      expect(config.isRobotMode, isTrue);
     });
 
-    test('should handle computed properties', () {
+    test('should copy with new values', () {
       final config = GameConfig.defaultConfig();
+      final newConfig = config.copyWith(
+        boardSize: 4,
+        winCondition: 4,
+        player1Name: 'Alice',
+        player2Name: 'Bob',
+      );
 
-      expect(config.firstMove, FirstMove.player1);
-      expect(config.gameMode, GameMode.local);
+      expect(newConfig.boardSize, equals(4));
+      expect(newConfig.winCondition, equals(4));
+      expect(newConfig.player1Name, equals('Alice'));
+      expect(newConfig.player2Name, equals('Bob'));
+      expect(newConfig.gameMode, equals(config.gameMode));
+      expect(newConfig.firstMove, equals(config.firstMove));
+      expect(newConfig.difficulty, equals(config.difficulty));
     });
   });
 

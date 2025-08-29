@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'routes.dart';
+import 'package:tictactoe_xo_royale/app/router/routes.dart';
 
 /// Deep linking configuration for the Tic Tac Toe XO Royale app
 class DeepLinkingConfig {
@@ -98,7 +98,7 @@ class DeepLinkingConfig {
 
       // Default fallback
       return AppRoutes.home;
-    } catch (e) {
+    } on Exception catch (e) {
       debugPrint('Deep link parsing error: $e');
       return AppRoutes.home;
     }
@@ -126,41 +126,37 @@ class DeepLinkingConfig {
   }
 
   /// Build store deep link
-  static String _buildStoreDeepLink(String category, String itemId) {
-    return '${AppRoutes.store}?category=$category&itemId=$itemId';
-  }
+  static String _buildStoreDeepLink(String category, String itemId) =>
+      '${AppRoutes.store}?category=$category&itemId=$itemId';
 
   /// Build store category deep link
-  static String _buildStoreCategoryDeepLink(String category) {
-    return '${AppRoutes.store}?category=$category';
-  }
+  static String _buildStoreCategoryDeepLink(String category) =>
+      '${AppRoutes.store}?category=$category';
 
   /// Build profile deep link
-  static String _buildProfileDeepLink(String userId) {
-    return '${AppRoutes.profile}?userId=$userId';
-  }
+  static String _buildProfileDeepLink(String userId) =>
+      '${AppRoutes.profile}?userId=$userId';
 
   /// Build challenge deep link
-  static String _buildChallengeDeepLink(String challengeId) {
-    return '${AppRoutes.setup}?challengeId=$challengeId';
-  }
+  static String _buildChallengeDeepLink(String challengeId) =>
+      '${AppRoutes.setup}?challengeId=$challengeId';
 
   /// Build leaderboard deep link
-  static String _buildLeaderboardDeepLink(String boardId) {
-    return '${AppRoutes.profile}?leaderboardId=$boardId';
-  }
+  static String _buildLeaderboardDeepLink(String boardId) =>
+      '${AppRoutes.profile}?leaderboardId=$boardId';
 
   /// Build tournament deep link
-  static String _buildTournamentDeepLink(String tournamentId) {
-    return '${AppRoutes.setup}?tournamentId=$tournamentId';
-  }
+  static String _buildTournamentDeepLink(String tournamentId) =>
+      '${AppRoutes.setup}?tournamentId=$tournamentId';
 
   /// Build share deep link
   static String _buildShareDeepLink(Map<String, String> queryParams) {
     final type = queryParams['type'] ?? 'game';
     final id = queryParams['id'];
 
-    if (id == null) return AppRoutes.home;
+    if (id == null) {
+      return AppRoutes.home;
+    }
 
     switch (type) {
       case 'game':
@@ -226,7 +222,9 @@ class DeepLinkingConfig {
 
   /// Check if a parameter is valid
   static bool _isValidParameter(String key, String value) {
-    if (value.isEmpty) return false;
+    if (value.isEmpty) {
+      return false;
+    }
 
     switch (key) {
       case 'gameId':
@@ -251,14 +249,12 @@ class DeepLinkingConfig {
   }
 
   /// Validate ID format
-  static bool _isValidId(String id) {
-    return RegExp(r'^[a-zA-Z0-9_-]{3,50}$').hasMatch(id);
-  }
+  static bool _isValidId(String id) =>
+      RegExp(r'^[a-zA-Z0-9_-]{3,50}$').hasMatch(id);
 
   /// Validate user ID format
-  static bool _isValidUserId(String userId) {
-    return RegExp(r'^[a-zA-Z0-9_-]{3,30}$').hasMatch(userId);
-  }
+  static bool _isValidUserId(String userId) =>
+      RegExp(r'^[a-zA-Z0-9_-]{3,30}$').hasMatch(userId);
 
   /// Validate category format
   static bool _isValidCategory(String category) {
@@ -267,9 +263,8 @@ class DeepLinkingConfig {
   }
 
   /// Validate item ID format
-  static bool _isValidItemId(String itemId) {
-    return RegExp(r'^[a-zA-Z0-9_-]{3,30}$').hasMatch(itemId);
-  }
+  static bool _isValidItemId(String itemId) =>
+      RegExp(r'^[a-zA-Z0-9_-]{3,30}$').hasMatch(itemId);
 
   /// Validate board size
   static bool _isValidBoardSize(String boardSize) {
@@ -291,9 +286,9 @@ class DeepLinkingConfig {
 }
 
 /// Deep link handler provider
-final deepLinkHandlerProvider = Provider<DeepLinkHandler>((ref) {
-  return DeepLinkHandler();
-});
+final deepLinkHandlerProvider = Provider<DeepLinkHandler>(
+  (ref) => DeepLinkHandler(),
+);
 
 /// Deep link handler class
 class DeepLinkHandler {
@@ -313,7 +308,7 @@ class DeepLinkHandler {
         debugPrint('Deep link could not be resolved');
         return null;
       }
-    } catch (e) {
+    } on Exception catch (e) {
       debugPrint('Error processing deep link: $e');
       return null;
     }
@@ -326,7 +321,7 @@ class DeepLinkHandler {
 
       // Add any additional state restoration logic here
       // For example, loading user preferences, game state, etc.
-    } catch (e) {
+    } on Exception catch (e) {
       debugPrint('Error restoring app state: $e');
     }
   }
@@ -336,33 +331,29 @@ class DeepLinkHandler {
     required String type,
     required String id,
     Map<String, String>? additionalParams,
-  }) {
-    return DeepLinkingConfig.generateShareLink(
-      type: type,
-      id: id,
-      additionalParams: additionalParams,
-    );
-  }
+  }) => DeepLinkingConfig.generateShareLink(
+    type: type,
+    id: id,
+    additionalParams: additionalParams,
+  );
 
   /// Generate web share link for current content
   String generateCurrentWebShareLink({
     required String type,
     required String id,
     Map<String, String>? additionalParams,
-  }) {
-    return DeepLinkingConfig.generateWebShareLink(
-      type: type,
-      id: id,
-      additionalParams: additionalParams,
-    );
-  }
+  }) => DeepLinkingConfig.generateWebShareLink(
+    type: type,
+    id: id,
+    additionalParams: additionalParams,
+  );
 }
 
 /// Deep link state provider
 final deepLinkStateProvider =
-    StateNotifierProvider<DeepLinkStateNotifier, DeepLinkState>((ref) {
-      return DeepLinkStateNotifier();
-    });
+    StateNotifierProvider<DeepLinkStateNotifier, DeepLinkState>(
+      (ref) => DeepLinkStateNotifier(),
+    );
 
 /// Deep link state notifier
 class DeepLinkStateNotifier extends StateNotifier<DeepLinkState> {
@@ -377,7 +368,7 @@ class DeepLinkStateNotifier extends StateNotifier<DeepLinkState> {
   }
 
   void clearDeepLinkError() {
-    state = state.copyWith(lastError: null, lastErrorTime: null);
+    state = state.copyWith();
   }
 
   void incrementDeepLinkCount() {
@@ -394,16 +385,14 @@ class DeepLinkState {
   final int totalDeepLinks;
 
   const DeepLinkState({
+    required this.totalDeepLinks,
     this.lastDeepLink,
     this.lastDeepLinkTime,
     this.lastError,
     this.lastErrorTime,
-    required this.totalDeepLinks,
   });
 
-  factory DeepLinkState.initial() {
-    return const DeepLinkState(totalDeepLinks: 0);
-  }
+  factory DeepLinkState.initial() => const DeepLinkState(totalDeepLinks: 0);
 
   DeepLinkState copyWith({
     Uri? lastDeepLink,
@@ -411,13 +400,11 @@ class DeepLinkState {
     String? lastError,
     DateTime? lastErrorTime,
     int? totalDeepLinks,
-  }) {
-    return DeepLinkState(
-      lastDeepLink: lastDeepLink ?? this.lastDeepLink,
-      lastDeepLinkTime: lastDeepLinkTime ?? this.lastDeepLinkTime,
-      lastError: lastError ?? this.lastError,
-      lastErrorTime: lastErrorTime ?? this.lastErrorTime,
-      totalDeepLinks: totalDeepLinks ?? this.totalDeepLinks,
-    );
-  }
+  }) => DeepLinkState(
+    lastDeepLink: lastDeepLink ?? this.lastDeepLink,
+    lastDeepLinkTime: lastDeepLinkTime ?? this.lastDeepLinkTime,
+    lastError: lastError ?? this.lastError,
+    lastErrorTime: lastErrorTime ?? this.lastErrorTime,
+    totalDeepLinks: totalDeepLinks ?? this.totalDeepLinks,
+  );
 }

@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../features/loading/loading.dart';
-import '../../features/home/home.dart';
-import '../../features/settings/settings.dart';
-import '../../features/store/store.dart';
-import '../../features/profile/profile.dart';
-import '../../features/setup/setup.dart';
-import '../../features/game/game.dart';
+import 'package:tictactoe_xo_royale/features/game/game.dart';
+import 'package:tictactoe_xo_royale/features/home/home.dart';
+import 'package:tictactoe_xo_royale/features/loading/loading.dart';
+import 'package:tictactoe_xo_royale/features/profile/profile.dart';
+import 'package:tictactoe_xo_royale/features/settings/settings.dart';
+import 'package:tictactoe_xo_royale/features/setup/setup.dart';
+import 'package:tictactoe_xo_royale/features/store/store.dart';
 
 // Theme mode provider
 final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.system);
 
 // Provider for the router
-final routerProvider = Provider<GoRouter>((ref) {
-  return GoRouter(
+final routerProvider = Provider<GoRouter>(
+  (ref) => GoRouter(
     initialLocation: '/loading',
     routes: appRoutes,
     debugLogDiagnostics: true,
-  );
-});
+  ),
+);
 
 // App routes configuration with shell route for bottom navigation
 final List<RouteBase> appRoutes = [
@@ -94,7 +94,7 @@ final List<RouteBase> appRoutes = [
 class MainAppShell extends StatefulWidget {
   final Widget child;
 
-  const MainAppShell({super.key, required this.child});
+  const MainAppShell({required this.child, super.key});
 
   @override
   State<MainAppShell> createState() => _MainAppShellState();

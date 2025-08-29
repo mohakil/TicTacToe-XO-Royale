@@ -30,17 +30,19 @@ void main() {
 
       test('Easy AI should prefer center when available', () {
         // Make some moves to create a scenario where center is available
-        gameLogic.makeMove(const Position(0, 0), CellState.X);
-        gameLogic.makeMove(const Position(0, 1), CellState.O);
+        gameLogic
+          ..makeMove(const Position(0, 0), CellState.X)
+          ..makeMove(const Position(0, 1), CellState.O);
 
         // Run multiple times to test heuristic preference
-        int centerMoves = 0;
+        var centerMoves = 0;
         const iterations = 100;
 
-        for (int i = 0; i < iterations; i++) {
-          gameLogic.resetBoard();
-          gameLogic.makeMove(const Position(0, 0), CellState.X);
-          gameLogic.makeMove(const Position(0, 1), CellState.O);
+        for (var i = 0; i < iterations; i++) {
+          gameLogic
+            ..resetBoard()
+            ..makeMove(const Position(0, 0), CellState.X)
+            ..makeMove(const Position(0, 1), CellState.O);
 
           final move = robotLogic.getNextMove(CellState.X);
           if (move == const Position(1, 1)) {
@@ -58,18 +60,19 @@ void main() {
         // X | O | X
         // O | X | O
         // - | - | -
-        gameLogic.makeMove(const Position(0, 0), CellState.X);
-        gameLogic.makeMove(const Position(0, 1), CellState.O);
-        gameLogic.makeMove(const Position(0, 2), CellState.X);
-        gameLogic.makeMove(const Position(1, 0), CellState.O);
-        gameLogic.makeMove(const Position(1, 1), CellState.X);
-        gameLogic.makeMove(const Position(1, 2), CellState.O);
+        gameLogic
+          ..makeMove(const Position(0, 0), CellState.X)
+          ..makeMove(const Position(0, 1), CellState.O)
+          ..makeMove(const Position(0, 2), CellState.X)
+          ..makeMove(const Position(1, 0), CellState.O)
+          ..makeMove(const Position(1, 1), CellState.X)
+          ..makeMove(const Position(1, 2), CellState.O);
 
         // Robot's turn - should sometimes choose the losing move
-        int blunderMoves = 0;
+        var blunderMoves = 0;
         const iterations = 100;
 
-        for (int i = 0; i < iterations; i++) {
+        for (var i = 0; i < iterations; i++) {
           final move = robotLogic.getNextMove(CellState.X);
           if (move == const Position(2, 0) ||
               move == const Position(2, 1) ||
@@ -106,12 +109,13 @@ void main() {
         // X | O | X
         // O | X | O
         // - | - | -
-        gameLogic.makeMove(const Position(0, 0), CellState.X);
-        gameLogic.makeMove(const Position(0, 1), CellState.O);
-        gameLogic.makeMove(const Position(0, 2), CellState.X);
-        gameLogic.makeMove(const Position(1, 0), CellState.O);
-        gameLogic.makeMove(const Position(1, 1), CellState.X);
-        gameLogic.makeMove(const Position(1, 2), CellState.O);
+        gameLogic
+          ..makeMove(const Position(0, 0), CellState.X)
+          ..makeMove(const Position(0, 1), CellState.O)
+          ..makeMove(const Position(0, 2), CellState.X)
+          ..makeMove(const Position(1, 0), CellState.O)
+          ..makeMove(const Position(1, 1), CellState.X)
+          ..makeMove(const Position(1, 2), CellState.O);
 
         // Robot should block O from winning
         final move = robotLogic.getNextMove(CellState.X);
@@ -125,12 +129,13 @@ void main() {
         // X | O | X
         // O | X | O
         // - | - | -
-        gameLogic.makeMove(const Position(0, 0), CellState.X);
-        gameLogic.makeMove(const Position(0, 1), CellState.O);
-        gameLogic.makeMove(const Position(0, 2), CellState.X);
-        gameLogic.makeMove(const Position(1, 0), CellState.O);
-        gameLogic.makeMove(const Position(1, 1), CellState.X);
-        gameLogic.makeMove(const Position(1, 2), CellState.O);
+        gameLogic
+          ..makeMove(const Position(0, 0), CellState.X)
+          ..makeMove(const Position(0, 1), CellState.O)
+          ..makeMove(const Position(0, 2), CellState.X)
+          ..makeMove(const Position(1, 0), CellState.O)
+          ..makeMove(const Position(1, 1), CellState.X)
+          ..makeMove(const Position(1, 2), CellState.O);
 
         // Robot should take the winning move
         final move = robotLogic.getNextMove(CellState.X);
@@ -162,12 +167,13 @@ void main() {
         // X | O | X
         // O | X | O
         // - | - | -
-        gameLogic.makeMove(const Position(0, 0), CellState.X);
-        gameLogic.makeMove(const Position(0, 1), CellState.O);
-        gameLogic.makeMove(const Position(0, 2), CellState.X);
-        gameLogic.makeMove(const Position(1, 0), CellState.O);
-        gameLogic.makeMove(const Position(1, 1), CellState.X);
-        gameLogic.makeMove(const Position(1, 2), CellState.O);
+        gameLogic
+          ..makeMove(const Position(0, 0), CellState.X)
+          ..makeMove(const Position(0, 1), CellState.O)
+          ..makeMove(const Position(0, 2), CellState.X)
+          ..makeMove(const Position(1, 0), CellState.O)
+          ..makeMove(const Position(1, 1), CellState.X)
+          ..makeMove(const Position(1, 2), CellState.O);
 
         // Robot should block O from winning
         final move = robotLogic.getNextMove(CellState.X);
@@ -181,12 +187,13 @@ void main() {
         // X | O | X
         // O | X | O
         // - | - | -
-        gameLogic.makeMove(const Position(0, 0), CellState.X);
-        gameLogic.makeMove(const Position(0, 1), CellState.O);
-        gameLogic.makeMove(const Position(0, 2), CellState.X);
-        gameLogic.makeMove(const Position(1, 0), CellState.O);
-        gameLogic.makeMove(const Position(1, 1), CellState.X);
-        gameLogic.makeMove(const Position(1, 2), CellState.O);
+        gameLogic
+          ..makeMove(const Position(0, 0), CellState.X)
+          ..makeMove(const Position(0, 1), CellState.O)
+          ..makeMove(const Position(0, 2), CellState.X)
+          ..makeMove(const Position(1, 0), CellState.O)
+          ..makeMove(const Position(1, 1), CellState.X)
+          ..makeMove(const Position(1, 2), CellState.O);
 
         // Robot should take the winning move
         final move = robotLogic.getNextMove(CellState.X);
@@ -200,12 +207,13 @@ void main() {
         // X | O | X
         // O | X | O
         // - | - | -
-        gameLogic.makeMove(const Position(0, 0), CellState.X);
-        gameLogic.makeMove(const Position(0, 1), CellState.O);
-        gameLogic.makeMove(const Position(0, 2), CellState.X);
-        gameLogic.makeMove(const Position(1, 0), CellState.O);
-        gameLogic.makeMove(const Position(1, 1), CellState.X);
-        gameLogic.makeMove(const Position(1, 2), CellState.O);
+        gameLogic
+          ..makeMove(const Position(0, 0), CellState.X)
+          ..makeMove(const Position(0, 1), CellState.O)
+          ..makeMove(const Position(0, 2), CellState.X)
+          ..makeMove(const Position(1, 0), CellState.O)
+          ..makeMove(const Position(1, 1), CellState.X)
+          ..makeMove(const Position(1, 2), CellState.O);
 
         final hint = robotLogic.getHint(CellState.X);
         expect(hint, equals(const Position(2, 1))); // This creates diagonal win
@@ -218,12 +226,13 @@ void main() {
           // X | O | X
           // O | X | O
           // - | - | -
-          gameLogic.makeMove(const Position(0, 0), CellState.X);
-          gameLogic.makeMove(const Position(0, 1), CellState.O);
-          gameLogic.makeMove(const Position(0, 2), CellState.X);
-          gameLogic.makeMove(const Position(1, 0), CellState.O);
-          gameLogic.makeMove(const Position(1, 1), CellState.X);
-          gameLogic.makeMove(const Position(1, 2), CellState.O);
+          gameLogic
+            ..makeMove(const Position(0, 0), CellState.X)
+            ..makeMove(const Position(0, 1), CellState.O)
+            ..makeMove(const Position(0, 2), CellState.X)
+            ..makeMove(const Position(1, 0), CellState.O)
+            ..makeMove(const Position(1, 1), CellState.X)
+            ..makeMove(const Position(1, 2), CellState.O);
 
           final hint = robotLogic.getHint(CellState.O);
           // Should suggest one of the bottom row positions to win
@@ -250,11 +259,12 @@ void main() {
         'Hint should prefer edges when center and corners not available',
         () {
           // Center and corners are taken
-          gameLogic.makeMove(const Position(1, 1), CellState.O);
-          gameLogic.makeMove(const Position(0, 0), CellState.X);
-          gameLogic.makeMove(const Position(0, 2), CellState.O);
-          gameLogic.makeMove(const Position(2, 0), CellState.X);
-          gameLogic.makeMove(const Position(2, 2), CellState.O);
+          gameLogic
+            ..makeMove(const Position(1, 1), CellState.O)
+            ..makeMove(const Position(0, 0), CellState.X)
+            ..makeMove(const Position(0, 2), CellState.O)
+            ..makeMove(const Position(2, 0), CellState.X)
+            ..makeMove(const Position(2, 2), CellState.O);
 
           final hint = robotLogic.getHint(CellState.X);
           final edges = PositionExtensions.getEdges(3);
@@ -263,7 +273,7 @@ void main() {
       );
 
       test('Multiple hints should return different positions', () {
-        final hints = robotLogic.getMultipleHints(CellState.X, count: 3);
+        final hints = robotLogic.getMultipleHints(CellState.X);
         expect(hints.length, equals(3));
 
         // All hints should be unique
@@ -285,9 +295,10 @@ void main() {
 
       test('Winning position should have high positive score', () {
         // Create a win for X
-        gameLogic.makeMove(const Position(0, 0), CellState.X);
-        gameLogic.makeMove(const Position(0, 1), CellState.X);
-        gameLogic.makeMove(const Position(0, 2), CellState.X);
+        gameLogic
+          ..makeMove(const Position(0, 0), CellState.X)
+          ..makeMove(const Position(0, 1), CellState.X)
+          ..makeMove(const Position(0, 2), CellState.X);
 
         final score = robotLogic.evaluatePosition(CellState.X);
         expect(score, equals(100));
@@ -295,9 +306,10 @@ void main() {
 
       test('Losing position should have high negative score', () {
         // Create a win for O
-        gameLogic.makeMove(const Position(0, 0), CellState.O);
-        gameLogic.makeMove(const Position(0, 1), CellState.O);
-        gameLogic.makeMove(const Position(0, 2), CellState.O);
+        gameLogic
+          ..makeMove(const Position(0, 0), CellState.O)
+          ..makeMove(const Position(0, 1), CellState.O)
+          ..makeMove(const Position(0, 2), CellState.O);
 
         final score = robotLogic.evaluatePosition(CellState.X);
         expect(score, equals(-100));
@@ -308,15 +320,16 @@ void main() {
         // X | O | X
         // O | X | O
         // O | X | O
-        gameLogic.makeMove(const Position(0, 0), CellState.X);
-        gameLogic.makeMove(const Position(0, 1), CellState.O);
-        gameLogic.makeMove(const Position(0, 2), CellState.X);
-        gameLogic.makeMove(const Position(1, 0), CellState.O);
-        gameLogic.makeMove(const Position(1, 1), CellState.X);
-        gameLogic.makeMove(const Position(1, 2), CellState.O);
-        gameLogic.makeMove(const Position(2, 0), CellState.O);
-        gameLogic.makeMove(const Position(2, 1), CellState.X);
-        gameLogic.makeMove(const Position(2, 2), CellState.O);
+        gameLogic
+          ..makeMove(const Position(0, 0), CellState.X)
+          ..makeMove(const Position(0, 1), CellState.O)
+          ..makeMove(const Position(0, 2), CellState.X)
+          ..makeMove(const Position(1, 0), CellState.O)
+          ..makeMove(const Position(1, 1), CellState.X)
+          ..makeMove(const Position(1, 2), CellState.O)
+          ..makeMove(const Position(2, 0), CellState.O)
+          ..makeMove(const Position(2, 1), CellState.X)
+          ..makeMove(const Position(2, 2), CellState.O);
 
         final score = robotLogic.evaluatePosition(CellState.X);
         expect(score, equals(0));
@@ -356,14 +369,15 @@ void main() {
     group('Edge Case Tests', () {
       test('Robot should handle almost full board', () {
         // Fill most of the board
-        gameLogic.makeMove(const Position(0, 0), CellState.X);
-        gameLogic.makeMove(const Position(0, 1), CellState.O);
-        gameLogic.makeMove(const Position(0, 2), CellState.X);
-        gameLogic.makeMove(const Position(1, 0), CellState.O);
-        gameLogic.makeMove(const Position(1, 1), CellState.X);
-        gameLogic.makeMove(const Position(1, 2), CellState.O);
-        gameLogic.makeMove(const Position(2, 0), CellState.X);
-        gameLogic.makeMove(const Position(2, 1), CellState.O);
+        gameLogic
+          ..makeMove(const Position(0, 0), CellState.X)
+          ..makeMove(const Position(0, 1), CellState.O)
+          ..makeMove(const Position(0, 2), CellState.X)
+          ..makeMove(const Position(1, 0), CellState.O)
+          ..makeMove(const Position(1, 1), CellState.X)
+          ..makeMove(const Position(1, 2), CellState.O)
+          ..makeMove(const Position(2, 0), CellState.X)
+          ..makeMove(const Position(2, 1), CellState.O);
 
         // Only one position left
         final move = robotLogic.getNextMove(CellState.X);
@@ -372,14 +386,15 @@ void main() {
 
       test('Robot should handle single available move', () {
         // Fill all but one position
-        gameLogic.makeMove(const Position(0, 0), CellState.X);
-        gameLogic.makeMove(const Position(0, 1), CellState.O);
-        gameLogic.makeMove(const Position(0, 2), CellState.X);
-        gameLogic.makeMove(const Position(1, 0), CellState.O);
-        gameLogic.makeMove(const Position(1, 1), CellState.X);
-        gameLogic.makeMove(const Position(1, 2), CellState.O);
-        gameLogic.makeMove(const Position(2, 0), CellState.X);
-        gameLogic.makeMove(const Position(2, 1), CellState.O);
+        gameLogic
+          ..makeMove(const Position(0, 0), CellState.X)
+          ..makeMove(const Position(0, 1), CellState.O)
+          ..makeMove(const Position(0, 2), CellState.X)
+          ..makeMove(const Position(1, 0), CellState.O)
+          ..makeMove(const Position(1, 1), CellState.X)
+          ..makeMove(const Position(1, 2), CellState.O)
+          ..makeMove(const Position(2, 0), CellState.X)
+          ..makeMove(const Position(2, 1), CellState.O);
 
         final move = robotLogic.getNextMove(CellState.X);
         expect(move, equals(const Position(2, 2)));

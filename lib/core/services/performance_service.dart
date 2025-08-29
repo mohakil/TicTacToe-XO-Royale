@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer' as developer;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -30,7 +31,9 @@ class PerformanceService {
 
   /// Start performance monitoring
   void startMonitoring() {
-    if (_isMonitoring) return;
+    if (_isMonitoring) {
+      return;
+    }
 
     _isMonitoring = true;
     _lastFrameTime = DateTime.now();
@@ -49,7 +52,9 @@ class PerformanceService {
 
   /// Stop performance monitoring
   void stopMonitoring() {
-    if (!_isMonitoring) return;
+    if (!_isMonitoring) {
+      return;
+    }
 
     _isMonitoring = false;
     // Note: Flutter doesn't provide removePersistentFrameCallback,
@@ -62,7 +67,9 @@ class PerformanceService {
 
   /// Frame callback for monitoring frame times
   void _onFrameCallback(Duration timeStamp) {
-    if (!_isMonitoring) return;
+    if (!_isMonitoring) {
+      return;
+    }
 
     final now = DateTime.now();
     if (_lastFrameTime != null) {
@@ -87,7 +94,9 @@ class PerformanceService {
 
   /// Periodic check for memory and CPU usage
   void _onPeriodicCheck(Timer timer) {
-    if (!_isMonitoring) return;
+    if (!_isMonitoring) {
+      return;
+    }
 
     // Get memory usage
     final memoryInfo = _getMemoryInfo();
@@ -125,11 +134,13 @@ class PerformanceService {
       // This is a simplified approach - in production you'd use platform channels
       // to get actual memory usage from the OS
       return 50; // Placeholder value
-    } catch (e) {
-      developer.log(
-        'Failed to get memory info: $e',
-        name: 'PerformanceService',
-      );
+    } on Exception catch (e) {
+      if (kDebugMode) {
+        developer.log(
+          'Failed to get memory info: $e',
+          name: 'PerformanceService',
+        );
+      }
       return 0;
     }
   }
@@ -139,10 +150,12 @@ class PerformanceService {
     try {
       // This is a simplified approach - in production you'd use platform channels
       // to get actual CPU usage from the OS
-      return 30.0; // Placeholder value
-    } catch (e) {
-      developer.log('Failed to get CPU info: $e', name: 'PerformanceService');
-      return 0.0;
+      return 30; // Placeholder value
+    } on Exception catch (e) {
+      if (kDebugMode) {
+        developer.log('Failed to get CPU info: $e', name: 'PerformanceService');
+      }
+      return 0;
     }
   }
 
@@ -165,18 +178,20 @@ class PerformanceService {
       try {
         callback(
           PerformanceMetrics(
-            frameRate: _getCurrentFrameRate(),
-            averageFrameTime: _getAverageFrameTime(),
-            memoryUsage: _getCurrentMemoryUsage(),
-            cpuUsage: _getCurrentCpuUsage(),
+            frameRate: getCurrentFrameRate(),
+            averageFrameTime: getAverageFrameTime(),
+            memoryUsage: getCurrentMemoryUsage(),
+            cpuUsage: getCurrentCpuUsage(),
             issues: [issue],
           ),
         );
-      } catch (e) {
-        developer.log(
-          'Error in performance callback: $e',
-          name: 'PerformanceService',
-        );
+      } on Exception catch (e) {
+        if (kDebugMode) {
+          developer.log(
+            'Error in performance callback: $e',
+            name: 'PerformanceService',
+          );
+        }
       }
     }
   }
@@ -188,50 +203,76 @@ class PerformanceService {
   ) {
     switch (type) {
       case PerformanceIssueType.frameTime:
-        if (value > 33) return PerformanceIssueSeverity.critical; // < 30 FPS
-        if (value > 20) return PerformanceIssueSeverity.high; // < 50 FPS
-        if (value > 16) return PerformanceIssueSeverity.medium; // < 60 FPS
+        if (value > 33) {
+          return PerformanceIssueSeverity.critical; // < 30 FPS
+        }
+        if (value > 20) {
+          return PerformanceIssueSeverity.high; // < 50 FPS
+        }
+        if (value > 16) {
+          return PerformanceIssueSeverity.medium; // < 60 FPS
+        }
         return PerformanceIssueSeverity.low;
 
       case PerformanceIssueType.memoryUsage:
-        if (value > 300) return PerformanceIssueSeverity.critical;
-        if (value > 250) return PerformanceIssueSeverity.high;
-        if (value > 200) return PerformanceIssueSeverity.medium;
+        if (value > 300) {
+          return PerformanceIssueSeverity.critical;
+        }
+        if (value > 250) {
+          return PerformanceIssueSeverity.high;
+        }
+        if (value > 200) {
+          return PerformanceIssueSeverity.medium;
+        }
         return PerformanceIssueSeverity.low;
 
       case PerformanceIssueType.cpuUsage:
-        if (value > 95) return PerformanceIssueSeverity.critical;
-        if (value > 85) return PerformanceIssueSeverity.high;
-        if (value > 80) return PerformanceIssueSeverity.medium;
+        if (value > 95) {
+          return PerformanceIssueSeverity.critical;
+        }
+        if (value > 85) {
+          return PerformanceIssueSeverity.high;
+        }
+        if (value > 80) {
+          return PerformanceIssueSeverity.medium;
+        }
         return PerformanceIssueSeverity.low;
     }
   }
 
   /// Get current frame rate
-  double _getCurrentFrameRate() {
-    if (_frameTimes.isEmpty) return 0.0;
+  double getCurrentFrameRate() {
+    if (_frameTimes.isEmpty) {
+      return 0;
+    }
 
-    final avgFrameTime = _getAverageFrameTime();
+    final avgFrameTime = getAverageFrameTime();
     return avgFrameTime > 0 ? 1000.0 / avgFrameTime : 0.0;
   }
 
   /// Get average frame time
-  double _getAverageFrameTime() {
-    if (_frameTimes.isEmpty) return 0.0;
+  double getAverageFrameTime() {
+    if (_frameTimes.isEmpty) {
+      return 0;
+    }
 
     final sum = _frameTimes.reduce((a, b) => a + b);
     return sum / _frameTimes.length;
   }
 
   /// Get current memory usage
-  int _getCurrentMemoryUsage() {
-    if (_memoryUsage.isEmpty) return 0;
+  int getCurrentMemoryUsage() {
+    if (_memoryUsage.isEmpty) {
+      return 0;
+    }
     return _memoryUsage.last;
   }
 
   /// Get current CPU usage
-  double _getCurrentCpuUsage() {
-    if (_cpuUsage.isEmpty) return 0.0;
+  double getCurrentCpuUsage() {
+    if (_cpuUsage.isEmpty) {
+      return 0;
+    }
     return _cpuUsage.last;
   }
 
@@ -246,15 +287,13 @@ class PerformanceService {
   }
 
   /// Get current performance metrics
-  PerformanceMetrics getCurrentMetrics() {
-    return PerformanceMetrics(
-      frameRate: _getCurrentFrameRate(),
-      averageFrameTime: _getAverageFrameTime(),
-      memoryUsage: _getCurrentMemoryUsage(),
-      cpuUsage: _getCurrentCpuUsage(),
-      issues: [], // No current issues
-    );
-  }
+  PerformanceMetrics getCurrentMetrics() => PerformanceMetrics(
+    frameRate: getCurrentFrameRate(),
+    averageFrameTime: getAverageFrameTime(),
+    memoryUsage: getCurrentMemoryUsage(),
+    cpuUsage: getCurrentCpuUsage(),
+    issues: [], // No current issues
+  );
 
   /// Get performance recommendations based on current metrics
   List<PerformanceRecommendation> getRecommendations() {
@@ -265,7 +304,7 @@ class PerformanceService {
     if (metrics.frameRate < 60) {
       if (metrics.frameRate < 30) {
         recommendations.add(
-          PerformanceRecommendation(
+          const PerformanceRecommendation(
             type: RecommendationType.critical,
             title: 'Critical Frame Rate Issue',
             description:
@@ -276,7 +315,7 @@ class PerformanceService {
         );
       } else {
         recommendations.add(
-          PerformanceRecommendation(
+          const PerformanceRecommendation(
             type: RecommendationType.high,
             title: 'Frame Rate Below Target',
             description:
@@ -290,7 +329,7 @@ class PerformanceService {
     // Memory recommendations
     if (metrics.memoryUsage > 150) {
       recommendations.add(
-        PerformanceRecommendation(
+        const PerformanceRecommendation(
           type: RecommendationType.medium,
           title: 'High Memory Usage',
           description: 'Memory usage is elevated. Monitor for memory leaks.',
@@ -302,7 +341,7 @@ class PerformanceService {
     // CPU recommendations
     if (metrics.cpuUsage > 70) {
       recommendations.add(
-        PerformanceRecommendation(
+        const PerformanceRecommendation(
           type: RecommendationType.medium,
           title: 'High CPU Usage',
           description:
@@ -342,12 +381,11 @@ class PerformanceMetrics {
   });
 
   @override
-  String toString() {
-    return 'PerformanceMetrics(frameRate: ${frameRate.toStringAsFixed(1)} FPS, '
-        'avgFrameTime: ${averageFrameTime.toStringAsFixed(2)}ms, '
-        'memory: ${memoryUsage}MB, cpu: ${cpuUsage.toStringAsFixed(1)}%, '
-        'issues: ${issues.length})';
-  }
+  String toString() =>
+      'PerformanceMetrics(frameRate: ${frameRate.toStringAsFixed(1)} FPS, '
+      'avgFrameTime: ${averageFrameTime.toStringAsFixed(2)}ms, '
+      'memory: ${memoryUsage}MB, cpu: ${cpuUsage.toStringAsFixed(1)}%, '
+      'issues: ${issues.length})';
 }
 
 /// Performance issue data class
@@ -365,10 +403,9 @@ class PerformanceIssue {
   });
 
   @override
-  String toString() {
-    return 'PerformanceIssue(${type.name}: ${value.toStringAsFixed(2)}, '
-        'severity: ${severity.name}, time: $timestamp)';
-  }
+  String toString() =>
+      'PerformanceIssue(${type.name}: ${value.toStringAsFixed(2)}, '
+      'severity: ${severity.name}, time: $timestamp)';
 }
 
 /// Performance issue types
@@ -404,9 +441,7 @@ final performanceServiceProvider = Provider<PerformanceService>((ref) {
     service.startMonitoring();
   });
 
-  ref.onDispose(() {
-    service.dispose();
-  });
+  ref.onDispose(service.dispose);
 
   return service;
 });
@@ -416,14 +451,10 @@ final performanceMetricsProvider = StreamProvider<PerformanceMetrics>((ref) {
   final service = ref.watch(performanceServiceProvider);
   final controller = StreamController<PerformanceMetrics>();
 
-  service.addPerformanceCallback((metrics) {
-    controller.add(metrics);
-  });
+  service.addPerformanceCallback(controller.add);
 
   ref.onDispose(() {
-    service.removePerformanceCallback((metrics) {
-      controller.add(metrics);
-    });
+    service.removePerformanceCallback(controller.add);
     controller.close();
   });
 

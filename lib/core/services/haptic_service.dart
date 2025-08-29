@@ -1,15 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:vibration/vibration.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/settings_provider.dart';
+import 'package:tictactoe_xo_royale/core/providers/settings_provider.dart';
+import 'package:vibration/vibration.dart';
 
 /// Haptic service for managing vibration feedback
 class HapticService {
-  HapticService._();
-
-  static final HapticService _instance = HapticService._();
-  static HapticService get instance => _instance;
+  HapticService();
 
   // Haptic patterns for different game events
   static const Map<String, List<int>> _hapticPatterns = {
@@ -36,21 +35,79 @@ class HapticService {
   bool _hasHapticSupport = false;
   bool _hasVibrationSupport = false;
 
-  /// Initialize the haptic service
+  /// Initialize the haptic service with platform-specific optimizations
   Future<void> initialize() async {
     try {
       // Check device capabilities
       _hasHapticSupport = true; // Flutter HapticFeedback is always available
       _hasVibrationSupport = await Vibration.hasVibrator();
 
+      // Platform-specific initialization
+      await initializePlatformSpecific();
+
       if (kDebugMode) {
         print(
-          'HapticService: Initialized - Haptic: $_hasHapticSupport, Vibration: $_hasVibrationSupport',
+          'HapticService: Initialized for ${Platform.operatingSystem} - Haptic: $_hasHapticSupport, Vibration: $_hasVibrationSupport',
         );
       }
-    } catch (e) {
+    } on Exception catch (e) {
       if (kDebugMode) {
         print('HapticService: Failed to initialize: $e');
+      }
+    }
+  }
+
+  /// Initialize platform-specific haptic features
+  Future<void> initializePlatformSpecific() async {
+    try {
+      if (Platform.isAndroid) {
+        await initializeAndroidHaptics();
+      } else if (Platform.isIOS) {
+        await _initializeIOSHaptics();
+      }
+    } on Exception catch (e) {
+      if (kDebugMode) {
+        print('HapticService: Platform-specific initialization failed: $e');
+      }
+    }
+  }
+
+  /// Initialize Android-specific haptic features
+  Future<void> initializeAndroidHaptics() async {
+    try {
+      // Check for advanced vibration patterns support
+      _hasVibrationSupport = await Vibration.hasVibrator();
+      if (_hasVibrationSupport) {
+        // Check for amplitude control support
+        _hasVibrationSupport = await Vibration.hasAmplitudeControl();
+      }
+    } on Exception catch (e) {
+      if (kDebugMode) {
+        print('HapticService: Android haptic initialization failed: $e');
+      }
+      // Fallback to basic vibration
+      _hasVibrationSupport = await Vibration.hasVibrator();
+    }
+  }
+
+  /// Initialize iOS-specific haptic features
+  Future<void> _initializeIOSHaptics() async {
+    try {
+      // iOS has excellent haptic support through HapticFeedback
+      // Additional iOS-specific configurations can be added here
+      const platform = MethodChannel(
+        'com.astrixforge.tictactoe_xo_royale/haptics',
+      );
+      final result = await platform.invokeMethod('initializeHaptics');
+      if (kDebugMode) {
+        print('HapticService: iOS haptic engine initialized: $result');
+      }
+    } on Exception catch (e) {
+      if (kDebugMode) {
+        // Fallback to standard HapticFeedback
+        print(
+          'HapticService: iOS platform channel failed, using standard feedback: $e',
+        );
       }
     }
   }
@@ -59,40 +116,190 @@ class HapticService {
   bool get hasHapticSupport => _hasHapticSupport;
   bool get hasVibrationSupport => _hasVibrationSupport;
 
-  /// Trigger haptic feedback using Flutter's HapticFeedback
-  Future<void> _triggerHapticFeedback(String type) async {
+  /// Trigger haptic feedback using Flutter's HapticFeedback with platform optimizations
+  Future<void> triggerHapticFeedback(String type) async {
     try {
       if (_hasHapticSupport) {
-        switch (type) {
-          case 'light':
-            HapticFeedback.lightImpact();
-            break;
-          case 'medium':
-            HapticFeedback.mediumImpact();
-            break;
-          case 'heavy':
-            HapticFeedback.heavyImpact();
-            break;
-          case 'selection':
-            HapticFeedback.selectionClick();
-            break;
-          case 'vibrate':
-            HapticFeedback.vibrate();
-            break;
-          default:
-            HapticFeedback.selectionClick();
-            break;
+        if (Platform.isIOS) {
+          await _triggerIOSHapticFeedback(type);
+        } else if (Platform.isAndroid) {
+          await _triggerAndroidHapticFeedback(type);
+        } else {
+          await _triggerGenericHapticFeedback(type);
         }
       }
-    } catch (e) {
+    } on Exception catch (e) {
       if (kDebugMode) {
         print('HapticService: Failed to trigger haptic feedback: $e');
       }
     }
   }
 
+  /// Trigger iOS-specific haptic feedback
+  Future<void> _triggerIOSHapticFeedback(String type) async {
+    try {
+      // iOS has excellent haptic support, use native feedback
+      switch (type) {
+        case 'light':
+          await HapticFeedback.lightImpact();
+          break;
+        case 'medium':
+          await HapticFeedback.mediumImpact();
+          break;
+        case 'heavy':
+          await HapticFeedback.heavyImpact();
+          break;
+        case 'selection':
+          await HapticFeedback.selectionClick();
+          break;
+        case 'success':
+          // iOS success feedback with custom pattern
+          await _triggerIOSCustomHaptic('success');
+          break;
+        case 'error':
+          // iOS error feedback
+          await _triggerIOSCustomHaptic('error');
+          break;
+        case 'vibrate':
+          await HapticFeedback.vibrate();
+          break;
+        default:
+          await HapticFeedback.selectionClick();
+          break;
+      }
+    } on Exception catch (e) {
+      if (kDebugMode) {
+        print('HapticService: iOS haptic feedback failed: $e');
+      }
+      // Fallback to generic feedback
+      await _triggerGenericHapticFeedback(type);
+    }
+  }
+
+  /// Trigger Android-specific haptic feedback
+  Future<void> _triggerAndroidHapticFeedback(String type) async {
+    try {
+      // Android has good vibration support, combine with haptic feedback
+      switch (type) {
+        case 'light':
+          await HapticFeedback.lightImpact();
+          if (_hasVibrationSupport) {
+            await Vibration.vibrate(duration: 50, amplitude: 50);
+          }
+          break;
+        case 'medium':
+          await HapticFeedback.mediumImpact();
+          if (_hasVibrationSupport) {
+            await Vibration.vibrate(duration: 100, amplitude: 100);
+          }
+          break;
+        case 'heavy':
+          await HapticFeedback.heavyImpact();
+          if (_hasVibrationSupport) {
+            await Vibration.vibrate(duration: 200, amplitude: 150);
+          }
+          break;
+        case 'selection':
+          await HapticFeedback.selectionClick();
+          if (_hasVibrationSupport) {
+            await Vibration.vibrate(duration: 20, amplitude: 30);
+          }
+          break;
+        case 'success':
+          await HapticFeedback.mediumImpact();
+          if (_hasVibrationSupport) {
+            await Vibration.vibrate(pattern: [0, 100, 50, 100], amplitude: 128);
+          }
+          break;
+        case 'error':
+          if (_hasVibrationSupport) {
+            await Vibration.vibrate(
+              pattern: [0, 200, 50, 200, 50, 200],
+              amplitude: 255,
+            );
+          } else {
+            await HapticFeedback.vibrate();
+          }
+          break;
+        case 'vibrate':
+          if (_hasVibrationSupport) {
+            await Vibration.vibrate(duration: 300, amplitude: 200);
+          } else {
+            await HapticFeedback.vibrate();
+          }
+          break;
+        default:
+          await HapticFeedback.selectionClick();
+          break;
+      }
+    } on Exception catch (e) {
+      if (kDebugMode) {
+        print('HapticService: Android haptic feedback failed: $e');
+      }
+      // Fallback to generic feedback
+      await _triggerGenericHapticFeedback(type);
+    }
+  }
+
+  /// Trigger generic haptic feedback for other platforms
+  Future<void> _triggerGenericHapticFeedback(String type) async {
+    try {
+      switch (type) {
+        case 'light':
+          await HapticFeedback.lightImpact();
+          break;
+        case 'medium':
+          await HapticFeedback.mediumImpact();
+          break;
+        case 'heavy':
+          await HapticFeedback.heavyImpact();
+          break;
+        case 'selection':
+          await HapticFeedback.selectionClick();
+          break;
+        case 'vibrate':
+          await HapticFeedback.vibrate();
+          break;
+        default:
+          await HapticFeedback.selectionClick();
+          break;
+      }
+    } on Exception catch (e) {
+      if (kDebugMode) {
+        print('HapticService: Generic haptic feedback failed: $e');
+      }
+    }
+  }
+
+  /// Trigger custom iOS haptic feedback patterns
+  Future<void> _triggerIOSCustomHaptic(String pattern) async {
+    try {
+      const platform = MethodChannel(
+        'com.astrixforge.tictactoe_xo_royale/haptics',
+      );
+      await platform.invokeMethod('playHapticPattern', {'pattern': pattern});
+    } on Exception catch (e) {
+      if (kDebugMode) {
+        print('HapticService: iOS custom haptic failed: $e');
+      }
+      // Fallback to standard feedback
+      switch (pattern) {
+        case 'success':
+          await HapticFeedback.mediumImpact();
+          await Future.delayed(const Duration(milliseconds: 100));
+          await HapticFeedback.lightImpact();
+          break;
+        case 'error':
+          await HapticFeedback.heavyImpact();
+          await Future.delayed(const Duration(milliseconds: 150));
+          await HapticFeedback.heavyImpact();
+          break;
+      }
+    }
+  }
+
   /// Trigger vibration using the vibration package
-  Future<void> _triggerVibration(List<int> pattern, {int? intensity}) async {
+  Future<void> triggerVibration(List<int> pattern, {int? intensity}) async {
     try {
       if (_hasVibrationSupport) {
         if (intensity != null) {
@@ -105,7 +312,7 @@ class HapticService {
           await Vibration.vibrate(pattern: pattern);
         }
       }
-    } catch (e) {
+    } on Exception catch (e) {
       if (kDebugMode) {
         print('HapticService: Failed to trigger vibration: $e');
       }
@@ -114,16 +321,18 @@ class HapticService {
 
   /// Trigger a light haptic feedback
   Future<void> lightImpact({WidgetRef? ref}) async {
-    if (!_isHapticEnabled(ref)) return;
+    if (!_isHapticEnabled(ref)) {
+      return;
+    }
 
     try {
-      await _triggerHapticFeedback('light');
-      await _triggerVibration(_hapticPatterns['light']!);
+      await triggerHapticFeedback('light');
+      await triggerVibration(_hapticPatterns['light']!);
 
       if (kDebugMode) {
         print('HapticService: Light impact triggered');
       }
-    } catch (e) {
+    } on Exception catch (e) {
       if (kDebugMode) {
         print('HapticService: Failed to trigger light impact: $e');
       }
@@ -132,16 +341,18 @@ class HapticService {
 
   /// Trigger a medium haptic feedback
   Future<void> mediumImpact({WidgetRef? ref}) async {
-    if (!_isHapticEnabled(ref)) return;
+    if (!_isHapticEnabled(ref)) {
+      return;
+    }
 
     try {
-      await _triggerHapticFeedback('medium');
-      await _triggerVibration(_hapticPatterns['medium']!);
+      await triggerHapticFeedback('medium');
+      await triggerVibration(_hapticPatterns['medium']!);
 
       if (kDebugMode) {
         print('HapticService: Medium impact triggered');
       }
-    } catch (e) {
+    } on Exception catch (e) {
       if (kDebugMode) {
         print('HapticService: Failed to trigger medium impact: $e');
       }
@@ -150,16 +361,18 @@ class HapticService {
 
   /// Trigger a heavy haptic feedback
   Future<void> heavyImpact({WidgetRef? ref}) async {
-    if (!_isHapticEnabled(ref)) return;
+    if (!_isHapticEnabled(ref)) {
+      return;
+    }
 
     try {
-      await _triggerHapticFeedback('heavy');
-      await _triggerVibration(_hapticPatterns['heavy']!);
+      await triggerHapticFeedback('heavy');
+      await triggerVibration(_hapticPatterns['heavy']!);
 
       if (kDebugMode) {
         print('HapticService: Heavy impact triggered');
       }
-    } catch (e) {
+    } on Exception catch (e) {
       if (kDebugMode) {
         print('HapticService: Failed to trigger heavy impact: $e');
       }
@@ -168,16 +381,18 @@ class HapticService {
 
   /// Trigger selection click haptic feedback
   Future<void> selectionClick({WidgetRef? ref}) async {
-    if (!_isHapticEnabled(ref)) return;
+    if (!_isHapticEnabled(ref)) {
+      return;
+    }
 
     try {
-      await _triggerHapticFeedback('selection');
-      await _triggerVibration(_hapticPatterns['button_tap']!);
+      await triggerHapticFeedback('selection');
+      await triggerVibration(_hapticPatterns['button_tap']!);
 
       if (kDebugMode) {
         print('HapticService: Selection click triggered');
       }
-    } catch (e) {
+    } on Exception catch (e) {
       if (kDebugMode) {
         print('HapticService: Failed to trigger selection click: $e');
       }
@@ -186,12 +401,14 @@ class HapticService {
 
   /// Trigger custom haptic feedback by name
   Future<void> triggerCustomHaptic(String hapticName, {WidgetRef? ref}) async {
-    if (!_isHapticEnabled(ref)) return;
+    if (!_isHapticEnabled(ref)) {
+      return;
+    }
 
     try {
       final pattern = _hapticPatterns[hapticName];
       if (pattern != null) {
-        await _triggerVibration(pattern);
+        await triggerVibration(pattern);
 
         if (kDebugMode) {
           print('HapticService: Custom haptic $hapticName triggered');
@@ -201,7 +418,7 @@ class HapticService {
           print('HapticService: Unknown haptic pattern: $hapticName');
         }
       }
-    } catch (e) {
+    } on Exception catch (e) {
       if (kDebugMode) {
         print('HapticService: Failed to trigger custom haptic $hapticName: $e');
       }
@@ -251,12 +468,14 @@ class HapticService {
 
   /// Check if haptic feedback is enabled based on user settings
   bool _isHapticEnabled(WidgetRef? ref) {
-    if (ref == null) return true; // Default to enabled if no ref provided
+    if (ref == null) {
+      return true; // Default to enabled if no ref provided
+    }
 
     try {
       final settings = ref.read(settingsProvider);
       return settings.vibrationEnabled && settings.hapticFeedbackEnabled;
-    } catch (e) {
+    } on Exception catch (e) {
       if (kDebugMode) {
         print('HapticService: Failed to read settings: $e');
       }
@@ -274,7 +493,10 @@ class HapticService {
   Future<bool> supportsHapticType(String type) async {
     try {
       return _hasHapticSupport;
-    } catch (e) {
+    } on Exception catch (e) {
+      if (kDebugMode) {
+        print('HapticService: Failed to check haptic type support: $e');
+      }
       return false;
     }
   }
@@ -288,7 +510,7 @@ class HapticService {
       if (kDebugMode) {
         print('HapticService: Disposed successfully');
       }
-    } catch (e) {
+    } on Exception catch (e) {
       if (kDebugMode) {
         print('HapticService: Failed to dispose: $e');
       }
@@ -297,9 +519,7 @@ class HapticService {
 }
 
 /// Provider for HapticService
-final hapticServiceProvider = Provider<HapticService>((ref) {
-  return HapticService.instance;
-});
+final hapticServiceProvider = Provider<HapticService>((ref) => HapticService());
 
 /// Provider for haptic settings
 final hapticSettingsProvider =

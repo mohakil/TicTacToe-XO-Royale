@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'route_transitions.dart';
-import 'routes.dart';
+import 'package:tictactoe_xo_royale/app/router/route_transitions.dart';
+import 'package:tictactoe_xo_royale/app/router/routes.dart';
 
 /// Navigation helper for the TicTacToe XO Royale app
 /// Provides methods to navigate between screens with custom transitions
@@ -128,6 +128,7 @@ class NavigationHelper {
 
   /// Build child widget for the route
   /// This is a simplified implementation - in a real app, you'd resolve the actual route
+  // ignore: prefer_expression_function_bodies
   static Widget _buildChild(String route, Object? extra) {
     // This would typically resolve to the actual screen widget
     // For now, return a placeholder
@@ -148,15 +149,13 @@ class NavigationHelper {
   }
 
   /// Get the appropriate transition type for a route
-  static PageTransitionType getTransitionTypeForRoute(String route) {
-    return RouteTransitionConfig.getForRoute(route).type;
-  }
+  static PageTransitionType getTransitionTypeForRoute(String route) =>
+      RouteTransitionConfig.getForRoute(route).type;
 
   /// Get the appropriate duration for a route
-  static Duration getDurationForRoute(String route) {
-    return RouteTransitionConfig.getForRoute(route).duration ??
-        const Duration(milliseconds: 300);
-  }
+  static Duration getDurationForRoute(String route) =>
+      RouteTransitionConfig.getForRoute(route).duration ??
+      const Duration(milliseconds: 300);
 }
 
 /// Extension methods for easier navigation

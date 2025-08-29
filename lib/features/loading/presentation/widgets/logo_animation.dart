@@ -31,11 +31,11 @@ class _LogoAnimationState extends State<LogoAnimation>
       vsync: this,
     )..repeat();
 
-    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
+    _pulseAnimation = Tween<double>(begin: 1, end: 1.05).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
 
-    _glowAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+    _glowAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(parent: _glowController, curve: Curves.easeInOut),
     );
 
@@ -61,37 +61,35 @@ class _LogoAnimationState extends State<LogoAnimation>
 
     return AnimatedBuilder(
       animation: Listenable.merge([_pulseController, _glowController]),
-      builder: (context, child) {
-        return Transform.scale(
-          scale: _pulseAnimation.value,
-          child: Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color:
-                      _glowColorAnimation.value?.withValues(
-                        alpha: 0.3 * _glowAnimation.value,
-                      ) ??
-                      Colors.transparent,
-                  blurRadius: 24,
-                  spreadRadius: 8,
-                ),
-              ],
-            ),
-            child: Text(
-              'XO',
-              style: theme.textTheme.displayLarge?.copyWith(
-                fontFamily: 'Sora',
-                fontWeight: FontWeight.w600,
-                color: theme.colorScheme.onSurface,
-                letterSpacing: -0.4,
+      builder: (context, child) => Transform.scale(
+        scale: _pulseAnimation.value,
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color:
+                    _glowColorAnimation.value?.withValues(
+                      alpha: 0.3 * _glowAnimation.value,
+                    ) ??
+                    Colors.transparent,
+                blurRadius: 24,
+                spreadRadius: 8,
               ),
+            ],
+          ),
+          child: Text(
+            'XO',
+            style: theme.textTheme.displayLarge?.copyWith(
+              fontFamily: 'Sora',
+              fontWeight: FontWeight.w600,
+              color: theme.colorScheme.onSurface,
+              letterSpacing: -0.4,
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }

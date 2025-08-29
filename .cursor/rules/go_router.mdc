@@ -1,0 +1,443 @@
+---
+alwaysApply: true
+---
+# Flutter go_router Expert Rules
+
+You are an expert Flutter developer specializing in go_router ^16.2.0 navigation. When working with files that import or use go_router, apply these comprehensive rules.
+
+## Core Principles
+
+- **Type Safety First**: Always use named routes with proper parameter validation
+- **Declarative Navigation**: Prefer go_router's declarative approach over imperative Navigator methods  
+- **Error Boundaries**: Every router must have comprehensive error handling
+- **Performance**: Use StatefulShellRoute for complex hierarchies, avoid unnecessary rebuilds
+- **Maintainability**: Organize routes in dedicated files with clear naming conventions
+
+## Essential Imports Pattern
+
+When creating files that use go_router, always include:
+
+```dart
+import 'package:go_router/go_router.dart';
+import 'package:flutter/material.dart';
+```
+
+## Router Configuration Standards
+
+### Basic Router Template
+```dart
+final GoRouter router = GoRouter(
+  initialLocation: '/',
+  debugLogDiagnostics: true, // Only in debug mode
+  routes: <RouteBase>[
+    // Route definitions here
+  ],
+  errorBuilder: (BuildContext context, GoRouterState state) => 
+    ErrorPage(error: state.error, location: state.matchedLocation),
+  redirect: (BuildContext context, GoRouterState state) {
+    // Global redirect logic
+    return null;
+  },
+);
+```
+
+### Route Definition Patterns
+
+**Simple Route Template:**
+```dart
+GoRoute(
+  path: '/route-name',
+  name: 'route_name',
+  builder: (BuildContext context, GoRouterState state) => const RouteNamePage(),
+)
+```
+
+**Parameterized Route Template:**
+```dart
+GoRoute(
+  path: '/entity/:entityId',
+  name: 'entity_detail',
+  builder: (BuildContext context, GoRouterState state) {
+    final String entityId = state.pathParameters['entityId']!;
+    return EntityDetailPage(entityId: entityId);
+  },
+)
+```
+
+**Route with Query Parameters Template:**
+```dart
+GoRoute(
+  path: '/search',
+  name: 'search',
+  builder: (BuildContext context, GoRouterState state) {
+    final String query = state.uri.queryParameters['q'] ?? '';
+    final String? filter = state.uri.queryParameters['filter'];
+    return SearchPage(query: query, filter: filter);
+  },
+)
+```
+
+## Navigation Method Standards
+
+### Required Navigation Patterns
+When generating navigation code, use these exact patterns:
+
+```dart
+// Push new route (adds to stack)
+context.push('/path');
+
+// Push named route with parameters
+context.pushNamed('route_name', pathParameters: {'id': value});
+
+// Push with query parameters
+context.pushNamed('route_name', queryParameters: {'key': 'value'});
+
+// Replace current route
+context.pushReplacement('/new-path');
+
+// Go to route (resets stack)
+context.go('/path');
+
+// Pop current route
+context.pop();
+
+// Pop with result
+context.pop(result);
+```
+
+### Type-Safe Navigation Extensions
+Always create extension methods for complex navigation:
+
+```dart
+extension TypeSafeNavigation on BuildContext {
+  void goToEntityDetail(String entityId) {
+    pushNamed('entity_detail', pathParameters: {'entityId': entityId});
+  }
+  
+  void goToSearch({String? query, String? filter}) {
+    pushNamed('search', queryParameters: {
+      if (query != null) 'q': query,
+      if (filter != null) 'filter': filter,
+    });
+  }
+}
+```
+
+## Shell Route Patterns
+
+### Bottom Navigation with StatefulShellRoute
+```dart
+StatefulShellRoute.indexedStack(
+  builder: (context, state, navigationShell) => 
+    MainScaffold(navigationShell: navigationShell),
+  branches: [
+    StatefulShellBranch(
+      routes: [
+        GoRoute(
+          path: '/home',
+          name: 'home',
+          builder: (context, state) => const HomePage(),
+          routes: [
+            GoRoute(
+              path: '/detail/:id',
+              name: 'home_detail',
+              builder: (context, state) => 
+                DetailPage(id: state.pathParameters['id']!),
+            ),
+          ],
+        ),
+      ],
+    ),
+  ],
+)
+```
+
+### Custom Layout Shell
+```dart
+ShellRoute(
+  builder: (context, state, child) => CustomLayout(child: child),
+  routes: [
+    GoRoute(
+      path: '/dashboard',
+      name: 'dashboard',
+      builder: (context, state) => const DashboardPage(),
+    ),
+  ],
+)
+```
+
+## Authentication & Guards
+
+### Authentication Guard Template
+```dart
+final GoRouter router = GoRouter(
+  refreshListenable: authNotifier,
+  redirect: (context, state) {
+    final bool isLoggedIn = authNotifier.isAuthenticated;
+    final bool isAuthRoute = ['/login', '/register'].contains(state.matchedLocation);
+    
+    if (!isLoggedIn && !isAuthRoute) return '/login';
+    if (isLoggedIn && isAuthRoute) return '/dashboard';
+    
+    return null;
+  },
+  routes: routes,
+);
+```
+
+### Route-Specific Guards
+```dart
+GoRoute(
+  path: '/admin',
+  name: 'admin',
+  redirect: (context, state) {
+    if (!UserService.instance.hasAdminRole) {
+      return '/unauthorized';
+    }
+    return null;
+  },
+  builder: (context, state) => const AdminPage(),
+)
+```
+
+## Error Handling Requirements
+
+### Mandatory Error Builder
+```dart
+errorBuilder: (BuildContext context, GoRouterState state) {
+  return ErrorPage(
+    error: state.error,
+    location: state.matchedLocation,
+    onRetry: () => context.go('/'),
+  );
+}
+```
+
+### Error Page Template
+```dart
+class ErrorPage extends StatelessWidget {
+  final Exception? error;
+  final String location;
+  final VoidCallback? onRetry;
+
+  const ErrorPage({
+    super.key,
+    this.error,
+    required this.location,
+    this.onRetry,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Something went wrong')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.error, size: 64, color: Colors.red),
+            const SizedBox(height: 16),
+            Text('Route: $location', style: Theme.of(context).textTheme.bodyLarge),
+            if (error != null) ...[
+              const SizedBox(height: 8),
+              Text(error.toString(), style: Theme.of(context).textTheme.bodySmall),
+            ],
+            const SizedBox(height: 24),
+            if (onRetry != null)
+              ElevatedButton(
+                onPressed: onRetry,
+                child: const Text('Go Home'),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
+## Advanced Patterns
+
+### Custom Transitions
+```dart
+GoRoute(
+  path: '/animated',
+  name: 'animated',
+  pageBuilder: (context, state) => CustomTransitionPage(
+    key: state.pageKey,
+    child: const AnimatedPage(),
+    transitionsBuilder: (context, animation, _, child) => SlideTransition(
+      position: animation.drive(
+        Tween(begin: const Offset(1.0, 0.0), end: Offset.zero)
+          .chain(CurveTween(curve: Curves.easeInOut)),
+      ),
+      child: child,
+    ),
+  ),
+)
+```
+
+### Deep Link Handling
+```dart
+GoRoute(
+  path: '/share/:type/:id',
+  name: 'shared_content',
+  builder: (context, state) {
+    final String type = state.pathParameters['type']!;
+    final String id = state.pathParameters['id']!;
+    final Map<String, String> extras = state.uri.queryParameters;
+    
+    return SharedContentPage(
+      contentType: type,
+      contentId: id,
+      metadata: extras,
+    );
+  },
+)
+```
+
+## File Organization Standards
+
+### Route Constants File
+Create `lib/routing/app_routes.dart`:
+```dart
+class AppRoutes {
+  // Route paths
+  static const String home = '/';
+  static const String profile = '/profile';
+  static const String userDetail = '/user/:userId';
+  
+  // Route names
+  static const String homeName = 'home';
+  static const String profileName = 'profile';
+  static const String userDetailName = 'user_detail';
+}
+```
+
+### Router Configuration File
+Create `lib/routing/app_router.dart`:
+```dart
+class AppRouter {
+  static final GoRouter router = GoRouter(
+    initialLocation: AppRoutes.home,
+    routes: _routes,
+    errorBuilder: _errorBuilder,
+    redirect: _globalRedirect,
+  );
+  
+  static List<RouteBase> get _routes => [
+    // Route definitions
+  ];
+  
+  static Widget _errorBuilder(BuildContext context, GoRouterState state) {
+    return ErrorPage(error: state.error, location: state.matchedLocation);
+  }
+  
+  static String? _globalRedirect(BuildContext context, GoRouterState state) {
+    // Global redirect logic
+    return null;
+  }
+}
+```
+
+## State Management Integration
+
+### Provider Integration
+```dart
+ChangeNotifierProvider<AuthProvider>(
+  create: (_) => AuthProvider(),
+  child: Consumer<AuthProvider>(
+    builder: (context, authProvider, _) => MaterialApp.router(
+      routerConfig: GoRouter(
+        refreshListenable: authProvider,
+        redirect: (context, state) => _authRedirect(authProvider, state),
+        routes: routes,
+      ),
+    ),
+  ),
+)
+```
+
+### Riverpod Integration
+```dart
+final routerProvider = Provider<GoRouter>((ref) {
+  final authState = ref.watch(authStateProvider);
+  
+  return GoRouter(
+    refreshListenable: GoRouterRefreshStream(authState.stream),
+    routes: routes,
+  );
+});
+```
+
+## Testing Requirements
+
+### Router Test Template
+```dart
+testWidgets('should navigate to user detail page', (tester) async {
+  final router = GoRouter(
+    routes: [
+      GoRoute(path: '/', builder: (_, __) => const HomePage()),
+      GoRoute(
+        path: '/user/:id',
+        name: 'user_detail', 
+        builder: (_, state) => UserPage(id: state.pathParameters['id']!),
+      ),
+    ],
+  );
+
+  await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+  
+  router.pushNamed('user_detail', pathParameters: {'id': '123'});
+  await tester.pumpAndSettle();
+  
+  expect(find.byType(UserPage), findsOneWidget);
+});
+```
+
+## Strict Requirements
+
+### ❌ Never Do These:
+- Use `Navigator.of(context)` methods alongside go_router
+- Call `context.push()` in `initState()` without `addPostFrameCallback`
+- Hardcode route paths as strings throughout the app
+- Skip parameter validation in route builders
+- Omit error builders in router configuration
+- Create routes without proper naming conventions
+
+### ✅ Always Do These:
+- Use named routes with proper constants
+- Validate all path parameters with `!` or null checks
+- Implement comprehensive error handling
+- Create type-safe navigation extensions
+- Use `const` constructors where possible
+- Add route testing for critical navigation flows
+- Document complex routing logic
+
+## Code Generation Templates
+
+When generating new route code, use this structure:
+
+```dart
+// New route template
+GoRoute(
+  path: '/{{kebab-case-path}}',
+  name: '{{snake_case_name}}',
+  builder: (BuildContext context, GoRouterState state) {
+    {{#if hasParameters}}
+    final String {{parameterName}} = state.pathParameters['{{parameterName}}']!;
+    {{/if}}
+    {{#if hasQueryParams}}
+    final String? {{queryParam}} = state.uri.queryParameters['{{queryParam}}'];
+    {{/if}}
+    
+    return {{PascalCasePage}}(
+      {{#if hasParameters}}{{parameterName}}: {{parameterName}},{{/if}}
+      {{#if hasQueryParams}}{{queryParam}}: {{queryParam}},{{/if}}
+    );
+  },
+)
+```
+
+Remember: Prioritize type safety, comprehensive error handling, and maintainable code organization in all go_router implementations.

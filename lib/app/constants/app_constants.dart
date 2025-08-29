@@ -69,44 +69,44 @@ class AppConstants {
   static const double maxFrameTime = 16.67; // milliseconds for 60 FPS
 
   // Spacing tokens (4-pt base system)
-  static const double spacing4 = 4.0;
-  static const double spacing8 = 8.0;
-  static const double spacing12 = 12.0;
-  static const double spacing16 = 16.0;
-  static const double spacing20 = 20.0;
-  static const double spacing24 = 24.0;
-  static const double spacing32 = 32.0;
-  static const double spacing40 = 40.0;
-  static const double spacing48 = 48.0;
-  static const double spacing64 = 64.0;
+  static const double spacing4 = 4;
+  static const double spacing8 = 8;
+  static const double spacing12 = 12;
+  static const double spacing16 = 16;
+  static const double spacing20 = 20;
+  static const double spacing24 = 24;
+  static const double spacing32 = 32;
+  static const double spacing40 = 40;
+  static const double spacing48 = 48;
+  static const double spacing64 = 64;
 
   // Border radius tokens
-  static const double radius8 = 8.0;
-  static const double radius16 = 16.0;
-  static const double radius20 = 20.0;
-  static const double radius24 = 24.0;
+  static const double radius8 = 8;
+  static const double radius16 = 16;
+  static const double radius20 = 20;
+  static const double radius24 = 24;
 
   // Elevation tokens
-  static const double elevation0 = 0.0;
-  static const double elevation1 = 1.0;
-  static const double elevation2 = 2.0;
-  static const double elevation4 = 4.0;
-  static const double elevation8 = 8.0;
-  static const double elevation12 = 12.0;
-  static const double elevation16 = 16.0;
+  static const double elevation0 = 0;
+  static const double elevation1 = 1;
+  static const double elevation2 = 2;
+  static const double elevation4 = 4;
+  static const double elevation8 = 8;
+  static const double elevation12 = 12;
+  static const double elevation16 = 16;
 
   // Screen breakpoints
-  static const double phoneBreakpoint = 600.0;
-  static const double tabletBreakpoint = 900.0;
-  static const double desktopBreakpoint = 1200.0;
+  static const double phoneBreakpoint = 600;
+  static const double tabletBreakpoint = 900;
+  static const double desktopBreakpoint = 1200;
 
   // Game board sizing
-  static const double boardAspectRatio = 1.0; // Square board
+  static const double boardAspectRatio = 1; // Square board
   static const double boardMaxWidthRatio =
       0.7; // Max 70% of screen width on tablets
   static const double boardMinWidthRatio =
       0.8; // Min 80% of screen width on phones
-  static const double cellMinTapSize = 48.0; // Minimum tap target size
+  static const double cellMinTapSize = 48; // Minimum tap target size
 
   // Haptic feedback patterns
   static const String hapticLight = 'lightImpact';
@@ -160,11 +160,11 @@ class AppConstants {
   static const List<String> gameTips = [
     'Start with the center cell for better chances',
     'Look for opportunities to create multiple winning paths',
-    'Block your opponent\'s winning moves',
+    "Block your opponent's winning moves",
     'Use hints strategically when stuck',
     'Practice on different board sizes to improve',
-    'Watch for patterns in your opponent\'s moves',
-    'Don\'t forget to have fun!',
+    "Watch for patterns in your opponent's moves",
+    "Don't forget to have fun!",
   ];
 
   // Achievement descriptions

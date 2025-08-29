@@ -5,8 +5,8 @@ class ProgressBar extends StatefulWidget {
   final Duration duration;
 
   const ProgressBar({
-    super.key,
     required this.progress,
+    super.key,
     this.duration = const Duration(milliseconds: 2000),
   });
 
@@ -27,13 +27,9 @@ class _ProgressBarState extends State<ProgressBar>
       vsync: this,
     );
 
-    _progressAnimation = Tween<double>(begin: 0.0, end: widget.progress)
-        .animate(
-          CurvedAnimation(
-            parent: _animationController,
-            curve: Curves.easeInOut,
-          ),
-        );
+    _progressAnimation = Tween<double>(begin: 0, end: widget.progress).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
 
     _animationController.forward();
   }
@@ -52,7 +48,7 @@ class _ProgressBarState extends State<ProgressBar>
               curve: Curves.easeInOut,
             ),
           );
-      _animationController.forward(from: 0.0);
+      _animationController.forward(from: 0);
     }
   }
 
@@ -68,30 +64,25 @@ class _ProgressBarState extends State<ProgressBar>
 
     return AnimatedBuilder(
       animation: _progressAnimation,
-      builder: (context, child) {
-        return Container(
-          width: double.infinity,
-          height: 8,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(4),
-            color: theme.colorScheme.surfaceContainer,
-            border: Border.all(
-              color: theme.colorScheme.outline.withValues(alpha: 0.2),
-              width: 1,
-            ),
+      builder: (context, child) => Container(
+        width: double.infinity,
+        height: 8,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(4),
+          color: theme.colorScheme.surfaceContainer,
+          border: Border.all(
+            color: theme.colorScheme.outline.withValues(alpha: 0.2),
           ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: _progressAnimation.value,
-              backgroundColor: Colors.transparent,
-              valueColor: AlwaysStoppedAnimation<Color>(
-                _getGradientColor(theme),
-              ),
-            ),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: LinearProgressIndicator(
+            value: _progressAnimation.value,
+            backgroundColor: Colors.transparent,
+            valueColor: AlwaysStoppedAnimation<Color>(_getGradientColor(theme)),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 

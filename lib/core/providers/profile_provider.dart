@@ -1,10 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
-import '../models/player_profile.dart';
+import 'package:tictactoe_xo_royale/core/models/player_profile.dart';
 
 // Profile state class
+@immutable
 class ProfileState {
   const ProfileState({
     required this.profile,
@@ -25,14 +27,12 @@ class ProfileState {
     String? error,
     bool? isEditing,
     bool clearError = false,
-  }) {
-    return ProfileState(
-      profile: profile ?? this.profile,
-      isLoading: isLoading ?? this.isLoading,
-      error: clearError ? null : (error ?? this.error),
-      isEditing: isEditing ?? this.isEditing,
-    );
-  }
+  }) => ProfileState(
+    profile: profile ?? this.profile,
+    isLoading: isLoading ?? this.isLoading,
+    error: clearError ? null : (error ?? this.error),
+    isEditing: isEditing ?? this.isEditing,
+  );
 
   // Initial state
   factory ProfileState.initial() => const ProfileState(
@@ -51,10 +51,10 @@ class ProfileState {
   );
 
   // Error state
-  factory ProfileState.error(String error) => const ProfileState(
+  factory ProfileState.error(String errorMessage) => ProfileState(
     profile: null,
     isLoading: false,
-    error: null,
+    error: errorMessage,
     isEditing: false,
   );
 
@@ -88,10 +88,17 @@ class ProfileState {
 
 // Profile notifier
 class ProfileNotifier extends StateNotifier<ProfileState> {
-  ProfileNotifier() : super(ProfileState.initial()) {
-    _loadProfile();
+  ProfileNotifier({PlayerProfile? initialProfile})
+    : super(
+        ProfileState.success(initialProfile ?? PlayerProfile.defaultProfile()),
+      ) {
+    // Always start with default profile, then load from storage
+    if (initialProfile == null) {
+      _loadProfile();
+    }
   }
 
+  bool _mounted = true;
   static const String _storageKey = 'user_profile';
 
   // Load profile from storage
@@ -107,16 +114,28 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
           json.decode(profileJson) as Map,
         );
         final profile = PlayerProfile.fromJson(profileMap);
-        state = ProfileState.success(profile);
+        if (_mounted) {
+          state = ProfileState.success(profile);
+        }
       } else {
         // Create default profile if none exists
         final defaultProfile = PlayerProfile.defaultProfile();
         await _saveProfile(defaultProfile);
-        state = ProfileState.success(defaultProfile);
+        if (_mounted) {
+          state = ProfileState.success(defaultProfile);
+        }
       }
-    } catch (e) {
-      state = ProfileState.error('Failed to load profile: $e');
+    } on Exception catch (e) {
+      if (_mounted) {
+        state = ProfileState.error('Failed to load profile: $e');
+      }
     }
+  }
+
+  @override
+  void dispose() {
+    _mounted = false;
+    super.dispose();
   }
 
   // Save profile to storage
@@ -125,7 +144,7 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
       final prefs = await SharedPreferences.getInstance();
       final profileJson = json.encode(profile.toJson());
       await prefs.setString(_storageKey, profileJson);
-    } catch (e) {
+    } on Exception catch (e) {
       state = state.copyWith(error: 'Failed to save profile: $e');
     }
   }
@@ -133,14 +152,20 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
   // Update profile
   Future<void> updateProfile(PlayerProfile updatedProfile) async {
     try {
-      state = state.copyWith(isLoading: true);
+      if (_mounted) {
+        state = state.copyWith(isLoading: true);
+      }
       await _saveProfile(updatedProfile);
-      state = ProfileState.success(updatedProfile);
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: 'Failed to update profile: $e',
-      );
+      if (_mounted) {
+        state = ProfileState.success(updatedProfile);
+      }
+    } on Exception catch (e) {
+      if (_mounted) {
+        state = state.copyWith(
+          isLoading: false,
+          error: 'Failed to update profile: $e',
+        );
+      }
     }
   }
 
@@ -249,18 +274,18 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
     final currentProfile = state.profile;
     if (currentProfile != null) {
       final currentStats = currentProfile.stats;
-      int newWins = currentStats.wins;
-      int newLosses = currentStats.losses;
-      int newDraws = currentStats.draws;
-      int newStreak = currentStats.streak;
+      var newWins = currentStats.wins;
+      var newLosses = currentStats.losses;
+      var newDraws = currentStats.draws;
+      var newStreak = currentStats.streak;
 
-      if (isWin == true) {
+      if (isWin ?? false) {
         newWins++;
         newStreak++;
       } else if (isWin == false) {
         newLosses++;
         newStreak = 0;
-      } else if (isDraw == true) {
+      } else if (isDraw ?? false) {
         newDraws++;
         newStreak = 0;
       }
@@ -288,17 +313,23 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
   // Reset profile to defaults
   Future<void> resetProfile() async {
     try {
-      state = ProfileState.loading();
+      if (_mounted) {
+        state = ProfileState.loading();
+      }
       final defaultProfile = PlayerProfile.defaultProfile();
       await _saveProfile(defaultProfile);
-      state = ProfileState.success(defaultProfile);
-    } catch (e) {
-      state = ProfileState.error('Failed to reset profile: $e');
+      if (_mounted) {
+        state = ProfileState.success(defaultProfile);
+      }
+    } on Exception catch (e) {
+      if (_mounted) {
+        state = ProfileState.error('Failed to reset profile: $e');
+      }
     }
   }
 
   // Set editing mode
-  void setEditing(bool isEditing) {
+  void setEditing({required bool isEditing}) {
     state = state.copyWith(isEditing: isEditing);
   }
 
@@ -339,51 +370,51 @@ final profileProvider =
 
 // ✅ OPTIMIZED: Use select for granular rebuilds instead of individual providers
 // Individual profile data providers for granular rebuilds
-final currentProfileProvider = Provider.autoDispose<PlayerProfile?>((ref) {
-  return ref.watch(profileProvider.select((state) => state.profile));
-});
+final currentProfileProvider = Provider.autoDispose<PlayerProfile?>(
+  (ref) => ref.watch(profileProvider.select((state) => state.profile)),
+);
 
-final profileStatsProvider = Provider.autoDispose<PlayerStats?>((ref) {
-  return ref.watch(profileProvider.select((state) => state.profile?.stats));
-});
+final profileStatsProvider = Provider.autoDispose<PlayerStats?>(
+  (ref) => ref.watch(profileProvider.select((state) => state.profile?.stats)),
+);
 
-final profileGemsProvider = Provider.autoDispose<int>((ref) {
-  return ref.watch(profileProvider.select((state) => state.profile?.gems ?? 0));
-});
+final profileGemsProvider = Provider.autoDispose<int>(
+  (ref) =>
+      ref.watch(profileProvider.select((state) => state.profile?.gems ?? 0)),
+);
 
-final profileHintsProvider = Provider.autoDispose<int>((ref) {
-  return ref.watch(
-    profileProvider.select((state) => state.profile?.hints ?? 0),
-  );
-});
+final profileHintsProvider = Provider.autoDispose<int>(
+  (ref) =>
+      ref.watch(profileProvider.select((state) => state.profile?.hints ?? 0)),
+);
 
-final profileNicknameProvider = Provider.autoDispose<String>((ref) {
-  return ref.watch(
+final profileNicknameProvider = Provider.autoDispose<String>(
+  (ref) => ref.watch(
     profileProvider.select((state) => state.profile?.nickname ?? 'Player'),
-  );
-});
+  ),
+);
 
-final profileAvatarProvider = Provider.autoDispose<String?>((ref) {
-  return ref.watch(
+final profileAvatarProvider = Provider.autoDispose<String?>(
+  (ref) => ref.watch(
     profileProvider.select((state) => state.profile?.avatarUrlOrProvider),
-  );
-});
+  ),
+);
 
-final profileIsLoadingProvider = Provider.autoDispose<bool>((ref) {
-  return ref.watch(profileProvider.select((state) => state.isLoading));
-});
+final profileIsLoadingProvider = Provider.autoDispose<bool>(
+  (ref) => ref.watch(profileProvider.select((state) => state.isLoading)),
+);
 
-final profileErrorProvider = Provider.autoDispose<String?>((ref) {
-  return ref.watch(profileProvider.select((state) => state.error));
-});
+final profileErrorProvider = Provider.autoDispose<String?>(
+  (ref) => ref.watch(profileProvider.select((state) => state.error)),
+);
 
-final profileIsEditingProvider = Provider.autoDispose<bool>((ref) {
-  return ref.watch(profileProvider.select((state) => state.isEditing));
-});
+final profileIsEditingProvider = Provider.autoDispose<bool>(
+  (ref) => ref.watch(profileProvider.select((state) => state.isEditing)),
+);
 
 // ✅ OPTIMIZED: Computed providers using select for better performance
-final profileWinRateProvider = Provider.autoDispose<double>((ref) {
-  return ref.watch(
+final profileWinRateProvider = Provider.autoDispose<double>(
+  (ref) => ref.watch(
     profileProvider.select((state) {
       final stats = state.profile?.stats;
       if (stats != null) {
@@ -391,11 +422,11 @@ final profileWinRateProvider = Provider.autoDispose<double>((ref) {
       }
       return 0.0;
     }),
-  );
-});
+  ),
+);
 
-final profileTotalGamesProvider = Provider.autoDispose<int>((ref) {
-  return ref.watch(
+final profileTotalGamesProvider = Provider.autoDispose<int>(
+  (ref) => ref.watch(
     profileProvider.select((state) {
       final stats = state.profile?.stats;
       if (stats != null) {
@@ -403,16 +434,16 @@ final profileTotalGamesProvider = Provider.autoDispose<int>((ref) {
       }
       return 0;
     }),
-  );
-});
+  ),
+);
 
-final profileIsProfileLoadedProvider = Provider.autoDispose<bool>((ref) {
-  return ref.watch(
+final profileIsProfileLoadedProvider = Provider.autoDispose<bool>(
+  (ref) => ref.watch(
     profileProvider.select(
       (state) => state.profile != null && !state.isLoading,
     ),
-  );
-});
+  ),
+);
 
 // ✅ OPTIMIZED: Extension methods for easy access with select-based providers
 extension ProfileProviderExtension on WidgetRef {
@@ -445,7 +476,7 @@ extension ProfileContextExtension on BuildContext {
   ProfileState? get profileState {
     try {
       return ProviderScope.containerOf(this).read(profileProvider);
-    } catch (e) {
+    } on Exception catch (e) {
       debugPrint('Failed to read profile state: $e');
       return null;
     }

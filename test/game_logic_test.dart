@@ -97,11 +97,12 @@ void main() {
         // X | X | X
         // O | O | -
         // - | - | -
-        gameLogic.makeMove(const Position(0, 0), CellState.X);
-        gameLogic.makeMove(const Position(1, 0), CellState.O);
-        gameLogic.makeMove(const Position(0, 1), CellState.X);
-        gameLogic.makeMove(const Position(1, 1), CellState.O);
-        gameLogic.makeMove(const Position(0, 2), CellState.X);
+        gameLogic
+          ..makeMove(const Position(0, 0), CellState.X)
+          ..makeMove(const Position(1, 0), CellState.O)
+          ..makeMove(const Position(0, 1), CellState.X)
+          ..makeMove(const Position(1, 1), CellState.O)
+          ..makeMove(const Position(0, 2), CellState.X);
 
         final result = gameLogic.checkGameState();
         expect(result.state, equals(GameState.win));
@@ -116,11 +117,12 @@ void main() {
         // X | O | -
         // X | O | -
         // X | - | -
-        gameLogic.makeMove(const Position(0, 0), CellState.X);
-        gameLogic.makeMove(const Position(0, 1), CellState.O);
-        gameLogic.makeMove(const Position(1, 0), CellState.X);
-        gameLogic.makeMove(const Position(1, 1), CellState.O);
-        gameLogic.makeMove(const Position(2, 0), CellState.X);
+        gameLogic
+          ..makeMove(const Position(0, 0), CellState.X)
+          ..makeMove(const Position(0, 1), CellState.O)
+          ..makeMove(const Position(1, 0), CellState.X)
+          ..makeMove(const Position(1, 1), CellState.O)
+          ..makeMove(const Position(2, 0), CellState.X);
 
         final result = gameLogic.checkGameState();
         expect(result.state, equals(GameState.win));
@@ -135,11 +137,12 @@ void main() {
         // X | O | -
         // O | X | -
         // - | - | X
-        gameLogic.makeMove(const Position(0, 0), CellState.X);
-        gameLogic.makeMove(const Position(0, 1), CellState.O);
-        gameLogic.makeMove(const Position(1, 1), CellState.X);
-        gameLogic.makeMove(const Position(1, 0), CellState.O);
-        gameLogic.makeMove(const Position(2, 2), CellState.X);
+        gameLogic
+          ..makeMove(const Position(0, 0), CellState.X)
+          ..makeMove(const Position(0, 1), CellState.O)
+          ..makeMove(const Position(1, 1), CellState.X)
+          ..makeMove(const Position(1, 0), CellState.O)
+          ..makeMove(const Position(2, 2), CellState.X);
 
         final result = gameLogic.checkGameState();
         expect(result.state, equals(GameState.win));
@@ -154,15 +157,15 @@ void main() {
         // X | O | X
         // O | X | O
         // O | X | O
-        gameLogic.makeMove(const Position(0, 0), CellState.X);
-        gameLogic.makeMove(const Position(0, 1), CellState.O);
-        gameLogic.makeMove(const Position(0, 2), CellState.X);
-        gameLogic.makeMove(const Position(1, 0), CellState.O);
-        gameLogic.makeMove(const Position(1, 1), CellState.X);
-        gameLogic.makeMove(const Position(1, 2), CellState.O);
-        gameLogic.makeMove(const Position(2, 0), CellState.O);
-        gameLogic.makeMove(const Position(2, 1), CellState.X);
-        gameLogic.makeMove(const Position(2, 2), CellState.O);
+        gameLogic
+          ..makeMove(const Position(0, 0), CellState.X)
+          ..makeMove(const Position(0, 1), CellState.O)
+          ..makeMove(const Position(0, 2), CellState.X)
+          ..makeMove(const Position(1, 0), CellState.O)
+          ..makeMove(const Position(1, 1), CellState.X)
+          ..makeMove(const Position(2, 0), CellState.O)
+          ..makeMove(const Position(2, 1), CellState.X)
+          ..makeMove(const Position(2, 2), CellState.O);
 
         final result = gameLogic.checkGameState();
         expect(result.state, equals(GameState.draw));
@@ -207,8 +210,9 @@ void main() {
       });
 
       test('Board reset should clear all moves', () {
-        gameLogic.makeMove(const Position(0, 0), CellState.X);
-        gameLogic.makeMove(const Position(1, 1), CellState.O);
+        gameLogic
+          ..makeMove(const Position(0, 0), CellState.X)
+          ..makeMove(const Position(1, 1), CellState.O);
         expect(gameLogic.moveCount, equals(2));
 
         gameLogic.resetBoard();

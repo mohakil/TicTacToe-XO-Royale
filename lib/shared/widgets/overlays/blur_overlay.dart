@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:io';
 import 'dart:ui';
+
+import 'package:flutter/material.dart';
 
 /// A blur overlay that provides a modal background with blur effects.
 /// Falls back to a semi-transparent overlay on devices that don't support blur.
@@ -33,8 +34,8 @@ class BlurOverlay extends StatelessWidget {
   final bool animate;
 
   const BlurOverlay({
-    super.key,
     required this.child,
+    super.key,
     this.visible = true,
     this.blurIntensity = 8.0,
     this.backgroundOpacity = 0.3,
@@ -47,7 +48,9 @@ class BlurOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!visible) return const SizedBox.shrink();
+    if (!visible) {
+      return const SizedBox.shrink();
+    }
 
     final theme = Theme.of(context);
     final effectiveBackgroundColor =
@@ -121,7 +124,9 @@ class BlurOverlay extends StatelessWidget {
   /// Check if blur effects are supported on the current platform.
   bool _isBlurSupported() {
     // iOS and macOS support blur effects
-    if (Platform.isIOS || Platform.isMacOS) return true;
+    if (Platform.isIOS || Platform.isMacOS) {
+      return true;
+    }
 
     // Android supports blur effects on API level 31+ (Android 12+)
     if (Platform.isAndroid) {
@@ -158,7 +163,6 @@ class _CloseButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: theme.colorScheme.outline.withValues(alpha: 0.3),
-              width: 1,
             ),
           ),
           child: Icon(
@@ -183,8 +187,8 @@ class ScrimOverlay extends StatelessWidget {
   final bool animate;
 
   const ScrimOverlay({
-    super.key,
     required this.child,
+    super.key,
     this.visible = true,
     this.opacity = 0.5,
     this.color,
@@ -194,7 +198,9 @@ class ScrimOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!visible) return const SizedBox.shrink();
+    if (!visible) {
+      return const SizedBox.shrink();
+    }
 
     final theme = Theme.of(context);
     final effectiveColor =

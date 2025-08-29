@@ -3,8 +3,8 @@ import 'package:tictactoe_xo_royale/features/setup/providers/setup_provider.dart
 
 class BoardPreview extends StatelessWidget {
   const BoardPreview({
-    super.key,
     required this.boardSize,
+    super.key,
     this.showWinLine = false,
     this.winCondition = WinCondition.threeInRow,
   });
@@ -23,7 +23,7 @@ class BoardPreview extends StatelessWidget {
       height: 120,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colorScheme.outline, width: 1),
+        border: Border.all(color: colorScheme.outline),
         color: colorScheme.surfaceContainer,
       ),
       child: ClipRRect(
@@ -65,15 +65,15 @@ class BoardPreviewPainter extends CustomPainter {
     final gridSize = _getGridSize();
 
     // Draw grid lines
-    for (int i = 1; i < gridSize; i++) {
+    for (var i = 1; i < gridSize; i++) {
       final x = i * cellSize;
       final y = i * cellSize;
 
       // Vertical lines
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
-
-      // Horizontal lines
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
+      canvas
+        ..drawLine(Offset(x, 0), Offset(x, size.height), paint)
+        // Horizontal lines
+        ..drawLine(Offset(0, y), Offset(size.width, y), paint);
     }
 
     // Draw win line if requested

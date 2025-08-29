@@ -150,17 +150,14 @@ class AppTypography {
   );
 
   // Helper method to scale typography based on text scale factor
-  static TextStyle scaleTextStyle(TextStyle baseStyle, double scaleFactor) {
-    return baseStyle.copyWith(fontSize: baseStyle.fontSize! * scaleFactor);
-  }
+  static TextStyle scaleTextStyle(TextStyle baseStyle, double scaleFactor) =>
+      baseStyle.copyWith(fontSize: baseStyle.fontSize! * scaleFactor);
 
   // Helper method to get tablet-optimized typography
-  static TextStyle getTabletStyle(TextStyle baseStyle) {
-    return baseStyle.copyWith(fontSize: baseStyle.fontSize! + 2);
-  }
+  static TextStyle getTabletStyle(TextStyle baseStyle) =>
+      baseStyle.copyWith(fontSize: baseStyle.fontSize! + 2);
 
   // Helper method to get large tablet-optimized typography
-  static TextStyle getLargeTabletStyle(TextStyle baseStyle) {
-    return baseStyle.copyWith(fontSize: baseStyle.fontSize! + 4);
-  }
+  static TextStyle getLargeTabletStyle(TextStyle baseStyle) =>
+      baseStyle.copyWith(fontSize: baseStyle.fontSize! + 4);
 }

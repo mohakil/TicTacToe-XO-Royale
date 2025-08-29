@@ -5,17 +5,15 @@ import 'package:tictactoe_xo_royale/app/constants/dimensions.dart';
 class ResponsiveBuilder extends StatelessWidget {
   final Widget Function(BuildContext context, ResponsiveLayout layout) builder;
 
-  const ResponsiveBuilder({super.key, required this.builder});
+  const ResponsiveBuilder({required this.builder, super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final layout = ResponsiveLayout.fromConstraints(constraints);
-        return builder(context, layout);
-      },
-    );
-  }
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) {
+      final layout = ResponsiveLayout.fromConstraints(constraints);
+      return builder(context, layout);
+    },
+  );
 }
 
 /// Responsive layout information based on screen size and orientation
@@ -102,13 +100,13 @@ class ResponsiveLayout {
   EdgeInsets get responsivePadding {
     switch (screenSize) {
       case ScreenSize.phone:
-        return const EdgeInsets.all(16.0);
+        return const EdgeInsets.all(16);
       case ScreenSize.tablet:
-        return const EdgeInsets.all(24.0);
+        return const EdgeInsets.all(24);
       case ScreenSize.largeTablet:
-        return const EdgeInsets.all(32.0);
+        return const EdgeInsets.all(32);
       case ScreenSize.desktop:
-        return const EdgeInsets.all(40.0);
+        return const EdgeInsets.all(40);
     }
   }
 
@@ -116,13 +114,13 @@ class ResponsiveLayout {
   EdgeInsets get responsiveMargin {
     switch (screenSize) {
       case ScreenSize.phone:
-        return const EdgeInsets.all(8.0);
+        return const EdgeInsets.all(8);
       case ScreenSize.tablet:
-        return const EdgeInsets.all(16.0);
+        return const EdgeInsets.all(16);
       case ScreenSize.largeTablet:
-        return const EdgeInsets.all(24.0);
+        return const EdgeInsets.all(24);
       case ScreenSize.desktop:
-        return const EdgeInsets.all(32.0);
+        return const EdgeInsets.all(32);
     }
   }
 
@@ -130,13 +128,13 @@ class ResponsiveLayout {
   double get responsiveSpacing {
     switch (screenSize) {
       case ScreenSize.phone:
-        return 16.0;
+        return 16;
       case ScreenSize.tablet:
-        return 24.0;
+        return 24;
       case ScreenSize.largeTablet:
-        return 32.0;
+        return 32;
       case ScreenSize.desktop:
-        return 40.0;
+        return 40;
     }
   }
 
@@ -144,13 +142,13 @@ class ResponsiveLayout {
   double get responsiveBorderRadius {
     switch (screenSize) {
       case ScreenSize.phone:
-        return 12.0;
+        return 12;
       case ScreenSize.tablet:
-        return 16.0;
+        return 16;
       case ScreenSize.largeTablet:
-        return 20.0;
+        return 20;
       case ScreenSize.desktop:
-        return 24.0;
+        return 24;
     }
   }
 
@@ -158,13 +156,13 @@ class ResponsiveLayout {
   double get responsiveIconSize {
     switch (screenSize) {
       case ScreenSize.phone:
-        return 24.0;
+        return 24;
       case ScreenSize.tablet:
-        return 28.0;
+        return 28;
       case ScreenSize.largeTablet:
-        return 32.0;
+        return 32;
       case ScreenSize.desktop:
-        return 36.0;
+        return 36;
     }
   }
 
@@ -172,13 +170,13 @@ class ResponsiveLayout {
   double get responsiveButtonHeight {
     switch (screenSize) {
       case ScreenSize.phone:
-        return 48.0;
+        return 48;
       case ScreenSize.tablet:
-        return 56.0;
+        return 56;
       case ScreenSize.largeTablet:
-        return 64.0;
+        return 64;
       case ScreenSize.desktop:
-        return 72.0;
+        return 72;
     }
   }
 
@@ -186,7 +184,7 @@ class ResponsiveLayout {
   double get responsiveTextScale {
     switch (screenSize) {
       case ScreenSize.phone:
-        return 1.0;
+        return 1;
       case ScreenSize.tablet:
         return 1.1;
       case ScreenSize.largeTablet:
@@ -236,127 +234,123 @@ enum ScreenSize { phone, tablet, largeTablet, desktop }
 /// Navigation type based on screen size
 enum NavigationType { bottomBar, rail, drawer }
 
-/// Responsive widget builders for common patterns
-class ResponsiveWidgets {
-  /// Build responsive grid with appropriate column count
-  static Widget responsiveGrid({
-    required BuildContext context,
-    required List<Widget> children,
-    double spacing = 16.0,
-    double runSpacing = 16.0,
-    EdgeInsets? padding,
-  }) {
-    return ResponsiveBuilder(
-      builder: (context, layout) {
-        final columnCount = layout.responsiveColumnCount;
-        final responsivePadding = padding ?? layout.responsivePadding;
+/// Build responsive grid with appropriate column count
+/// This function creates a responsive grid that adapts to different screen sizes
+/// with the appropriate number of columns and spacing.
+Widget responsiveGrid({
+  required BuildContext context,
+  required List<Widget> children,
+  double spacing = 16.0,
+  double runSpacing = 16.0,
+  EdgeInsets? padding,
+}) => ResponsiveBuilder(
+  builder: (context, layout) {
+    final columnCount = layout.responsiveColumnCount;
+    final responsivePadding = padding ?? layout.responsivePadding;
 
-        return Padding(
-          padding: responsivePadding,
-          child: GridView.builder(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: columnCount,
-              crossAxisSpacing: spacing,
-              mainAxisSpacing: runSpacing,
-              childAspectRatio: 1.0,
-            ),
-            itemCount: children.length,
-            itemBuilder: (context, index) => children[index],
-          ),
-        );
-      },
+    return Padding(
+      padding: responsivePadding,
+      child: GridView.builder(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: columnCount,
+          crossAxisSpacing: spacing,
+          mainAxisSpacing: runSpacing,
+        ),
+        itemCount: children.length,
+        itemBuilder: (context, index) => children[index],
+      ),
     );
-  }
+  },
+);
 
-  /// Build responsive list with appropriate spacing
-  static Widget responsiveList({
-    required BuildContext context,
-    required List<Widget> children,
-    double spacing = 16.0,
-    EdgeInsets? padding,
-    ScrollPhysics? physics,
-  }) {
-    return ResponsiveBuilder(
-      builder: (context, layout) {
-        final responsivePadding = padding ?? layout.responsivePadding;
+/// Build responsive list with appropriate spacing
+/// This function creates a responsive list that adapts to different screen sizes
+/// with appropriate spacing between items.
+Widget responsiveList({
+  required BuildContext context,
+  required List<Widget> children,
+  double spacing = 16.0,
+  EdgeInsets? padding,
+  ScrollPhysics? physics,
+}) => ResponsiveBuilder(
+  builder: (context, layout) {
+    final responsivePadding = padding ?? layout.responsivePadding;
 
-        return Padding(
-          padding: responsivePadding,
-          child: ListView.separated(
-            itemCount: children.length,
-            separatorBuilder: (context, index) => SizedBox(height: spacing),
-            itemBuilder: (context, index) => children[index],
-            physics: physics,
-          ),
-        );
-      },
+    return Padding(
+      padding: responsivePadding,
+      child: ListView.separated(
+        itemCount: children.length,
+        separatorBuilder: (context, index) => SizedBox(height: spacing),
+        itemBuilder: (context, index) => children[index],
+        physics: physics,
+      ),
     );
-  }
+  },
+);
 
-  /// Build responsive card with appropriate sizing
-  static Widget responsiveCard({
-    required BuildContext context,
-    required Widget child,
-    EdgeInsets? margin,
-    EdgeInsets? padding,
-    double? elevation,
-    double? borderRadius,
-  }) {
-    return ResponsiveBuilder(
-      builder: (context, layout) {
-        final responsiveMargin = margin ?? layout.responsiveMargin;
-        final responsivePadding = padding ?? layout.responsivePadding;
-        final responsiveElevation = elevation ?? (layout.isPhone ? 2.0 : 4.0);
-        final responsiveBorderRadius =
-            borderRadius ?? layout.responsiveBorderRadius;
+/// Build responsive card with appropriate sizing
+/// This function creates a responsive card that adapts its size, elevation,
+/// and border radius based on the screen size.
+Widget responsiveCard({
+  required BuildContext context,
+  required Widget child,
+  EdgeInsets? margin,
+  EdgeInsets? padding,
+  double? elevation,
+  double? borderRadius,
+}) => ResponsiveBuilder(
+  builder: (context, layout) {
+    final responsiveMargin = margin ?? layout.responsiveMargin;
+    final responsivePadding = padding ?? layout.responsivePadding;
+    final responsiveElevation = elevation ?? (layout.isPhone ? 2.0 : 4.0);
+    final responsiveBorderRadius =
+        borderRadius ?? layout.responsiveBorderRadius;
 
-        return Card(
-          margin: responsiveMargin,
-          elevation: responsiveElevation,
+    return Card(
+      margin: responsiveMargin,
+      elevation: responsiveElevation,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(responsiveBorderRadius),
+      ),
+      child: Padding(padding: responsivePadding, child: child),
+    );
+  },
+);
+
+/// Build responsive button with appropriate sizing
+/// This function creates a responsive button that adapts its height and padding
+/// based on the screen size for optimal touch targets.
+Widget responsiveButton({
+  required BuildContext context,
+  required Widget child,
+  VoidCallback? onPressed,
+  EdgeInsets? padding,
+  double? height,
+  double? borderRadius,
+}) => ResponsiveBuilder(
+  builder: (context, layout) {
+    final responsivePadding =
+        padding ??
+        EdgeInsets.symmetric(
+          horizontal: layout.responsivePadding.left,
+          vertical: layout.responsivePadding.top,
+        );
+    final responsiveHeight = height ?? layout.responsiveButtonHeight;
+    final responsiveBorderRadius =
+        borderRadius ?? layout.responsiveBorderRadius;
+
+    return SizedBox(
+      height: responsiveHeight,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          padding: responsivePadding,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(responsiveBorderRadius),
           ),
-          child: Padding(padding: responsivePadding, child: child),
-        );
-      },
+        ),
+        child: child,
+      ),
     );
-  }
-
-  /// Build responsive button with appropriate sizing
-  static Widget responsiveButton({
-    required BuildContext context,
-    required Widget child,
-    VoidCallback? onPressed,
-    EdgeInsets? padding,
-    double? height,
-    double? borderRadius,
-  }) {
-    return ResponsiveBuilder(
-      builder: (context, layout) {
-        final responsivePadding =
-            padding ??
-            EdgeInsets.symmetric(
-              horizontal: layout.responsivePadding.left,
-              vertical: layout.responsivePadding.top,
-            );
-        final responsiveHeight = height ?? layout.responsiveButtonHeight;
-        final responsiveBorderRadius =
-            borderRadius ?? layout.responsiveBorderRadius;
-
-        return SizedBox(
-          height: responsiveHeight,
-          child: ElevatedButton(
-            onPressed: onPressed,
-            style: ElevatedButton.styleFrom(
-              padding: responsivePadding,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(responsiveBorderRadius),
-              ),
-            ),
-            child: child,
-          ),
-        );
-      },
-    );
-  }
-}
+  },
+);

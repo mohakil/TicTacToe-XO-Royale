@@ -1,9 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'routes.dart';
-import 'deep_linking.dart';
-import 'route_transitions.dart';
+import 'package:tictactoe_xo_royale/app/router/route_transitions.dart';
+import 'package:tictactoe_xo_royale/app/router/routes.dart';
 
 /// Enhanced navigation service for the Tic Tac Toe XO Royale app
 /// Provides advanced navigation capabilities, route guards, and analytics
@@ -32,18 +33,18 @@ class NavigationService {
       if (replace) {
         context.go(finalUri.toString());
       } else {
-        context.push(finalUri.toString(), extra: extra);
+        unawaited(context.push(finalUri.toString(), extra: extra));
       }
 
       // Log navigation for analytics
       _logNavigation(route, queryParameters, transitionType);
-    } catch (e) {
+    } on Exception catch (e) {
       debugPrint('Navigation error: $e');
       // Fallback to basic navigation
       if (replace) {
         context.go(route);
       } else {
-        context.push(route);
+        unawaited(context.push(route));
       }
     }
   }
@@ -71,7 +72,7 @@ class NavigationService {
         debugPrint('Route name not found: $routeName');
         context.go(AppRoutes.home);
       }
-    } catch (e) {
+    } on Exception catch (e) {
       debugPrint('Named navigation error: $e');
       context.go(AppRoutes.home);
     }
@@ -117,13 +118,27 @@ class NavigationService {
     if (winCondition != null) {
       queryParams[AppRoutes.winConditionParam] = winCondition.toString();
     }
-    if (gameMode != null) queryParams[AppRoutes.gameModeParam] = gameMode;
-    if (difficulty != null) queryParams[AppRoutes.difficultyParam] = difficulty;
-    if (player1 != null) queryParams[AppRoutes.player1Param] = player1;
-    if (player2 != null) queryParams[AppRoutes.player2Param] = player2;
-    if (firstMove != null) queryParams[AppRoutes.firstMoveParam] = firstMove;
-    if (challengeId != null) queryParams['challengeId'] = challengeId;
-    if (tournamentId != null) queryParams['tournamentId'] = tournamentId;
+    if (gameMode != null) {
+      queryParams[AppRoutes.gameModeParam] = gameMode;
+    }
+    if (difficulty != null) {
+      queryParams[AppRoutes.difficultyParam] = difficulty;
+    }
+    if (player1 != null) {
+      queryParams[AppRoutes.player1Param] = player1;
+    }
+    if (player2 != null) {
+      queryParams[AppRoutes.player2Param] = player2;
+    }
+    if (firstMove != null) {
+      queryParams[AppRoutes.firstMoveParam] = firstMove;
+    }
+    if (challengeId != null) {
+      queryParams['challengeId'] = challengeId;
+    }
+    if (tournamentId != null) {
+      queryParams['tournamentId'] = tournamentId;
+    }
 
     await navigateTo(
       context,
@@ -153,12 +168,24 @@ class NavigationService {
     if (winCondition != null) {
       queryParams[AppRoutes.winConditionParam] = winCondition.toString();
     }
-    if (gameMode != null) queryParams[AppRoutes.gameModeParam] = gameMode;
-    if (difficulty != null) queryParams[AppRoutes.difficultyParam] = difficulty;
-    if (player1 != null) queryParams[AppRoutes.player1Param] = player1;
-    if (player2 != null) queryParams[AppRoutes.player2Param] = player2;
-    if (firstMove != null) queryParams[AppRoutes.firstMoveParam] = firstMove;
-    if (gameId != null) queryParams['gameId'] = gameId;
+    if (gameMode != null) {
+      queryParams[AppRoutes.gameModeParam] = gameMode;
+    }
+    if (difficulty != null) {
+      queryParams[AppRoutes.difficultyParam] = difficulty;
+    }
+    if (player1 != null) {
+      queryParams[AppRoutes.player1Param] = player1;
+    }
+    if (player2 != null) {
+      queryParams[AppRoutes.player2Param] = player2;
+    }
+    if (firstMove != null) {
+      queryParams[AppRoutes.firstMoveParam] = firstMove;
+    }
+    if (gameId != null) {
+      queryParams['gameId'] = gameId;
+    }
 
     await navigateTo(
       context,
@@ -176,8 +203,12 @@ class NavigationService {
   }) async {
     final queryParams = <String, String>{};
 
-    if (category != null) queryParams['category'] = category;
-    if (itemId != null) queryParams['itemId'] = itemId;
+    if (category != null) {
+      queryParams['category'] = category;
+    }
+    if (itemId != null) {
+      queryParams['itemId'] = itemId;
+    }
 
     await navigateTo(
       context,
@@ -195,8 +226,12 @@ class NavigationService {
   }) async {
     final queryParams = <String, String>{};
 
-    if (userId != null) queryParams['userId'] = userId;
-    if (leaderboardId != null) queryParams['leaderboardId'] = leaderboardId;
+    if (userId != null) {
+      queryParams['userId'] = userId;
+    }
+    if (leaderboardId != null) {
+      queryParams['leaderboardId'] = leaderboardId;
+    }
 
     await navigateTo(
       context,
@@ -219,7 +254,7 @@ class NavigationService {
         // Fallback to home if can't pop
         context.go(AppRoutes.home);
       }
-    } catch (e) {
+    } on Exception catch (e) {
       debugPrint('Navigation back error: $e');
       context.go(AppRoutes.home);
     }
@@ -256,11 +291,19 @@ class NavigationService {
     required String id,
     Map<String, String>? additionalParams,
   }) {
-    return DeepLinkingConfig.generateShareLink(
-      type: type,
-      id: id,
-      additionalParams: additionalParams,
-    );
+    // Simplified share link generation without deep linking
+    const baseUrl = 'https://xotictactoe.com/share';
+    final params = <String, String>{
+      'type': type,
+      'id': id,
+      ...?additionalParams,
+    };
+
+    final queryString = params.entries
+        .map((e) => '${e.key}=${Uri.encodeComponent(e.value)}')
+        .join('&');
+
+    return '$baseUrl?$queryString';
   }
 
   /// Generate web share link for current content
@@ -268,13 +311,9 @@ class NavigationService {
     required String type,
     required String id,
     Map<String, String>? additionalParams,
-  }) {
-    return DeepLinkingConfig.generateWebShareLink(
-      type: type,
-      id: id,
-      additionalParams: additionalParams,
-    );
-  }
+  }) =>
+      // Same as regular share link for web
+      generateShareLink(type: type, id: id, additionalParams: additionalParams);
 
   /// Check if route requires authentication
   static bool requiresAuth(String route) {
@@ -307,7 +346,7 @@ class NavigationService {
       }
 
       return true;
-    } catch (e) {
+    } on Exception catch (e) {
       debugPrint('Route access check error: $e');
       return false;
     }
@@ -392,8 +431,8 @@ class NavigationAnalyticsService {
   /// Log navigation event
   void logNavigation({
     required String route,
-    Map<String, String>? parameters,
     required PageTransitionType transitionType,
+    Map<String, String>? parameters,
     Duration? duration,
   }) {
     // Add your analytics implementation here
@@ -428,9 +467,9 @@ class NavigationAnalyticsService {
 
 /// Navigation state provider
 final navigationStateProvider =
-    StateNotifierProvider<NavigationStateNotifier, NavigationState>((ref) {
-      return NavigationStateNotifier();
-    });
+    StateNotifierProvider<NavigationStateNotifier, NavigationState>(
+      (ref) => NavigationStateNotifier(),
+    );
 
 /// Navigation state notifier
 class NavigationStateNotifier extends StateNotifier<NavigationState> {
@@ -457,7 +496,7 @@ class NavigationStateNotifier extends StateNotifier<NavigationState> {
   }
 
   void clearNavigationError() {
-    state = state.copyWith(lastError: null, lastErrorTime: null);
+    state = state.copyWith();
   }
 
   void incrementNavigationCount() {
@@ -477,22 +516,20 @@ class NavigationState {
 
   const NavigationState({
     required this.currentRoute,
-    this.previousRoute,
     required this.navigationHistory,
     required this.lastNavigationTime,
+    required this.totalNavigations,
+    this.previousRoute,
     this.lastError,
     this.lastErrorTime,
-    required this.totalNavigations,
   });
 
-  factory NavigationState.initial() {
-    return NavigationState(
-      currentRoute: AppRoutes.loading,
-      navigationHistory: [AppRoutes.loading],
-      lastNavigationTime: DateTime.now(),
-      totalNavigations: 0,
-    );
-  }
+  factory NavigationState.initial() => NavigationState(
+    currentRoute: AppRoutes.loading,
+    navigationHistory: [AppRoutes.loading],
+    lastNavigationTime: DateTime.now(),
+    totalNavigations: 0,
+  );
 
   NavigationState copyWith({
     String? currentRoute,
@@ -502,15 +539,13 @@ class NavigationState {
     String? lastError,
     DateTime? lastErrorTime,
     int? totalNavigations,
-  }) {
-    return NavigationState(
-      currentRoute: currentRoute ?? this.currentRoute,
-      previousRoute: previousRoute ?? this.previousRoute,
-      navigationHistory: navigationHistory ?? this.navigationHistory,
-      lastNavigationTime: lastNavigationTime ?? this.lastNavigationTime,
-      lastError: lastError ?? this.lastError,
-      lastErrorTime: lastErrorTime ?? this.lastErrorTime,
-      totalNavigations: totalNavigations ?? this.totalNavigations,
-    );
-  }
+  }) => NavigationState(
+    currentRoute: currentRoute ?? this.currentRoute,
+    previousRoute: previousRoute ?? this.previousRoute,
+    navigationHistory: navigationHistory ?? this.navigationHistory,
+    lastNavigationTime: lastNavigationTime ?? this.lastNavigationTime,
+    lastError: lastError ?? this.lastError,
+    lastErrorTime: lastErrorTime ?? this.lastErrorTime,
+    totalNavigations: totalNavigations ?? this.totalNavigations,
+  );
 }
