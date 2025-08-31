@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:tictactoe_xo_royale/features/setup/presentation/widgets/board_preview.dart';
 import 'package:tictactoe_xo_royale/features/setup/providers/setup_provider.dart';
 
-class BoardCarousel extends StatelessWidget {
-  const BoardCarousel({
+class BoardSizeSelector extends StatelessWidget {
+  const BoardSizeSelector({
     required this.selectedBoardSize,
     required this.onBoardSizeChanged,
     super.key,
@@ -32,9 +32,16 @@ class BoardCarousel extends StatelessWidget {
             color: colorScheme.onSurface,
           ),
         ),
+        const SizedBox(height: 8),
+        Text(
+          'Choose the size of your game board',
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+          ),
+        ),
         const SizedBox(height: 16),
         SizedBox(
-          height: 160,
+          height: 180,
           child: PageView.builder(
             controller: PageController(
               viewportFraction: 0.7,
@@ -56,7 +63,10 @@ class BoardCarousel extends StatelessWidget {
                   children: [
                     Transform.scale(
                       scale: isSelected ? 1.0 : 0.9,
-                      child: BoardPreview(boardSize: boardSize),
+                      child: BoardPreview(
+                        key: ValueKey('board_${boardSize.name}'),
+                        boardSize: boardSize,
+                      ),
                     ),
                     const SizedBox(height: 12),
                     Text(
@@ -69,6 +79,17 @@ class BoardCarousel extends StatelessWidget {
                             ? FontWeight.w600
                             : FontWeight.normal,
                       ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      _getBoardSizeDescription(boardSize),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: isSelected
+                            ? colorScheme.primary
+                            : colorScheme.onSurfaceVariant,
+                        fontSize: 11,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
                   ],
                 ),
@@ -88,6 +109,17 @@ class BoardCarousel extends StatelessWidget {
         return '4 × 4';
       case BoardSize.fiveByFive:
         return '5 × 5';
+    }
+  }
+
+  String _getBoardSizeDescription(BoardSize boardSize) {
+    switch (boardSize) {
+      case BoardSize.threeByThree:
+        return 'Classic tic-tac-toe';
+      case BoardSize.fourByFour:
+        return 'More strategic gameplay';
+      case BoardSize.fiveByFive:
+        return 'Advanced strategy game';
     }
   }
 }

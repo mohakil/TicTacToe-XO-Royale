@@ -10,10 +10,10 @@ PlayerProfile _$PlayerProfileFromJson(Map<String, dynamic> json) =>
     PlayerProfile(
       id: json['id'] as String,
       nickname: json['nickname'] as String,
-      avatarUrlOrProvider: json['avatarUrlOrProvider'] as String?,
       stats: PlayerStats.fromJson(json['stats'] as Map<String, dynamic>),
       gems: (json['gems'] as num).toInt(),
       hints: (json['hints'] as num).toInt(),
+      avatarUrlOrProvider: json['avatarUrlOrProvider'] as String?,
     );
 
 PlayerStats _$PlayerStatsFromJson(Map<String, dynamic> json) => PlayerStats(

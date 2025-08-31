@@ -11,10 +11,10 @@ StoreItem _$StoreItemFromJson(Map<String, dynamic> json) => StoreItem(
   category: $enumDecode(_$StoreItemCategoryEnumMap, json['category']),
   name: json['name'] as String,
   desc: json['desc'] as String,
-  priceGems: (json['priceGems'] as num?)?.toInt(),
-  priceReal: (json['priceReal'] as num?)?.toDouble(),
   premium: json['premium'] as bool,
   locked: json['locked'] as bool,
+  priceGems: (json['priceGems'] as num?)?.toInt(),
+  priceReal: (json['priceReal'] as num?)?.toDouble(),
   previewAsset: json['previewAsset'] as String?,
 );
 

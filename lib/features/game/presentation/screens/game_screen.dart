@@ -42,7 +42,7 @@ class GameScreen extends ConsumerStatefulWidget {
   /// Difficulty level for robot opponent ('easy', 'medium', 'hard')
   final String difficulty;
 
-  /// Which player makes the first move ('x' or 'o')
+  /// Which player makes the first move ('player1', 'player2', 'random')
   final String firstMove;
 
   const GameScreen({
@@ -53,7 +53,7 @@ class GameScreen extends ConsumerStatefulWidget {
     this.player2Name = 'Player 2',
     this.isRobotMode = false,
     this.difficulty = 'medium',
-    this.firstMove = 'x',
+    this.firstMove = 'random',
   });
 
   @override
@@ -77,11 +77,23 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     });
   }
 
-  void _initializeGameConfig() {}
+  void _initializeGameConfig() {
+    final gameNotifier = ref.read(gameStateProvider.notifier);
+    gameNotifier.initializeGame(
+      boardSize: widget.boardSize,
+      winCondition: widget.winCondition,
+      player1Name: widget.player1Name,
+      player2Name: widget.player2Name,
+      isRobotMode: widget.isRobotMode,
+      difficulty: widget.difficulty,
+      firstMove: widget.firstMove,
+    );
+  }
 
   void _onCellTap(int row, int col) {
-    final gameNotifier = ref.read(gameStateProvider.notifier)
-      ..makeMove(row, col);
+    // Use ref.read to get the notifier and make the move
+    final gameNotifier = ref.read(gameStateProvider.notifier);
+    gameNotifier.makeMove(row, col);
 
     // Check game result after move
     final gameResult = gameNotifier.checkGameResult();
@@ -137,32 +149,37 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: Stack(
         children: [
-          // Game board - centered and properly sized
-          Center(
-            child: Container(
-              constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 0.9,
-                maxHeight: MediaQuery.of(context).size.height * 0.6,
-              ),
-              child: GameBoard(
-                boardSize: widget.boardSize,
-                winCondition: widget.winCondition,
-                boardState: gameLogic.board,
-                currentPlayer: gameLogic.getNextPlayer(),
-                isGameOver: gameResult.isGameOver,
-                winningLine: gameResult.winningLine,
-                onCellTap: _onCellTap,
-                showHints: _showHint,
-                hintCells: _showHint
-                    ? [const Position(1, 1)]
-                    : null, // Example hint cell
+          // Game board - positioned above turn indicator
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 320,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Container(
+                constraints: BoxConstraints(
+                  maxWidth: MediaQuery.of(context).size.width * 0.9,
+                  maxHeight: MediaQuery.of(context).size.height * 0.6,
+                ),
+                child: GameBoard(
+                  boardSize: widget.boardSize,
+                  winCondition: widget.winCondition,
+                  boardState: gameLogic.board,
+                  currentPlayer: gameLogic.getNextPlayer(),
+                  isGameOver: gameResult.isGameOver,
+                  winningLine: gameResult.winningLine,
+                  onCellTap: _onCellTap,
+                  showHints: _showHint,
+                  hintCells: _showHint
+                      ? [const Position(1, 1)]
+                      : null, // Example hint cell
+                ),
               ),
             ),
           ),
 
-          // Top controls
+          // Top controls - positioned just below safe area
           Positioned(
-            top: MediaQuery.of(context).padding.top + 16,
+            top: MediaQuery.of(context).padding.top - 16,
             left: 16,
             child: IconButton(
               onPressed: _exitGame,
@@ -173,7 +190,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
           ),
 
           Positioned(
-            top: MediaQuery.of(context).padding.top + 16,
+            top: MediaQuery.of(context).padding.top - 16,
             right: 16,
             child: IconButton(
               onPressed: _showSettingsOverlay,
@@ -183,9 +200,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
             ),
           ),
 
-          // Game HUD - properly positioned above the board
+          // Game HUD - positioned closer to top controls
           Positioned(
-            top: MediaQuery.of(context).padding.top + 80,
+            top: MediaQuery.of(context).padding.top + 40,
             left: 0,
             right: 0,
             child: GameHeader(
@@ -197,9 +214,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
             ),
           ),
 
-          // Turn indicator - positioned below HUD with proper spacing
+          // Turn indicator - positioned just below game header
           Positioned(
-            top: MediaQuery.of(context).padding.top + 200,
+            top: MediaQuery.of(context).padding.top + 220,
             left: 0,
             right: 0,
             child: GameStatus(

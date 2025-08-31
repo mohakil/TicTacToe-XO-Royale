@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class CustomTextField extends StatelessWidget {
-  const CustomTextField({
+class PlayerNameInput extends StatelessWidget {
+  const PlayerNameInput({
     required this.label,
     required this.value,
     required this.onChanged,

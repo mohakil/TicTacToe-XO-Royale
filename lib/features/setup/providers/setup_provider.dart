@@ -22,7 +22,7 @@ abstract class GameSetup with _$GameSetup {
 
 enum GameMode { local, robot }
 
-enum FirstMove { x, o, random }
+enum FirstMove { player1, player2, random }
 
 enum Difficulty { easy, medium, hard }
 
@@ -60,28 +60,71 @@ class SetupNotifier extends StateNotifier<GameSetup> {
   }
 
   void setBoardSize(BoardSize boardSize) {
+    // Don't update if the board size is the same
+    if (state.boardSize == boardSize) return;
+
+    // Update board size first
     state = state.copyWith(boardSize: boardSize);
-    // Adjust win condition if needed
-    if (boardSize == BoardSize.threeByThree &&
-        state.winCondition == WinCondition.fourInRow) {
-      state = state.copyWith(winCondition: WinCondition.threeInRow);
-    } else if (boardSize == BoardSize.fourByFour &&
-        state.winCondition == WinCondition.fiveInRow) {
-      state = state.copyWith(winCondition: WinCondition.fourInRow);
+
+    // Automatically adjust win condition to be valid for the new board size
+    WinCondition newWinCondition = state.winCondition;
+    bool winConditionChanged = false;
+
+    switch (boardSize) {
+      case BoardSize.threeByThree:
+        // 3x3 board can only have 3-in-row win condition
+        if (newWinCondition != WinCondition.threeInRow) {
+          newWinCondition = WinCondition.threeInRow;
+          winConditionChanged = true;
+        }
+        break;
+      case BoardSize.fourByFour:
+        // 4x4 board can have 3-in-row or 4-in-row
+        if (newWinCondition == WinCondition.fiveInRow) {
+          newWinCondition = WinCondition.fourInRow;
+          winConditionChanged = true;
+        }
+        break;
+      case BoardSize.fiveByFive:
+        // 5x5 board can have 3-in-row, 4-in-row, or 5-in-row
+        // No adjustment needed, all win conditions are valid
+        break;
+    }
+
+    // Update the win condition if it changed
+    if (winConditionChanged) {
+      state = state.copyWith(winCondition: newWinCondition);
     }
   }
 
   void setWinCondition(WinCondition winCondition) {
-    // Validate win condition against board size
-    if (state.boardSize == BoardSize.threeByThree &&
-        winCondition != WinCondition.threeInRow) {
-      return; // Invalid combination
+    // Validate win condition against current board size
+    bool isValidCombination = _isValidBoardWinCombination(
+      state.boardSize,
+      winCondition,
+    );
+
+    if (isValidCombination) {
+      state = state.copyWith(winCondition: winCondition);
     }
-    if (state.boardSize == BoardSize.fourByFour &&
-        winCondition == WinCondition.fiveInRow) {
-      return; // Invalid combination
+  }
+
+  /// Check if a board size and win condition combination is valid
+  bool _isValidBoardWinCombination(
+    BoardSize boardSize,
+    WinCondition winCondition,
+  ) {
+    switch (boardSize) {
+      case BoardSize.threeByThree:
+        return winCondition == WinCondition.threeInRow;
+      case BoardSize.fourByFour:
+        return winCondition == WinCondition.threeInRow ||
+            winCondition == WinCondition.fourInRow;
+      case BoardSize.fiveByFive:
+        return winCondition == WinCondition.threeInRow ||
+            winCondition == WinCondition.fourInRow ||
+            winCondition == WinCondition.fiveInRow;
     }
-    state = state.copyWith(winCondition: winCondition);
   }
 
   bool get isValid {
@@ -132,10 +175,10 @@ class SetupNotifier extends StateNotifier<GameSetup> {
 
   String get firstMoveValue {
     switch (state.firstMove) {
-      case FirstMove.x:
-        return 'x';
-      case FirstMove.o:
-        return 'o';
+      case FirstMove.player1:
+        return 'player1';
+      case FirstMove.player2:
+        return 'player2';
       case FirstMove.random:
         return 'random';
     }

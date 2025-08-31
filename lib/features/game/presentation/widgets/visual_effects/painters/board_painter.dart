@@ -38,9 +38,6 @@ class BoardPainter extends CustomPainter {
   late final double _hintAnimValue;
   late final double _ambientAnimValue;
 
-  // Cached board state hash for efficient comparison
-  late final int _boardStateHash;
-
   BoardPainter({
     required this.boardSize,
     required this.boardState,
@@ -71,28 +68,6 @@ class BoardPainter extends CustomPainter {
     _winningLineAnimValue = winningLineAnimation.value;
     _hintAnimValue = hintAnimation.value;
     _ambientAnimValue = ambientAnimation.value;
-
-    // Compute efficient hash for board state comparison
-    _boardStateHash = _computeBoardStateHash();
-  }
-
-  int _computeBoardStateHash() {
-    // Fast hash computation for board state comparison
-    var hash = 0;
-    for (var row = 0; row < boardState.length && row < boardSize; row++) {
-      for (
-        var col = 0;
-        col < boardState[row].length && col < boardSize;
-        col++
-      ) {
-        final mark = boardState[row][col];
-        if (mark != null) {
-          // Use a simple hash function: position + mark hash
-          hash = hash * 31 + (row * boardSize + col) * mark.hashCode;
-        }
-      }
-    }
-    return hash;
   }
 
   void _initializePaints() {
@@ -183,20 +158,22 @@ class BoardPainter extends CustomPainter {
   }
 
   void _drawCellsOptimized(Canvas canvas, Size size, double cellSize) {
-    // Safety check: ensure boardState has correct dimensions
-    if (boardState.length != boardSize ||
-        boardState.any((row) => row.length != boardSize)) {
-      // Draw empty board if dimensions don't match
-      return;
-    }
-
     // Pre-compute glow intensity to avoid repeated calculations
     final glowIntensity = _markAnimValue >= 1.0 ? 0.8 : 0.0;
 
-    for (var row = 0; row < boardSize; row++) {
-      for (var col = 0; col < boardSize; col++) {
+    // Ensure we don't exceed the board dimensions safely
+    final maxRows = boardState.length < boardSize
+        ? boardState.length
+        : boardSize;
+
+    for (var row = 0; row < maxRows; row++) {
+      final maxCols = boardState[row].length < boardSize
+          ? boardState[row].length
+          : boardSize;
+
+      for (var col = 0; col < maxCols; col++) {
         final mark = boardState[row][col];
-        if (mark != null) {
+        if (mark != null && mark.isNotEmpty) {
           // Inline cell rect calculation for better performance
           final cellRect = Rect.fromLTWH(
             col * cellSize,
@@ -302,8 +279,8 @@ class BoardPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant BoardPainter oldDelegate) {
-    // Fast board state comparison using cached hash
-    if (_boardStateHash != oldDelegate._boardStateHash) {
+    // Always repaint if board state has changed
+    if (oldDelegate.boardState != boardState) {
       return true;
     }
 

@@ -38,8 +38,8 @@ Map<String, dynamic> _$GameSetupToJson(_GameSetup instance) =>
 const _$GameModeEnumMap = {GameMode.local: 'local', GameMode.robot: 'robot'};
 
 const _$FirstMoveEnumMap = {
-  FirstMove.x: 'x',
-  FirstMove.o: 'o',
+  FirstMove.player1: 'player1',
+  FirstMove.player2: 'player2',
   FirstMove.random: 'random',
 };
 

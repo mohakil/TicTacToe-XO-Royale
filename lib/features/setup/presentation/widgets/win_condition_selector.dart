@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:tictactoe_xo_royale/features/setup/presentation/widgets/board_preview.dart';
 import 'package:tictactoe_xo_royale/features/setup/providers/setup_provider.dart';
 
-class WinCarousel extends StatelessWidget {
-  const WinCarousel({
+class WinConditionSelector extends StatelessWidget {
+  const WinConditionSelector({
     required this.selectedWinCondition,
     required this.onWinConditionChanged,
     required this.boardSize,
@@ -28,6 +28,13 @@ class WinCarousel extends StatelessWidget {
           'Win Condition',
           style: theme.textTheme.titleMedium?.copyWith(
             color: colorScheme.onSurface,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Choose the win condition of your game board',
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: colorScheme.onSurfaceVariant,
           ),
         ),
         const SizedBox(height: 16),
@@ -55,6 +62,7 @@ class WinCarousel extends StatelessWidget {
                     Transform.scale(
                       scale: isSelected ? 1.0 : 0.9,
                       child: BoardPreview(
+                        key: ValueKey('${boardSize.name}_${winCondition.name}'),
                         boardSize: boardSize,
                         showWinLine: true,
                         winCondition: winCondition,

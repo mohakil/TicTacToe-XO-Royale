@@ -185,79 +185,88 @@ class _GameBoardState extends ConsumerState<GameBoard>
   }
 
   @override
-  Widget build(BuildContext context) => RepaintBoundary(
-    child: AspectRatio(
-      aspectRatio: 1, // Ensure square aspect ratio
-      child: GestureDetector(
-        onTapUp: (details) {
-          final renderBox = context.findRenderObject()! as RenderBox;
-          final localPosition = renderBox.globalToLocal(details.globalPosition);
-          final cellSize = _calculateCellSize(context);
-          final row = (localPosition.dy / cellSize).floor();
-          final col = (localPosition.dx / cellSize).floor();
+  Widget build(BuildContext context) {
+    return RepaintBoundary(
+      child: AspectRatio(
+        aspectRatio: 1, // Ensure square aspect ratio
+        child: GestureDetector(
+          onTapUp: (details) {
+            final renderBox = context.findRenderObject()! as RenderBox;
+            final localPosition = renderBox.globalToLocal(
+              details.globalPosition,
+            );
+            final cellSize = _calculateCellSize(context);
+            final row = (localPosition.dy / cellSize).floor();
+            final col = (localPosition.dx / cellSize).floor();
 
-          if (row >= 0 &&
-              row < widget.boardSize &&
-              col >= 0 &&
-              col < widget.boardSize) {
-            _onCellTap(row, col);
-          }
-        },
-        child: CustomPaint(
-          painter: BoardPainter(
-            boardSize: widget.boardSize,
-            // Convert CellState board to String board for BoardPainter compatibility
-            boardState: widget.boardState
-                .map(
-                  (row) => row
-                      .map((cell) => cell == CellState.empty ? null : cell.name)
-                      .toList(),
-                )
-                .toList(),
-            currentPlayer: widget.currentPlayer.name,
-            isGameOver: widget.isGameOver,
-            winningLine: widget.winningLine
-                ?.expand((pos) => [pos.row, pos.col])
-                .toList(),
-            hoveredCell: _hoveredRow != null && _hoveredCol != null
-                ? [_hoveredRow!, _hoveredCol!]
-                : null,
-            showHints: widget.showHints,
-            hintCells: widget.hintCells
-                ?.expand((pos) => [pos.row, pos.col])
-                .toList(),
-            markAnimation: _markAnimation,
-            winningLineAnimation: _winningLineAnimation,
-            hintAnimation: _hintAnimation,
-            ambientAnimation: _ambientAnimation,
-            gameColors: Theme.of(context).extension<GameColors>(),
-            themeData: Theme.of(context),
-          ),
-          child: SizedBox(
-            width: double.infinity,
-            height: double.infinity,
-            child: MouseRegion(
-              onHover: (event) {
-                final cellSize = _calculateCellSize(context);
-                final row = (event.localPosition.dy / cellSize).floor();
-                final col = (event.localPosition.dx / cellSize).floor();
+            if (row >= 0 &&
+                row < widget.boardSize &&
+                col >= 0 &&
+                col < widget.boardSize) {
+              _onCellTap(row, col);
+            }
+          },
+          child: CustomPaint(
+            key: ValueKey(
+              '${widget.boardState.hashCode}',
+            ), // Force rebuild when board changes
+            painter: BoardPainter(
+              boardSize: widget.boardSize,
+              // Convert CellState board to String board for BoardPainter compatibility
+              boardState: widget.boardState
+                  .map(
+                    (row) => row
+                        .map(
+                          (cell) => cell == CellState.empty ? null : cell.name,
+                        )
+                        .toList(),
+                  )
+                  .toList(),
+              currentPlayer: widget.currentPlayer.name,
+              isGameOver: widget.isGameOver,
+              winningLine: widget.winningLine
+                  ?.expand((pos) => [pos.row, pos.col])
+                  .toList(),
+              hoveredCell: _hoveredRow != null && _hoveredCol != null
+                  ? [_hoveredRow!, _hoveredCol!]
+                  : null,
+              showHints: widget.showHints,
+              hintCells: widget.hintCells
+                  ?.expand((pos) => [pos.row, pos.col])
+                  .toList(),
+              markAnimation: _markAnimation,
+              winningLineAnimation: _winningLineAnimation,
+              hintAnimation: _hintAnimation,
+              ambientAnimation: _ambientAnimation,
+              gameColors: Theme.of(context).extension<GameColors>(),
+              themeData: Theme.of(context),
+            ),
+            child: SizedBox(
+              width: double.infinity,
+              height: double.infinity,
+              child: MouseRegion(
+                onHover: (event) {
+                  final cellSize = _calculateCellSize(context);
+                  final row = (event.localPosition.dy / cellSize).floor();
+                  final col = (event.localPosition.dx / cellSize).floor();
 
-                if (row >= 0 &&
-                    row < widget.boardSize &&
-                    col >= 0 &&
-                    col < widget.boardSize) {
-                  _onCellHover(row, col);
-                }
-              },
-              onExit: (_) => _onCellExit(),
-              child:
-                  const SizedBox.shrink(), // Empty sized box for mouse region
+                  if (row >= 0 &&
+                      row < widget.boardSize &&
+                      col >= 0 &&
+                      col < widget.boardSize) {
+                    _onCellHover(row, col);
+                  }
+                },
+                onExit: (_) => _onCellExit(),
+                child:
+                    const SizedBox.shrink(), // Empty sized box for mouse region
+              ),
             ),
           ),
         ),
       ),
-    ),
-  );
+    );
+  }
 
   double _calculateCellSize(BuildContext context) {
     final size = MediaQuery.of(context).size;

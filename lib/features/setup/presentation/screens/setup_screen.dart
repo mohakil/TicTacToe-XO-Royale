@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tictactoe_xo_royale/app/router/routes.dart';
-import 'package:tictactoe_xo_royale/features/setup/presentation/widgets/board_carousel.dart';
-import 'package:tictactoe_xo_royale/features/setup/presentation/widgets/choice_chips.dart';
-import 'package:tictactoe_xo_royale/features/setup/presentation/widgets/custom_text_field.dart';
-import 'package:tictactoe_xo_royale/features/setup/presentation/widgets/win_carousel.dart';
+import 'package:tictactoe_xo_royale/features/setup/presentation/widgets/board_size_selector.dart';
+import 'package:tictactoe_xo_royale/features/setup/presentation/widgets/selection_chips.dart';
+import 'package:tictactoe_xo_royale/features/setup/presentation/widgets/player_name_input.dart';
+import 'package:tictactoe_xo_royale/features/setup/presentation/widgets/win_condition_selector.dart';
 import 'package:tictactoe_xo_royale/features/setup/providers/setup_provider.dart';
 
 class SetupScreen extends ConsumerStatefulWidget {
@@ -40,11 +40,78 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
   @override
   void initState() {
     super.initState();
-    // No provider modification here - let the UI react to the initial parameters
+    // Initialize the provider state based on widget parameters
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final setupNotifier = ref.read(setupProvider.notifier);
+
+      // Set game mode first (this affects other settings)
+      if (widget.gameMode != null) {
+        final mode = widget.gameMode == 'robot'
+            ? GameMode.robot
+            : GameMode.local;
+        setupNotifier.setMode(mode);
+      }
+
+      // Set other parameters if provided
+      if (widget.player1 != null) {
+        setupNotifier.setPlayer1Name(widget.player1!);
+      }
+
+      if (widget.player2 != null) {
+        setupNotifier.setPlayer2Name(widget.player2!);
+      }
+
+      if (widget.firstMove != null) {
+        final firstMove = _parseFirstMove(widget.firstMove!);
+        if (firstMove != null) {
+          setupNotifier.setFirstMove(firstMove);
+        }
+      }
+
+      if (widget.difficulty != null) {
+        final difficulty = _parseDifficulty(widget.difficulty!);
+        if (difficulty != null) {
+          setupNotifier.setDifficulty(difficulty);
+        }
+      }
+
+      if (widget.boardSize != null) {
+        setupNotifier.setBoardSize(widget.boardSize!);
+      }
+
+      if (widget.winCondition != null) {
+        setupNotifier.setWinCondition(widget.winCondition!);
+      }
+    });
   }
 
-  // Difficulty? _parseDifficulty(String difficulty) { ... }
-  // FirstMove? _parseFirstMove(String firstMove) { ... }
+  Difficulty? _parseDifficulty(String difficulty) {
+    switch (difficulty.toLowerCase()) {
+      case 'easy':
+        return Difficulty.easy;
+      case 'medium':
+        return Difficulty.medium;
+      case 'hard':
+        return Difficulty.hard;
+      default:
+        return null;
+    }
+  }
+
+  FirstMove? _parseFirstMove(String firstMove) {
+    switch (firstMove.toLowerCase()) {
+      case 'player1':
+      case 'x':
+        return FirstMove.player1;
+      case 'player2':
+      case 'o':
+        return FirstMove.player2;
+      case 'random':
+        return FirstMove.random;
+      default:
+        return null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,11 +120,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    // Use widget parameters to determine the effective setup state
-    final effectiveMode = widget.gameMode == 'robot'
-        ? GameMode.robot
-        : GameMode.local;
-    final effectiveSetup = setup.copyWith(mode: effectiveMode);
+    // Provider state is now properly initialized in initState
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -93,20 +156,20 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
               ),
               const SizedBox(height: 16),
 
-              CustomTextField(
+              PlayerNameInput(
                 label: 'Player 1',
-                value: effectiveSetup.player1Name,
+                value: setup.player1Name,
                 onChanged: setupNotifier.setPlayer1Name,
               ),
 
               const SizedBox(height: 16),
 
-              CustomTextField(
+              PlayerNameInput(
                 label: 'Player 2',
-                value: effectiveSetup.player2Name,
+                value: setup.player2Name,
                 onChanged: setupNotifier.setPlayer2Name,
-                enabled: effectiveSetup.mode == GameMode.local,
-                hintText: effectiveSetup.mode == GameMode.robot
+                enabled: setup.mode == GameMode.local,
+                hintText: setup.mode == GameMode.robot
                     ? 'CPU'
                     : 'Enter player name',
               ),
@@ -114,41 +177,48 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
               const SizedBox(height: 32),
 
               // First Move Selection
-              ChoiceChips<FirstMove>(
+              SelectionChips<FirstMove>(
                 label: 'First Move',
+                subText: 'Choose who goes first',
                 options: const [
-                  ChoiceChipOption(label: 'X', value: FirstMove.x),
-                  ChoiceChipOption(label: 'O', value: FirstMove.o),
-                  ChoiceChipOption(label: 'Random', value: FirstMove.random),
+                  SelectionChipOption(
+                    label: 'Player 1 (X)',
+                    value: FirstMove.player1,
+                  ),
+                  SelectionChipOption(
+                    label: 'Player 2 (O)',
+                    value: FirstMove.player2,
+                  ),
+                  SelectionChipOption(label: 'Random', value: FirstMove.random),
                 ],
-                selectedOption: effectiveSetup.firstMove,
+                selectedOption: setup.firstMove,
                 onOptionSelected: setupNotifier.setFirstMove,
               ),
 
               const SizedBox(height: 32),
 
               // Difficulty Selection (Robot mode only)
-              if (effectiveSetup.mode == GameMode.robot) ...[
-                ChoiceChips<Difficulty>(
+              if (setup.mode == GameMode.robot) ...[
+                SelectionChips<Difficulty>(
                   label: 'Difficulty',
                   options: const [
-                    ChoiceChipOption(
+                    SelectionChipOption(
                       label: 'Easy',
                       value: Difficulty.easy,
                       description: 'Random moves with occasional blunders',
                     ),
-                    ChoiceChipOption(
+                    SelectionChipOption(
                       label: 'Medium',
                       value: Difficulty.medium,
                       description: 'Strategic play with limited depth',
                     ),
-                    ChoiceChipOption(
+                    SelectionChipOption(
                       label: 'Hard',
                       value: Difficulty.hard,
                       description: 'Optimal play with full analysis',
                     ),
                   ],
-                  selectedOption: effectiveSetup.difficulty,
+                  selectedOption: setup.difficulty,
                   onOptionSelected: setupNotifier.setDifficulty,
                 ),
 
@@ -156,18 +226,18 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
               ],
 
               // Board Size Carousel
-              BoardCarousel(
-                selectedBoardSize: effectiveSetup.boardSize,
+              BoardSizeSelector(
+                selectedBoardSize: setup.boardSize,
                 onBoardSizeChanged: setupNotifier.setBoardSize,
               ),
 
               const SizedBox(height: 32),
 
               // Win Condition Carousel
-              WinCarousel(
-                selectedWinCondition: effectiveSetup.winCondition,
+              WinConditionSelector(
+                selectedWinCondition: setup.winCondition,
                 onWinConditionChanged: setupNotifier.setWinCondition,
-                boardSize: effectiveSetup.boardSize,
+                boardSize: setup.boardSize,
               ),
 
               const SizedBox(height: 48),
@@ -185,8 +255,8 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                             winCondition: setupNotifier.winConditionValue,
                             gameMode: setupNotifier.gameModeValue,
                             difficulty: setupNotifier.difficultyValue,
-                            player1: effectiveSetup.player1Name,
-                            player2: effectiveSetup.player2Name,
+                            player1: setup.player1Name,
+                            player2: setup.player2Name,
                             firstMove: setupNotifier.firstMoveValue,
                           );
 

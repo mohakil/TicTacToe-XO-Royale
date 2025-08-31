@@ -68,7 +68,30 @@ final List<RouteBase> appRoutes = [
   GoRoute(
     path: '/setup',
     name: 'setup',
-    builder: (context, state) => const SetupScreen(),
+    builder: (context, state) {
+      // Extract query parameters from the URL
+      final queryParams = state.uri.queryParameters;
+
+      return SetupScreen(
+        challengeId: queryParams['challengeId'],
+        tournamentId: queryParams['tournamentId'],
+        boardSize: int.tryParse(queryParams['boardSize'] ?? '3') == 3
+            ? BoardSize.threeByThree
+            : int.tryParse(queryParams['boardSize'] ?? '4') == 4
+            ? BoardSize.fourByFour
+            : BoardSize.fiveByFive,
+        winCondition: int.tryParse(queryParams['winCondition'] ?? '3') == 3
+            ? WinCondition.threeInRow
+            : int.tryParse(queryParams['winCondition'] ?? '4') == 4
+            ? WinCondition.fourInRow
+            : WinCondition.fiveInRow,
+        gameMode: queryParams['gameMode'],
+        difficulty: queryParams['difficulty'],
+        player1: queryParams['player1'],
+        player2: queryParams['player2'],
+        firstMove: queryParams['firstMove'],
+      );
+    },
   ),
 
   GoRoute(
@@ -85,6 +108,7 @@ final List<RouteBase> appRoutes = [
         player2Name: queryParams['player2'] ?? 'Player 2',
         isRobotMode: queryParams['gameMode'] == 'robot',
         difficulty: queryParams['difficulty'] ?? 'medium',
+        firstMove: queryParams['firstMove'] ?? 'random',
       );
     },
   ),

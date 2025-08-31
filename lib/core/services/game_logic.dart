@@ -303,8 +303,44 @@ class GameLogic {
   /// Check if it's the first move of the game
   bool get isFirstMove => moveCount == 0;
 
-  /// Get the next player based on move count
-  CellState getNextPlayer() => moveCount.isEven ? CellState.X : CellState.O;
+  /// Get the next player based on move count and first move configuration
+  CellState getNextPlayer() {
+    if (moveCount == 0) {
+      // First move of the game
+      switch (config.firstMove) {
+        case FirstMove.player1:
+          return CellState.X;
+        case FirstMove.player2:
+          return CellState.O;
+        case FirstMove.random:
+          // This should never happen in practice since random is resolved during initialization
+          // But if it does, default to X for consistency
+          return CellState.X;
+      }
+    } else {
+      // After first move, alternate based on who went first
+      final firstPlayer = _getFirstPlayer();
+      return moveCount.isEven ? firstPlayer : _getOpponent(firstPlayer);
+    }
+  }
+
+  /// Get the first player based on configuration
+  CellState _getFirstPlayer() {
+    switch (config.firstMove) {
+      case FirstMove.player1:
+        return CellState.X;
+      case FirstMove.player2:
+        return CellState.O;
+      case FirstMove.random:
+        // This should never happen in practice since random is resolved during initialization
+        // But if it does, default to X for consistency
+        return CellState.X;
+    }
+  }
+
+  /// Get the opponent of the given player
+  CellState _getOpponent(CellState player) =>
+      player == CellState.X ? CellState.O : CellState.X;
 }
 
 /// Internal class for win check results

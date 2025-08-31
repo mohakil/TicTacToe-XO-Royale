@@ -122,5 +122,26 @@ class BoardPreviewPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant BoardPreviewPainter oldDelegate) {
+    // Always repaint when any of these properties change
+    return oldDelegate.boardSize != boardSize ||
+        oldDelegate.showWinLine != showWinLine ||
+        oldDelegate.winCondition != winCondition ||
+        oldDelegate.colorScheme != colorScheme;
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is BoardPreviewPainter &&
+        other.boardSize == boardSize &&
+        other.showWinLine == showWinLine &&
+        other.winCondition == winCondition &&
+        other.colorScheme == colorScheme;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hash(boardSize, showWinLine, winCondition, colorScheme);
+  }
 }
