@@ -111,7 +111,7 @@ class StoreState {
       'purchaseHistory: ${purchaseHistory.length}, watchAdCooldown: $watchAdCooldown)';
 }
 
-// Store notifier
+// Store notifier with proper disposal
 class StoreNotifier extends StateNotifier<StoreState> {
   StoreNotifier() : super(StoreState.initial()) {
     _loadStoreData();
@@ -120,10 +120,15 @@ class StoreNotifier extends StateNotifier<StoreState> {
   static const String _purchaseHistoryKey = 'purchase_history';
   static const String _watchAdCooldownKey = 'watch_ad_cooldown';
 
-  // Load store data from storage
+  // Mounted flag for proper disposal
+  bool _mounted = true;
+
+  // Load store data from storage with mounted checks
   Future<void> _loadStoreData() async {
     try {
-      state = StoreState.loading();
+      if (_mounted) {
+        state = StoreState.loading();
+      }
 
       final prefs = await SharedPreferences.getInstance();
 
@@ -148,30 +153,36 @@ class StoreNotifier extends StateNotifier<StoreState> {
         return item;
       }).toList();
 
-      state = StoreState(
-        items: updatedItems,
-        selectedCategory: StoreItemCategory.theme,
-        isLoading: false,
-        error: null,
-        purchaseHistory: purchaseHistoryJson,
-        watchAdCooldown: watchAdCooldown,
-      );
+      if (_mounted) {
+        state = StoreState(
+          items: updatedItems,
+          selectedCategory: StoreItemCategory.theme,
+          isLoading: false,
+          error: null,
+          purchaseHistory: purchaseHistoryJson,
+          watchAdCooldown: watchAdCooldown,
+        );
+      }
     } on Exception catch (e) {
-      state = StoreState.error('Failed to load store data: $e');
+      if (_mounted) {
+        state = StoreState.error('Failed to load store data: $e');
+      }
     }
   }
 
-  // Save purchase history to storage
+  // Save purchase history to storage with mounted checks
   Future<void> _savePurchaseHistory() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setStringList(_purchaseHistoryKey, state.purchaseHistory);
     } on Exception catch (e) {
-      state = state.copyWith(error: 'Failed to save purchase history: $e');
+      if (_mounted) {
+        state = state.copyWith(error: 'Failed to save purchase history: $e');
+      }
     }
   }
 
-  // Save watch ad cooldown to storage
+  // Save watch ad cooldown to storage with mounted checks
   Future<void> _saveWatchAdCooldown() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -184,13 +195,17 @@ class StoreNotifier extends StateNotifier<StoreState> {
         await prefs.remove(_watchAdCooldownKey);
       }
     } on Exception catch (e) {
-      state = state.copyWith(error: 'Failed to save watch ad cooldown: $e');
+      if (_mounted) {
+        state = state.copyWith(error: 'Failed to save watch ad cooldown: $e');
+      }
     }
   }
 
-  // Select category
+  // Select category with mounted checks
   void selectCategory(StoreItemCategory category) {
-    state = state.copyWith(selectedCategory: category);
+    if (_mounted) {
+      state = state.copyWith(selectedCategory: category);
+    }
   }
 
   // Get items by category
@@ -354,6 +369,12 @@ class StoreNotifier extends StateNotifier<StoreState> {
 
   // Get purchase history
   List<String> get purchaseHistory => state.purchaseHistory;
+
+  @override
+  void dispose() {
+    _mounted = false;
+    super.dispose();
+  }
 }
 
 // ✅ OPTIMIZED: Main store provider with AutoDispose for better lifecycle management

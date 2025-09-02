@@ -24,13 +24,21 @@ class BoardPainter extends CustomPainter {
   final dynamic motionDurations;
   final ThemeData themeData;
 
+  // Static cached Paint objects for maximum performance
+  static final Paint _staticGridPaint = Paint()
+    ..strokeWidth = 2.0
+    ..style = PaintingStyle.stroke
+    ..strokeCap = StrokeCap.round;
+
+  static final Paint _staticHoverPaint = Paint()..style = PaintingStyle.fill;
+
+  static final Paint _staticBackgroundPaint = Paint()
+    ..style = PaintingStyle.fill;
+
+  // Note: Mark-specific Paint objects are handled in mark_painter.dart for better organization
+
   // Cached values for performance optimization
   late final double _cellSize;
-
-  // Cached Paint objects for performance
-  late final Paint _gridPaint;
-  late final Paint _hoverPaint;
-  late final Paint _backgroundPaint;
 
   // Cached animation values to avoid repeated getter calls
   late final double _markAnimValue;
@@ -56,7 +64,7 @@ class BoardPainter extends CustomPainter {
     this.motionDurations,
   }) {
     _initializeCachedValues();
-    _initializePaints();
+    _updateStaticPaints();
   }
 
   void _initializeCachedValues() {
@@ -70,33 +78,20 @@ class BoardPainter extends CustomPainter {
     _ambientAnimValue = ambientAnimation.value;
   }
 
-  void _initializePaints() {
-    // Grid lines paint
-    _gridPaint = Paint()
-      ..color = gameColors?.boardLine ?? const Color(0xFFD6DAE3)
-      ..strokeWidth = 2.0
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
-
-    // Hover effect paint
-    _hoverPaint = Paint()
-      ..color = (gameColors?.cellHover ?? const Color(0xFF2DD4FF)).withValues(
-        alpha: 0.1,
-      )
-      ..style = PaintingStyle.fill;
-
-    // Background paint
-    _backgroundPaint = Paint()
-      ..color = themeData.scaffoldBackgroundColor
-      ..style = PaintingStyle.fill;
+  void _updateStaticPaints() {
+    // Update static Paint objects with current colors
+    _staticGridPaint.color = gameColors?.boardLine ?? const Color(0xFFD6DAE3);
+    _staticHoverPaint.color = (gameColors?.cellHover ?? const Color(0xFF2DD4FF))
+        .withValues(alpha: 0.1);
+    _staticBackgroundPaint.color = themeData.scaffoldBackgroundColor;
   }
 
   @override
   void paint(Canvas canvas, Size size) {
     final cellSize = size.width * _cellSize; // Use cached normalized value
 
-    // Draw background - use cached rect scaled to actual size
-    canvas.drawRect(Offset.zero & size, _backgroundPaint);
+    // Draw background - use static cached paint
+    canvas.drawRect(Offset.zero & size, _staticBackgroundPaint);
 
     // Draw ambient effects - use cached animation value
     if (_ambientAnimValue > 0) {
@@ -140,26 +135,29 @@ class BoardPainter extends CustomPainter {
       // Optimized for common tic-tac-toe sizes (3x3, 4x4, 5x5)
       for (var i = 1; i < boardSize; i++) {
         final x = i * cellSize;
-        canvas.drawLine(Offset(x, 0), Offset(x, height), _gridPaint);
+        canvas.drawLine(Offset(x, 0), Offset(x, height), _staticGridPaint);
       }
     } else {
       // Fallback for larger boards
       for (var i = 1; i < boardSize; i++) {
         final x = i * cellSize;
-        canvas.drawLine(Offset(x, 0), Offset(x, height), _gridPaint);
+        canvas.drawLine(Offset(x, 0), Offset(x, height), _staticGridPaint);
       }
     }
 
     // Draw horizontal lines
     for (var i = 1; i < boardSize; i++) {
       final y = i * cellSize;
-      canvas.drawLine(Offset(0, y), Offset(width, y), _gridPaint);
+      canvas.drawLine(Offset(0, y), Offset(width, y), _staticGridPaint);
     }
   }
 
   void _drawCellsOptimized(Canvas canvas, Size size, double cellSize) {
     // Pre-compute glow intensity to avoid repeated calculations
     final glowIntensity = _markAnimValue >= 1.0 ? 0.8 : 0.0;
+
+    // Pre-compute common values to reduce calculations in loop
+    final cellSizeDouble = cellSize;
 
     // Ensure we don't exceed the board dimensions safely
     final maxRows = boardState.length < boardSize
@@ -171,15 +169,18 @@ class BoardPainter extends CustomPainter {
           ? boardState[row].length
           : boardSize;
 
+      // Pre-compute row offset to avoid repeated multiplication
+      final rowOffset = row * cellSizeDouble;
+
       for (var col = 0; col < maxCols; col++) {
         final mark = boardState[row][col];
         if (mark != null && mark.isNotEmpty) {
-          // Inline cell rect calculation for better performance
+          // Optimized cell rect calculation using pre-computed values
           final cellRect = Rect.fromLTWH(
-            col * cellSize,
-            row * cellSize,
-            cellSize,
-            cellSize,
+            col * cellSizeDouble,
+            rowOffset,
+            cellSizeDouble,
+            cellSizeDouble,
           );
 
           paintMark(
@@ -216,11 +217,11 @@ class BoardPainter extends CustomPainter {
         cellSize,
       );
 
-      // Use animated hover effect
+      // Use animated hover effect with static paint
       paintHover(
         canvas,
         cellRect,
-        _hoverPaint,
+        _staticHoverPaint,
         gameColors,
         1, // Full hover animation value
       );
@@ -279,8 +280,23 @@ class BoardPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant BoardPainter oldDelegate) {
-    // Always repaint if board state has changed
+    // Early exit for most common case - no changes
+    if (identical(oldDelegate, this)) {
+      return false;
+    }
+
+    // Check board state changes first (most common)
     if (oldDelegate.boardState != boardState) {
+      return true;
+    }
+
+    // Check animation values with epsilon comparison for better performance
+    const epsilon = 0.001;
+    if ((oldDelegate._markAnimValue - _markAnimValue).abs() > epsilon ||
+        (oldDelegate._winningLineAnimValue - _winningLineAnimValue).abs() >
+            epsilon ||
+        (oldDelegate._hintAnimValue - _hintAnimValue).abs() > epsilon ||
+        (oldDelegate._ambientAnimValue - _ambientAnimValue).abs() > epsilon) {
       return true;
     }
 
@@ -290,10 +306,6 @@ class BoardPainter extends CustomPainter {
         oldDelegate.winningLine != winningLine ||
         oldDelegate.hoveredCell != hoveredCell ||
         oldDelegate.showHints != showHints ||
-        oldDelegate.hintCells != hintCells ||
-        oldDelegate._markAnimValue != _markAnimValue ||
-        oldDelegate._winningLineAnimValue != _winningLineAnimValue ||
-        oldDelegate._hintAnimValue != _hintAnimValue ||
-        oldDelegate._ambientAnimValue != _ambientAnimValue;
+        oldDelegate.hintCells != hintCells;
   }
 }

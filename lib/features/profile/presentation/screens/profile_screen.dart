@@ -11,6 +11,7 @@ class ProfileScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // ✅ OPTIMIZED: Use select for granular rebuilds - only rebuild when specific values change
     final isLoading = ref.watch(profileIsLoadingProvider);
     final error = ref.watch(profileErrorProvider);
 

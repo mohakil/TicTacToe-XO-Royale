@@ -1,6 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:tictactoe_xo_royale/app/theme/theme_extensions.dart';
 
+// Static cached Paint objects for maximum performance
+class _WinningLinePaints {
+  static final Paint linePaint = Paint()
+    ..strokeWidth = 8.0
+    ..strokeCap = StrokeCap.round
+    ..style = PaintingStyle.stroke;
+
+  static final Paint glowPaint = Paint()
+    ..strokeWidth = 16.0
+    ..strokeCap = StrokeCap.round
+    ..style = PaintingStyle.stroke
+    ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
+}
+
 void paintWinningLine(
   Canvas canvas,
   List<Offset> cells,
@@ -67,16 +81,14 @@ void _drawGradientLine(
     }
   }
 
-  // Create gradient paint
+  // Create gradient paint using static paint object
   final gradient = LinearGradient(colors: [startColor, endColor]);
 
-  final paint = Paint()
-    ..shader = gradient.createShader(Rect.fromPoints(cells.first, cells.last))
-    ..strokeWidth = 8.0
-    ..strokeCap = StrokeCap.round
-    ..style = PaintingStyle.stroke;
+  _WinningLinePaints.linePaint.shader = gradient.createShader(
+    Rect.fromPoints(cells.first, cells.last),
+  );
 
-  canvas.drawPath(path, paint);
+  canvas.drawPath(path, _WinningLinePaints.linePaint);
 }
 
 void _drawGlowEffect(
@@ -112,18 +124,13 @@ void _drawGlowEffect(
     }
   }
 
-  // Create glow effect with blur
-  final glowPaint = Paint()
-    ..shader = LinearGradient(
-      colors: [
-        startColor.withValues(alpha: 0.6),
-        endColor.withValues(alpha: 0.6),
-      ],
-    ).createShader(Rect.fromPoints(cells.first, cells.last))
-    ..strokeWidth = 16.0
-    ..strokeCap = StrokeCap.round
-    ..style = PaintingStyle.stroke
-    ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
+  // Create glow effect with blur using static paint object
+  _WinningLinePaints.glowPaint.shader = LinearGradient(
+    colors: [
+      startColor.withValues(alpha: 0.6),
+      endColor.withValues(alpha: 0.6),
+    ],
+  ).createShader(Rect.fromPoints(cells.first, cells.last));
 
-  canvas.drawPath(path, glowPaint);
+  canvas.drawPath(path, _WinningLinePaints.glowPaint);
 }

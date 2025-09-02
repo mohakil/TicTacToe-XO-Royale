@@ -4,6 +4,36 @@ import 'package:tictactoe_xo_royale/app/theme/theme_extensions.dart';
 
 const int _hintSparkleCount = 8;
 
+/// Static Paint objects for hint sparkle effects to improve performance
+class _HintSparklePaints {
+  // Sparkle line paint
+  static final Paint _sparklePaint = Paint()
+    ..color = const Color(0xFFFFB020)
+    ..strokeWidth = 2.0
+    ..strokeCap = StrokeCap.round
+    ..style = PaintingStyle.stroke;
+
+  // Sparkle glow paint
+  static final Paint _sparkleGlowPaint = Paint()
+    ..color = const Color(0xFFFFB020)
+    ..strokeWidth = 4.0
+    ..strokeCap = StrokeCap.round
+    ..style = PaintingStyle.stroke
+    ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2);
+
+  // Central glow paint
+  static final Paint _centralGlowPaint = Paint()
+    ..color = const Color(0xFFFFB020)
+    ..style = PaintingStyle.fill
+    ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
+
+  // Getters for accessing static paints
+  static Paint get sparklePaint => _sparklePaint;
+  static Paint get sparkleGlowPaint => _sparkleGlowPaint;
+  static Paint get centralGlowPaint => _centralGlowPaint;
+}
+
+/// Optimized paint hint sparkle effects
 void paintHintSparkle(
   Canvas canvas,
   Rect cellRect,
@@ -34,12 +64,12 @@ void _drawHintSparkle(Canvas canvas, Offset position, double animationValue) {
   final size = 4.0 * animationValue;
   final alpha = (1.0 - animationValue).clamp(0.0, 1.0);
 
-  // Draw cross sparkle
+  // Draw cross sparkle using static paint
   final paint = Paint()
-    ..color = const Color(0xFFFFB020).withValues(alpha: alpha)
-    ..strokeWidth = 2.0
-    ..strokeCap = StrokeCap.round
-    ..style = PaintingStyle.stroke;
+    ..color = _HintSparklePaints.sparklePaint.color.withValues(alpha: alpha)
+    ..strokeWidth = _HintSparklePaints.sparklePaint.strokeWidth
+    ..strokeCap = _HintSparklePaints.sparklePaint.strokeCap
+    ..style = _HintSparklePaints.sparklePaint.style;
 
   // Horizontal line
   canvas
@@ -55,13 +85,15 @@ void _drawHintSparkle(Canvas canvas, Offset position, double animationValue) {
       paint,
     );
 
-  // Add glow effect
+  // Add glow effect using static paint
   final glowPaint = Paint()
-    ..color = const Color(0xFFFFB020).withValues(alpha: alpha * 0.5)
-    ..strokeWidth = 4.0
-    ..strokeCap = StrokeCap.round
-    ..style = PaintingStyle.stroke
-    ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2);
+    ..color = _HintSparklePaints.sparkleGlowPaint.color.withValues(
+      alpha: alpha * 0.5,
+    )
+    ..strokeWidth = _HintSparklePaints.sparkleGlowPaint.strokeWidth
+    ..strokeCap = _HintSparklePaints.sparkleGlowPaint.strokeCap
+    ..style = _HintSparklePaints.sparkleGlowPaint.style
+    ..maskFilter = _HintSparklePaints.sparkleGlowPaint.maskFilter;
 
   canvas
     ..drawLine(
@@ -82,10 +114,13 @@ void _drawCentralGlow(
   double radius,
   double animationValue,
 ) {
+  // Use static paint with animated opacity
   final glowPaint = Paint()
-    ..color = const Color(0xFFFFB020).withValues(alpha: 0.3 * animationValue)
-    ..style = PaintingStyle.fill
-    ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
+    ..color = _HintSparklePaints.centralGlowPaint.color.withValues(
+      alpha: 0.3 * animationValue,
+    )
+    ..style = _HintSparklePaints.centralGlowPaint.style
+    ..maskFilter = _HintSparklePaints.centralGlowPaint.maskFilter;
 
   final glowRadius = radius * (0.5 + 0.5 * animationValue);
   canvas.drawCircle(center, glowRadius, glowPaint);

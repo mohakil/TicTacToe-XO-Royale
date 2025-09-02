@@ -31,38 +31,59 @@ class HomeState {
   );
 }
 
-/// Home screen provider for managing state
+/// Home screen provider for managing state with proper disposal
 class HomeNotifier extends StateNotifier<HomeState> {
   HomeNotifier() : super(const HomeState());
 
+  // Mounted flag for proper disposal
+  bool _mounted = true;
+
   /// Update the last game result
   void updateLastResult(String result) {
-    state = state.copyWith(lastResult: result);
+    if (_mounted) {
+      state = state.copyWith(lastResult: result);
+    }
   }
 
   /// Update the current streak
   void updateStreak(int streak) {
-    state = state.copyWith(streak: streak);
+    if (_mounted) {
+      state = state.copyWith(streak: streak);
+    }
   }
 
   /// Update gems count
   void updateGemsCount(int gems) {
-    state = state.copyWith(gemsCount: gems);
+    if (_mounted) {
+      state = state.copyWith(gemsCount: gems);
+    }
   }
 
   /// Update hint count
   void updateHintCount(int hints) {
-    state = state.copyWith(hintCount: hints);
+    if (_mounted) {
+      state = state.copyWith(hintCount: hints);
+    }
   }
 
   /// Set loading state
   void setLoading({required bool loading}) {
-    state = state.copyWith(isLoading: loading);
+    if (_mounted) {
+      state = state.copyWith(isLoading: loading);
+    }
   }
 
   /// Reset stats to default values
   void resetStats() {
-    state = const HomeState();
+    if (_mounted) {
+      state = const HomeState();
+    }
+  }
+
+  @override
+  void dispose() {
+    _mounted = false;
+    super.dispose();
   }
 }
 
@@ -71,25 +92,63 @@ final homeProvider = StateNotifierProvider<HomeNotifier, HomeState>(
   (ref) => HomeNotifier(),
 );
 
-/// Provider for last result
+// ✅ OPTIMIZED: Use select for granular rebuilds instead of individual providers
+// Individual home data providers for granular rebuilds
 final lastResultProvider = Provider<String>(
-  (ref) => ref.watch(homeProvider).lastResult,
+  (ref) => ref.watch(homeProvider.select((state) => state.lastResult)),
 );
 
-/// Provider for streak
-final streakProvider = Provider<int>((ref) => ref.watch(homeProvider).streak);
+final streakProvider = Provider<int>(
+  (ref) => ref.watch(homeProvider.select((state) => state.streak)),
+);
 
-/// Provider for gems count
 final gemsCountProvider = Provider<int>(
-  (ref) => ref.watch(homeProvider).gemsCount,
+  (ref) => ref.watch(homeProvider.select((state) => state.gemsCount)),
 );
 
-/// Provider for hint count
 final hintCountProvider = Provider<int>(
-  (ref) => ref.watch(homeProvider).hintCount,
+  (ref) => ref.watch(homeProvider.select((state) => state.hintCount)),
 );
 
-/// Provider for loading state
 final homeLoadingProvider = Provider<bool>(
-  (ref) => ref.watch(homeProvider).isLoading,
+  (ref) => ref.watch(homeProvider.select((state) => state.isLoading)),
 );
+
+// ✅ OPTIMIZED: Computed providers using select for better performance
+final homeStatsProvider =
+    Provider<({String lastResult, int streak, int gemsCount, int hintCount})>(
+      (ref) => ref.watch(
+        homeProvider.select(
+          (state) => (
+            lastResult: state.lastResult,
+            streak: state.streak,
+            gemsCount: state.gemsCount,
+            hintCount: state.hintCount,
+          ),
+        ),
+      ),
+    );
+
+final homeIsLoadingProvider = Provider<bool>(
+  (ref) => ref.watch(homeProvider.select((state) => state.isLoading)),
+);
+
+// ✅ OPTIMIZED: Extension methods for easy access with select-based providers
+extension HomeProviderExtension on WidgetRef {
+  // Get home notifier
+  HomeNotifier get homeNotifier => read(homeProvider.notifier);
+
+  // Get individual home data using select for granular rebuilds
+  String get lastResult => watch(lastResultProvider);
+  int get streak => watch(streakProvider);
+  int get gemsCount => watch(gemsCountProvider);
+  int get hintCount => watch(hintCountProvider);
+  bool get homeIsLoading => watch(homeLoadingProvider);
+
+  // Get computed home data
+  ({String lastResult, int streak, int gemsCount, int hintCount})
+  get homeStats => watch(homeStatsProvider);
+
+  // Get all home state
+  HomeState get homeState => watch(homeProvider);
+}

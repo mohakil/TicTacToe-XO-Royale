@@ -47,7 +47,7 @@ final responsiveThemeProvider = Provider.family<ThemeData, double>((
   return AppTheme.getResponsiveTheme(baseTheme, scaleFactor);
 });
 
-// ✅ OPTIMIZED: Theme mode notifier with improved error handling
+// ✅ OPTIMIZED: Theme mode notifier with improved error handling and proper disposal
 class ThemeModeNotifier extends StateNotifier<ThemeMode> {
   ThemeModeNotifier() : super(ThemeMode.system) {
     _loadThemeMode();
@@ -56,41 +56,53 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
   // Storage key for theme mode
   static const String _storageKey = 'theme_mode';
 
-  // Load theme mode from storage with error handling
+  // Mounted flag for proper disposal
+  bool _mounted = true;
+
+  // Load theme mode from storage with error handling and mounted checks
   Future<void> _loadThemeMode() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final themeModeIndex = prefs.getInt(_storageKey);
-      if (themeModeIndex != null &&
+      if (_mounted &&
+          themeModeIndex != null &&
           themeModeIndex >= 0 &&
           themeModeIndex < ThemeMode.values.length) {
         state = ThemeMode.values[themeModeIndex];
       }
     } on Exception catch (e) {
       // If loading fails, keep default system theme
-      debugPrint('Failed to load theme mode: $e');
+      if (_mounted) {
+        debugPrint('Failed to load theme mode: $e');
+      }
       // Don't change state, keep the default system theme
     }
   }
 
-  // Save theme mode to storage with error handling
+  // Save theme mode to storage with error handling and mounted checks
   Future<void> _saveThemeMode(ThemeMode themeMode) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt(_storageKey, themeMode.index);
     } on Exception catch (e) {
-      debugPrint('Failed to save theme mode: $e');
+      if (_mounted) {
+        debugPrint('Failed to save theme mode: $e');
+      }
       // Don't throw error, just log it
     }
   }
 
-  // Set theme mode with error handling
+  // Set theme mode with error handling and mounted checks
   Future<void> setThemeMode(ThemeMode themeMode) async {
     try {
-      state = themeMode;
-      await _saveThemeMode(themeMode);
+      if (_mounted) {
+        state = themeMode;
+        await _saveThemeMode(themeMode);
+      }
     } on Exception catch (e) {
-      debugPrint('Failed to set theme mode: $e');
+      if (_mounted) {
+        debugPrint('Failed to set theme mode: $e');
+      }
       // Revert to previous state if save fails
       // Note: In a production app, you might want to show a user-friendly error
     }
@@ -99,28 +111,38 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
   // Toggle between light and dark themes
   Future<void> toggleTheme() async {
     try {
-      final newThemeMode = state == ThemeMode.light
-          ? ThemeMode.dark
-          : ThemeMode.light;
-      await setThemeMode(newThemeMode);
+      if (_mounted) {
+        final newThemeMode = state == ThemeMode.light
+            ? ThemeMode.dark
+            : ThemeMode.light;
+        await setThemeMode(newThemeMode);
+      }
     } on Exception catch (e) {
-      debugPrint('Failed to toggle theme: $e');
+      if (_mounted) {
+        debugPrint('Failed to toggle theme: $e');
+      }
     }
   }
 
   // Set light theme
   Future<void> setLightTheme() async {
-    await setThemeMode(ThemeMode.light);
+    if (_mounted) {
+      await setThemeMode(ThemeMode.light);
+    }
   }
 
   // Set dark theme
   Future<void> setDarkTheme() async {
-    await setThemeMode(ThemeMode.dark);
+    if (_mounted) {
+      await setThemeMode(ThemeMode.dark);
+    }
   }
 
   // Set system theme
   Future<void> setSystemTheme() async {
-    await setThemeMode(ThemeMode.system);
+    if (_mounted) {
+      await setThemeMode(ThemeMode.system);
+    }
   }
 
   // Check if current theme is light
@@ -154,6 +176,12 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
       case ThemeMode.system:
         return Icons.brightness_auto;
     }
+  }
+
+  @override
+  void dispose() {
+    _mounted = false;
+    super.dispose();
   }
 }
 

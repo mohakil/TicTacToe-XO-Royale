@@ -18,36 +18,57 @@ class LoadingState {
 class LoadingNotifier extends StateNotifier<LoadingState> {
   LoadingNotifier() : super(const LoadingState());
 
+  // Mounted flag for proper disposal
+  bool _mounted = true;
+
   void startLoading() {
-    state = const LoadingState();
-    _simulateLoading();
+    if (_mounted) {
+      state = const LoadingState();
+      _simulateLoading();
+    }
   }
 
   Future<void> _simulateLoading() async {
     // Simulate loading progress
     for (var i = 0; i <= 100; i += 2) {
-      if (!state.isLoading) {
+      if (!_mounted || !state.isLoading) {
         break;
       }
 
       await Future.delayed(const Duration(milliseconds: 50));
-      state = state.copyWith(progress: i / 100);
+      if (_mounted) {
+        state = state.copyWith(progress: i / 100);
+      }
     }
 
     // Complete loading
-    state = state.copyWith(isLoading: false, progress: 1);
+    if (_mounted) {
+      state = state.copyWith(isLoading: false, progress: 1);
+    }
   }
 
   void setProgress(double progress) {
-    state = state.copyWith(progress: progress);
+    if (_mounted) {
+      state = state.copyWith(progress: progress);
+    }
   }
 
   void setError(String error) {
-    state = state.copyWith(error: error, isLoading: false);
+    if (_mounted) {
+      state = state.copyWith(error: error, isLoading: false);
+    }
   }
 
   void reset() {
-    state = const LoadingState();
+    if (_mounted) {
+      state = const LoadingState();
+    }
+  }
+
+  @override
+  void dispose() {
+    _mounted = false;
+    super.dispose();
   }
 }
 

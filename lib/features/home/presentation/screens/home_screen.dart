@@ -196,18 +196,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
                                   const SizedBox(height: 32),
 
-                                  // Quick stats ribbon
+                                  // Quick stats ribbon - optimized with select for granular rebuilds
                                   Consumer(
                                     builder: (context, ref, child) {
+                                      // Use select for granular rebuilds - only rebuild when specific values change
                                       final lastResult = ref.watch(
-                                        lastResultProvider,
+                                        homeProvider.select(
+                                          (state) => state.lastResult,
+                                        ),
                                       );
-                                      final streak = ref.watch(streakProvider);
+                                      final streak = ref.watch(
+                                        homeProvider.select(
+                                          (state) => state.streak,
+                                        ),
+                                      );
                                       final gemsCount = ref.watch(
-                                        gemsCountProvider,
+                                        homeProvider.select(
+                                          (state) => state.gemsCount,
+                                        ),
                                       );
                                       final hintCount = ref.watch(
-                                        hintCountProvider,
+                                        homeProvider.select(
+                                          (state) => state.hintCount,
+                                        ),
                                       );
 
                                       return QuickStatsRibbon(

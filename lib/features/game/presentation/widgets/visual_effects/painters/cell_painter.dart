@@ -1,7 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:tictactoe_xo_royale/app/theme/theme_extensions.dart';
 
-/// Paint hover effect on a game cell
+/// Static Paint objects for cell painting operations to improve performance
+class _CellPaints {
+  // Hover effect paints
+  static final Paint _hoverPaint = Paint()
+    ..style = PaintingStyle.fill
+    ..color = const Color(0xFFF1F5F9).withValues(alpha: 0.1);
+
+  static final Paint _hoverGlowPaint = Paint()
+    ..style = PaintingStyle.stroke
+    ..color = const Color(0xFFF1F5F9).withValues(alpha: 0.3)
+    ..strokeWidth = 1.0;
+
+  // Pressed effect paints
+  static final Paint _pressedPaint = Paint()
+    ..style = PaintingStyle.fill
+    ..color = const Color(0xFFE2E8F0).withValues(alpha: 0.8);
+
+  static final Paint _pressedShadowPaint = Paint()
+    ..style = PaintingStyle.fill
+    ..color = const Color(0xFF000000).withValues(alpha: 0.1);
+
+  // Empty cell paint
+  static final Paint _emptyBorderPaint = Paint()
+    ..style = PaintingStyle.stroke
+    ..color = const Color(0xFFD6DAE3).withValues(alpha: 0.3)
+    ..strokeWidth = 1.0;
+
+  // Shake effect paint
+  static final Paint _shakePaint = Paint()
+    ..style = PaintingStyle.fill
+    ..color = const Color(0xFFFF6B6B).withValues(alpha: 0.3);
+
+  // Getters for accessing static paints
+  static Paint get hoverPaint => _hoverPaint;
+  static Paint get hoverGlowPaint => _hoverGlowPaint;
+  static Paint get pressedPaint => _pressedPaint;
+  static Paint get pressedShadowPaint => _pressedShadowPaint;
+  static Paint get emptyBorderPaint => _emptyBorderPaint;
+  static Paint get shakePaint => _shakePaint;
+}
+
+/// Optimized paint hover effect on a game cell
 /// Creates an animated hover effect with scaling and glow for visual feedback
 /// when the user hovers over a cell.
 void paintHover(
@@ -25,21 +66,21 @@ void paintHover(
     const Radius.circular(8),
   );
 
-  // Animate opacity for smooth appearance
+  // Animate opacity for smooth appearance using static paint
   final animatedPaint = Paint()
-    ..color = hoverPaint.color.withValues(
-      alpha: (hoverPaint.color.a / 255.0) * hoverAnimationValue,
+    ..color = _CellPaints.hoverPaint.color.withValues(
+      alpha: (_CellPaints.hoverPaint.color.a / 255.0) * hoverAnimationValue,
     )
-    ..style = hoverPaint.style;
+    ..style = _CellPaints.hoverPaint.style;
 
   canvas.drawRRect(roundedRect, animatedPaint);
 
-  // Add animated glow effect
+  // Add animated glow effect using static paint
   final glowPaint = Paint()
-    ..color = const Color(
-      0xFFF1F5F9,
-    ).withValues(alpha: 0.3 * hoverAnimationValue)
-    ..style = PaintingStyle.stroke
+    ..color = _CellPaints.hoverGlowPaint.color.withValues(
+      alpha: 0.3 * hoverAnimationValue,
+    )
+    ..style = _CellPaints.hoverGlowPaint.style
     ..strokeWidth = 1.0 + (2.0 * hoverAnimationValue)
     ..maskFilter = MaskFilter.blur(
       BlurStyle.normal,
@@ -49,7 +90,7 @@ void paintHover(
   canvas.drawRRect(roundedRect, glowPaint);
 }
 
-/// Paint pressed effect on a game cell
+/// Optimized paint pressed effect on a game cell
 /// Creates an animated pressed effect with scaling and shadow
 /// to provide visual feedback when a cell is pressed.
 void paintPressed(
@@ -66,11 +107,12 @@ void paintPressed(
     height: cellRect.height * scale,
   );
 
+  // Use static paint with animated opacity
   final pressedPaint = Paint()
-    ..color = const Color(
-      0xFFE2E8F0,
-    ).withValues(alpha: 0.8 * pressedAnimationValue)
-    ..style = PaintingStyle.fill;
+    ..color = _CellPaints.pressedPaint.color.withValues(
+      alpha: 0.8 * pressedAnimationValue,
+    )
+    ..style = _CellPaints.pressedPaint.style;
 
   final roundedRect = RRect.fromRectAndRadius(
     pressedRect,
@@ -79,12 +121,12 @@ void paintPressed(
 
   canvas.drawRRect(roundedRect, pressedPaint);
 
-  // Add subtle shadow effect when pressed
+  // Add subtle shadow effect when pressed using static paint
   if (pressedAnimationValue > 0.5) {
     final shadowPaint = Paint()
-      ..color = const Color(
-        0xFF000000,
-      ).withValues(alpha: 0.1 * pressedAnimationValue)
+      ..color = _CellPaints.pressedShadowPaint.color.withValues(
+        alpha: 0.1 * pressedAnimationValue,
+      )
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
 
     final shadowRect = pressedRect.translate(2, 2);
@@ -96,25 +138,20 @@ void paintPressed(
   }
 }
 
-/// Paint empty cell with subtle border
+/// Optimized paint empty cell with subtle border
 /// Draws a basic empty cell with a subtle border to indicate
 /// an available space for game pieces.
 void paintEmpty(Canvas canvas, Rect cellRect, GameColors? gameColors) {
-  // Draw empty cell with subtle border
-  final borderPaint = Paint()
-    ..color = const Color(0xFFD6DAE3).withValues(alpha: 0.3)
-    ..style = PaintingStyle.stroke
-    ..strokeWidth = 1.0;
-
+  // Draw empty cell with subtle border using static paint
   final roundedRect = RRect.fromRectAndRadius(
     cellRect,
     const Radius.circular(8),
   );
 
-  canvas.drawRRect(roundedRect, borderPaint);
+  canvas.drawRRect(roundedRect, _CellPaints.emptyBorderPaint);
 }
 
-/// Paint shake effect on a game cell
+/// Optimized paint shake effect on a game cell
 /// Creates an animated shake effect to provide visual feedback
 /// for invalid moves or error states.
 void paintShake(
@@ -127,12 +164,12 @@ void paintShake(
   final shakeOffset = 3.0 * shakeAnimationValue * (shakeAnimationValue - 1.0);
   final shakenRect = cellRect.translate(shakeOffset, 0);
 
-  // Draw cell with shake effect
+  // Draw cell with shake effect using static paint
   final shakePaint = Paint()
-    ..color = const Color(
-      0xFFFF6B6B,
-    ).withValues(alpha: 0.3 * shakeAnimationValue)
-    ..style = PaintingStyle.fill;
+    ..color = _CellPaints.shakePaint.color.withValues(
+      alpha: 0.3 * shakeAnimationValue,
+    )
+    ..style = _CellPaints.shakePaint.style;
 
   final roundedRect = RRect.fromRectAndRadius(
     shakenRect,

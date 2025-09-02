@@ -138,14 +138,16 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
     super.dispose();
   }
 
-  // Save profile to storage
+  // Save profile to storage with mounted checks
   Future<void> _saveProfile(PlayerProfile profile) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final profileJson = json.encode(profile.toJson());
       await prefs.setString(_storageKey, profileJson);
     } on Exception catch (e) {
-      state = state.copyWith(error: 'Failed to save profile: $e');
+      if (_mounted) {
+        state = state.copyWith(error: 'Failed to save profile: $e');
+      }
     }
   }
 

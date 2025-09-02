@@ -113,12 +113,47 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
     }
   }
 
+  // Helper method to check if setup is valid
+  bool _isValidSetup(GameSetup setup) {
+    if (setup.player1Name.trim().isEmpty) {
+      return false;
+    }
+    if (setup.mode == GameMode.local && setup.player2Name.trim().isEmpty) {
+      return false;
+    }
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final setup = ref.watch(setupProvider);
+    // ✅ OPTIMIZED: Use select for granular rebuilds - only rebuild when specific values change
     final setupNotifier = ref.read(setupProvider.notifier);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+
+    // Use select for frequently accessed setup properties to minimize rebuilds
+    final player1Name = ref.watch(
+      setupProvider.select((state) => state.player1Name),
+    );
+    final player2Name = ref.watch(
+      setupProvider.select((state) => state.player2Name),
+    );
+    final mode = ref.watch(setupProvider.select((state) => state.mode));
+    final firstMove = ref.watch(
+      setupProvider.select((state) => state.firstMove),
+    );
+    final difficulty = ref.watch(
+      setupProvider.select((state) => state.difficulty),
+    );
+    final boardSize = ref.watch(
+      setupProvider.select((state) => state.boardSize),
+    );
+    final winCondition = ref.watch(
+      setupProvider.select((state) => state.winCondition),
+    );
+    final isValid = ref.watch(
+      setupProvider.select((state) => _isValidSetup(state)),
+    );
 
     // Provider state is now properly initialized in initState
 
@@ -158,7 +193,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
 
               PlayerNameInput(
                 label: 'Player 1',
-                value: setup.player1Name,
+                value: player1Name, // Use optimized value
                 onChanged: setupNotifier.setPlayer1Name,
               ),
 
@@ -166,10 +201,13 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
 
               PlayerNameInput(
                 label: 'Player 2',
-                value: setup.player2Name,
+                value: player2Name, // Use optimized value
                 onChanged: setupNotifier.setPlayer2Name,
-                enabled: setup.mode == GameMode.local,
-                hintText: setup.mode == GameMode.robot
+                enabled: mode == GameMode.local, // Use optimized value
+                hintText:
+                    mode ==
+                        GameMode
+                            .robot // Use optimized value
                     ? 'CPU'
                     : 'Enter player name',
               ),
@@ -191,14 +229,15 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                   ),
                   SelectionChipOption(label: 'Random', value: FirstMove.random),
                 ],
-                selectedOption: setup.firstMove,
+                selectedOption: firstMove, // Use optimized value
                 onOptionSelected: setupNotifier.setFirstMove,
               ),
 
               const SizedBox(height: 32),
 
               // Difficulty Selection (Robot mode only)
-              if (setup.mode == GameMode.robot) ...[
+              if (mode == GameMode.robot) ...[
+                // Use optimized value
                 SelectionChips<Difficulty>(
                   label: 'Difficulty',
                   options: const [
@@ -218,7 +257,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                       description: 'Optimal play with full analysis',
                     ),
                   ],
-                  selectedOption: setup.difficulty,
+                  selectedOption: difficulty, // Use optimized value
                   onOptionSelected: setupNotifier.setDifficulty,
                 ),
 
@@ -227,7 +266,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
 
               // Board Size Carousel
               BoardSizeSelector(
-                selectedBoardSize: setup.boardSize,
+                selectedBoardSize: boardSize, // Use optimized value
                 onBoardSizeChanged: setupNotifier.setBoardSize,
               ),
 
@@ -235,9 +274,9 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
 
               // Win Condition Carousel
               WinConditionSelector(
-                selectedWinCondition: setup.winCondition,
+                selectedWinCondition: winCondition, // Use optimized value
                 onWinConditionChanged: setupNotifier.setWinCondition,
-                boardSize: setup.boardSize,
+                boardSize: boardSize, // Use optimized value
               ),
 
               const SizedBox(height: 48),
@@ -247,7 +286,8 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                 width: double.infinity,
                 height: 56,
                 child: FilledButton(
-                  onPressed: setupNotifier.isValid
+                  onPressed:
+                      isValid // Use optimized value
                       ? () {
                           // Navigate to game screen with setup data
                           final gameRoute = AppRoutes.getGameRoute(
@@ -255,8 +295,8 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                             winCondition: setupNotifier.winConditionValue,
                             gameMode: setupNotifier.gameModeValue,
                             difficulty: setupNotifier.difficultyValue,
-                            player1: setup.player1Name,
-                            player2: setup.player2Name,
+                            player1: player1Name, // Use optimized value
+                            player2: player2Name, // Use optimized value
                             firstMove: setupNotifier.firstMoveValue,
                           );
 

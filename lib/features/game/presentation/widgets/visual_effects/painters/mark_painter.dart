@@ -1,6 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:tictactoe_xo_royale/app/theme/theme_extensions.dart';
 
+// Static cached Paint objects for maximum performance
+class _MarkPaints {
+  static final Paint xPaint = Paint()
+    ..color = const Color(0xFF2DD4FF)
+    ..strokeWidth = 4.0
+    ..strokeCap = StrokeCap.round
+    ..style = PaintingStyle.stroke;
+
+  static final Paint oPaint = Paint()
+    ..color = const Color(0xFFF43F9D)
+    ..strokeWidth = 4.0
+    ..strokeCap = StrokeCap.round
+    ..style = PaintingStyle.stroke;
+
+  static final Paint xGlowPaint = Paint()
+    ..color = const Color(0xFF2DD4FF)
+    ..strokeCap = StrokeCap.round
+    ..style = PaintingStyle.stroke;
+
+  static final Paint oGlowPaint = Paint()
+    ..color = const Color(0xFFF43F9D)
+    ..strokeCap = StrokeCap.round
+    ..style = PaintingStyle.stroke;
+}
+
 void paintMark(
   Canvas canvas,
   Rect cellRect,
@@ -48,16 +73,6 @@ void _paintX(
   final shakeOffset = enableShake ? 2.0 * shakeValue * (shakeValue - 1.0) : 0.0;
   final shakenCenter = center.translate(shakeOffset, 0);
 
-  // X mark color - using default azure color
-  const xColor = Color(0xFF2DD4FF);
-
-  // First stroke (top-left to bottom-right)
-  final firstStrokePaint = Paint()
-    ..color = xColor
-    ..strokeWidth = 4.0
-    ..strokeCap = StrokeCap.round
-    ..style = PaintingStyle.stroke;
-
   final firstStart = Offset(
     shakenCenter.dx - halfSize,
     shakenCenter.dy - halfSize,
@@ -67,10 +82,10 @@ void _paintX(
     shakenCenter.dy + halfSize,
   );
 
-  // Animate first stroke
+  // Animate first stroke using static paint
   final firstProgress = (animationValue * 2).clamp(0.0, 1.0);
   final firstCurrentEnd = Offset.lerp(firstStart, firstEnd, firstProgress)!;
-  canvas.drawLine(firstStart, firstCurrentEnd, firstStrokePaint);
+  canvas.drawLine(firstStart, firstCurrentEnd, _MarkPaints.xPaint);
 
   // Second stroke (top-right to bottom-left) - starts after first stroke
   if (animationValue > 0.5) {
@@ -89,23 +104,22 @@ void _paintX(
       secondProgress,
     )!;
 
-    canvas.drawLine(secondStart, secondCurrentEnd, firstStrokePaint);
+    canvas.drawLine(secondStart, secondCurrentEnd, _MarkPaints.xPaint);
 
     // Add animated glow effect when fully drawn
     if (animationValue >= 1.0 && glowIntensity > 0.0) {
-      final glowPaint = Paint()
-        ..color = xColor.withValues(alpha: 0.3 * glowIntensity)
+      // Update static glow paint with current glow properties
+      _MarkPaints.xGlowPaint
+        ..color = const Color(0xFF2DD4FF).withValues(alpha: 0.3 * glowIntensity)
         ..strokeWidth = 6.0 + (4.0 * glowIntensity)
-        ..strokeCap = StrokeCap.round
-        ..style = PaintingStyle.stroke
         ..maskFilter = MaskFilter.blur(
           BlurStyle.normal,
           3.0 + (2.0 * glowIntensity),
         );
 
       canvas
-        ..drawLine(firstStart, firstEnd, glowPaint)
-        ..drawLine(secondStart, secondEnd, glowPaint);
+        ..drawLine(firstStart, firstEnd, _MarkPaints.xGlowPaint)
+        ..drawLine(secondStart, secondEnd, _MarkPaints.xGlowPaint);
     }
   }
 }
@@ -125,35 +139,25 @@ void _paintO(
   final shakeOffset = enableShake ? 2.0 * shakeValue * (shakeValue - 1.0) : 0.0;
   final shakenCenter = center.translate(shakeOffset, 0);
 
-  // O mark color - using default magenta color
-  const oColor = Color(0xFFF43F9D);
-
-  final circlePaint = Paint()
-    ..color = oColor
-    ..strokeWidth = 4.0
-    ..style = PaintingStyle.stroke
-    ..strokeCap = StrokeCap.round;
-
-  // Animate circle drawing
+  // Animate circle drawing using static paint
   final sweepAngle = animationValue * 2 * 3.14159; // Full circle
   final rect = Rect.fromCircle(center: shakenCenter, radius: radius);
 
   // Start from top and sweep clockwise
-  canvas.drawArc(rect, -3.14159 / 2, sweepAngle, false, circlePaint);
+  canvas.drawArc(rect, -3.14159 / 2, sweepAngle, false, _MarkPaints.oPaint);
 
   // Add animated luminous edge effect when fully drawn
   if (animationValue >= 1.0 && glowIntensity > 0.0) {
-    final glowPaint = Paint()
-      ..color = oColor.withValues(alpha: 0.4 * glowIntensity)
+    // Update static glow paint with current glow properties
+    _MarkPaints.oGlowPaint
+      ..color = const Color(0xFFF43F9D).withValues(alpha: 0.4 * glowIntensity)
       ..strokeWidth = 6.0 + (4.0 * glowIntensity)
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
       ..maskFilter = MaskFilter.blur(
         BlurStyle.normal,
         2.0 + (3.0 * glowIntensity),
       );
 
-    canvas.drawCircle(shakenCenter, radius, glowPaint);
+    canvas.drawCircle(shakenCenter, radius, _MarkPaints.oGlowPaint);
   }
 }
 
@@ -177,15 +181,13 @@ void _paintXGlow(Canvas canvas, Rect cellRect, double glowAnimationValue) {
   final size = cellRect.width * 0.6;
   final halfSize = size / 2;
 
-  const xColor = Color(0xFF2DD4FF);
-
   // Create simple pulsing glow effect using linear interpolation
   final pulseValue = glowAnimationValue;
-  final glowPaint = Paint()
-    ..color = xColor.withValues(alpha: 0.2 * pulseValue)
+
+  // Update static glow paint with current glow properties
+  _MarkPaints.xGlowPaint
+    ..color = const Color(0xFF2DD4FF).withValues(alpha: 0.2 * pulseValue)
     ..strokeWidth = 8.0 + (4.0 * pulseValue)
-    ..strokeCap = StrokeCap.round
-    ..style = PaintingStyle.stroke
     ..maskFilter = MaskFilter.blur(BlurStyle.normal, 4.0 + (2.0 * pulseValue));
 
   final firstStart = Offset(center.dx - halfSize, center.dy - halfSize);
@@ -194,24 +196,22 @@ void _paintXGlow(Canvas canvas, Rect cellRect, double glowAnimationValue) {
   final secondEnd = Offset(center.dx - halfSize, center.dy + halfSize);
 
   canvas
-    ..drawLine(firstStart, firstEnd, glowPaint)
-    ..drawLine(secondStart, secondEnd, glowPaint);
+    ..drawLine(firstStart, firstEnd, _MarkPaints.xGlowPaint)
+    ..drawLine(secondStart, secondEnd, _MarkPaints.xGlowPaint);
 }
 
 void _paintOGlow(Canvas canvas, Rect cellRect, double glowAnimationValue) {
   final center = cellRect.center;
   final radius = cellRect.width * 0.25;
 
-  const oColor = Color(0xFFF43F9D);
-
   // Create simple pulsing glow effect using linear interpolation
   final pulseValue = glowAnimationValue;
-  final glowPaint = Paint()
-    ..color = oColor.withValues(alpha: 0.3 * pulseValue)
+
+  // Update static glow paint with current glow properties
+  _MarkPaints.oGlowPaint
+    ..color = const Color(0xFFF43F9D).withValues(alpha: 0.3 * pulseValue)
     ..strokeWidth = 8.0 + (4.0 * pulseValue)
-    ..style = PaintingStyle.stroke
-    ..strokeCap = StrokeCap.round
     ..maskFilter = MaskFilter.blur(BlurStyle.normal, 3.0 + (2.0 * pulseValue));
 
-  canvas.drawCircle(center, radius, glowPaint);
+  canvas.drawCircle(center, radius, _MarkPaints.oGlowPaint);
 }

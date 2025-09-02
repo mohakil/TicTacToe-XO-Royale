@@ -5,6 +5,16 @@ import 'package:tictactoe_xo_royale/app/theme/theme_extensions.dart';
 final Random _confettiRandom = Random();
 const int _confettiParticleCount = 50;
 
+/// Static Paint objects for confetti effects to improve performance
+class _ConfettiPaints {
+  // Confetti particle paint
+  static final Paint _particlePaint = Paint()..style = PaintingStyle.fill;
+
+  // Getters for accessing static paints
+  static Paint get particlePaint => _particlePaint;
+}
+
+/// Optimized paint confetti effects
 void paintConfetti(Canvas canvas, Size size, GameColors? gameColors) {
   final particles = _generateParticles(size);
 
@@ -65,9 +75,10 @@ void _drawParticle(Canvas canvas, _ConfettiParticle particle) {
     height: particle.size * 0.3,
   );
 
+  // Use static paint with particle color
   final paint = Paint()
     ..color = particle.color
-    ..style = PaintingStyle.fill;
+    ..style = _ConfettiPaints.particlePaint.style;
 
   canvas
     ..drawRRect(RRect.fromRectAndRadius(rect, const Radius.circular(2)), paint)

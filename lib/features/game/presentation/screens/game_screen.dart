@@ -142,8 +142,20 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // ✅ OPTIMIZED: Use select for granular rebuilds - only rebuild when specific values change
     final gameLogic = ref.watch(gameStateProvider);
     final gameResult = gameLogic.checkGameState();
+
+    // Use select for frequently accessed properties to minimize rebuilds
+    final currentPlayer = ref.watch(
+      gameStateProvider.select((state) => state.getNextPlayer()),
+    );
+    final isGameOver = ref.watch(
+      gameStateProvider.select((state) => state.checkGameState().isGameOver),
+    );
+    final boardState = ref.watch(
+      gameStateProvider.select((state) => state.board),
+    );
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -154,24 +166,27 @@ class _GameScreenState extends ConsumerState<GameScreen> {
             top: MediaQuery.of(context).padding.top + 320,
             left: 0,
             right: 0,
-            child: Center(
-              child: Container(
-                constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width * 0.9,
-                  maxHeight: MediaQuery.of(context).size.height * 0.6,
-                ),
-                child: GameBoard(
-                  boardSize: widget.boardSize,
-                  winCondition: widget.winCondition,
-                  boardState: gameLogic.board,
-                  currentPlayer: gameLogic.getNextPlayer(),
-                  isGameOver: gameResult.isGameOver,
-                  winningLine: gameResult.winningLine,
-                  onCellTap: _onCellTap,
-                  showHints: _showHint,
-                  hintCells: _showHint
-                      ? [const Position(1, 1)]
-                      : null, // Example hint cell
+            child: RepaintBoundary(
+              child: Center(
+                child: Container(
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width * 0.9,
+                    maxHeight: MediaQuery.of(context).size.height * 0.6,
+                  ),
+                  child: GameBoard(
+                    boardSize: widget.boardSize,
+                    winCondition: widget.winCondition,
+                    boardState: boardState, // Use optimized board state
+                    currentPlayer:
+                        currentPlayer, // Use optimized current player
+                    isGameOver: isGameOver, // Use optimized game over state
+                    winningLine: gameResult.winningLine,
+                    onCellTap: _onCellTap,
+                    showHints: _showHint,
+                    hintCells: _showHint
+                        ? [const Position(1, 1)]
+                        : null, // Example hint cell
+                  ),
                 ),
               ),
             ),
@@ -181,22 +196,26 @@ class _GameScreenState extends ConsumerState<GameScreen> {
           Positioned(
             top: MediaQuery.of(context).padding.top - 16,
             left: 16,
-            child: IconButton(
-              onPressed: _exitGame,
-              icon: const Icon(Icons.close),
-              iconSize: 28,
-              color: Theme.of(context).colorScheme.onSurface,
+            child: RepaintBoundary(
+              child: IconButton(
+                onPressed: _exitGame,
+                icon: const Icon(Icons.close),
+                iconSize: 28,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
           ),
 
           Positioned(
             top: MediaQuery.of(context).padding.top - 16,
             right: 16,
-            child: IconButton(
-              onPressed: _showSettingsOverlay,
-              icon: const Icon(Icons.settings),
-              iconSize: 28,
-              color: Theme.of(context).colorScheme.onSurface,
+            child: RepaintBoundary(
+              child: IconButton(
+                onPressed: _showSettingsOverlay,
+                icon: const Icon(Icons.settings),
+                iconSize: 28,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
           ),
 
@@ -205,12 +224,15 @@ class _GameScreenState extends ConsumerState<GameScreen> {
             top: MediaQuery.of(context).padding.top + 40,
             left: 0,
             right: 0,
-            child: GameHeader(
-              player1Name: widget.player1Name,
-              player2Name: widget.player2Name,
-              player1Wins: 0, // TODO(Add win tracking to providers)
-              player2Wins: 0, // TODO(Add win tracking to providers)
-              currentPlayer: gameLogic.getNextPlayer().name,
+            child: RepaintBoundary(
+              child: GameHeader(
+                player1Name: widget.player1Name,
+                player2Name: widget.player2Name,
+                player1Wins: 0, // TODO(Add win tracking to providers)
+                player2Wins: 0, // TODO(Add win tracking to providers)
+                currentPlayer:
+                    currentPlayer.name, // Use optimized current player
+              ),
             ),
           ),
 
@@ -219,9 +241,12 @@ class _GameScreenState extends ConsumerState<GameScreen> {
             top: MediaQuery.of(context).padding.top + 220,
             left: 0,
             right: 0,
-            child: GameStatus(
-              currentPlayer: gameLogic.getNextPlayer().name,
-              isGameOver: gameResult.isGameOver,
+            child: RepaintBoundary(
+              child: GameStatus(
+                currentPlayer:
+                    currentPlayer.name, // Use optimized current player
+                isGameOver: isGameOver, // Use optimized game over state
+              ),
             ),
           ),
 
@@ -230,10 +255,12 @@ class _GameScreenState extends ConsumerState<GameScreen> {
             bottom: MediaQuery.of(context).padding.bottom + 32,
             left: 24,
             right: 24,
-            child: GameControls(
-              hintCount: _hintCount,
-              onHint: _useHint,
-              onNewGame: _newGame,
+            child: RepaintBoundary(
+              child: GameControls(
+                hintCount: _hintCount,
+                onHint: _useHint,
+                onNewGame: _newGame,
+              ),
             ),
           ),
 

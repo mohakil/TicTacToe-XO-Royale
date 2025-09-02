@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,18 +9,63 @@ import 'package:tictactoe_xo_royale/features/profile/profile.dart';
 import 'package:tictactoe_xo_royale/features/settings/settings.dart';
 import 'package:tictactoe_xo_royale/features/setup/setup.dart';
 import 'package:tictactoe_xo_royale/features/store/store.dart';
-
-// Theme mode provider
-final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.system);
+import 'package:tictactoe_xo_royale/core/widgets/error_boundary.dart';
 
 // Provider for the router
-final routerProvider = Provider<GoRouter>(
-  (ref) => GoRouter(
+final routerProvider = Provider<GoRouter>((ref) {
+  final errorLoggingService = ref.watch(errorLoggingProvider);
+
+  return GoRouter(
     initialLocation: '/loading',
     routes: appRoutes,
-    debugLogDiagnostics: true,
-  ),
-);
+    debugLogDiagnostics: kDebugMode,
+    errorBuilder: (context, state) => _ErrorPage(
+      error: state.error,
+      location: state.matchedLocation,
+      onRetry: () => context.go('/home'),
+    ),
+    redirect: (context, state) {
+      // Global redirect logic with error handling
+      try {
+        return _handleRedirect(context, state, errorLoggingService);
+      } catch (error, stackTrace) {
+        errorLoggingService.logError(
+          error,
+          stackTrace,
+          context: 'RouterRedirect',
+          additionalData: {
+            'location': state.matchedLocation,
+            'uri': state.uri.toString(),
+          },
+        );
+        // Fallback to home on redirect error
+        return '/home';
+      }
+    },
+  );
+});
+
+/// Handle router redirects with error recovery
+String? _handleRedirect(
+  BuildContext context,
+  GoRouterState state,
+  ErrorLoggingService errorLoggingService,
+) {
+  // Add any global redirect logic here
+  // For example: authentication checks, maintenance mode, etc.
+
+  // Example: Redirect to maintenance page if needed
+  // if (isMaintenanceMode) {
+  //   return '/maintenance';
+  // }
+
+  // Example: Redirect to login if not authenticated
+  // if (requiresAuth(state.matchedLocation) && !isAuthenticated) {
+  //   return '/login';
+  // }
+
+  return null; // No redirect needed
+}
 
 // App routes configuration with shell route for bottom navigation
 final List<RouteBase> appRoutes = [
@@ -216,6 +262,163 @@ class _MainAppShellState extends State<MainAppShell> {
         backgroundColor: colorScheme.surface,
         indicatorColor: colorScheme.primaryContainer,
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+      ),
+    );
+  }
+}
+
+/// Error page widget for router errors
+class _ErrorPage extends StatelessWidget {
+  final Exception? error;
+  final String location;
+  final VoidCallback? onRetry;
+
+  const _ErrorPage({this.error, required this.location, this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Scaffold(
+      backgroundColor: colorScheme.surface,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Error icon
+              Icon(Icons.route_outlined, size: 80, color: colorScheme.error),
+
+              const SizedBox(height: 24),
+
+              // Error title
+              Text(
+                'Page Not Found',
+                style: theme.textTheme.headlineMedium?.copyWith(
+                  color: colorScheme.onSurface,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: 16),
+
+              // Error message
+              Text(
+                'The page you\'re looking for doesn\'t exist or has been moved.',
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: 8),
+
+              // Location info
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: colorScheme.surfaceContainerHighest.withValues(
+                    alpha: 0.5,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  'Location: $location',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    fontFamily: 'monospace',
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 32),
+
+              // Action buttons
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Go back button
+                  OutlinedButton.icon(
+                    onPressed: () => context.pop(),
+                    icon: const Icon(Icons.arrow_back),
+                    label: const Text('Go Back'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: colorScheme.primary,
+                      side: BorderSide(color: colorScheme.primary),
+                    ),
+                  ),
+
+                  const SizedBox(width: 16),
+
+                  // Go home button
+                  ElevatedButton.icon(
+                    onPressed: () => context.go('/home'),
+                    icon: const Icon(Icons.home),
+                    label: const Text('Go Home'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: colorScheme.primary,
+                      foregroundColor: colorScheme.onPrimary,
+                    ),
+                  ),
+                ],
+              ),
+
+              // Retry button (if provided)
+              if (onRetry != null) ...[
+                const SizedBox(height: 16),
+                TextButton.icon(
+                  onPressed: onRetry,
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('Retry'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: colorScheme.secondary,
+                  ),
+                ),
+              ],
+
+              // Error details (debug mode only)
+              if (kDebugMode && error != null) ...[
+                const SizedBox(height: 32),
+                const Divider(),
+                const SizedBox(height: 16),
+
+                Text(
+                  'Error Details (Debug Mode)',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: colorScheme.error,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: colorScheme.errorContainer.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: colorScheme.error.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: SingleChildScrollView(
+                    child: Text(
+                      error.toString(),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colorScheme.error,
+                        fontFamily: 'monospace',
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
       ),
     );
   }

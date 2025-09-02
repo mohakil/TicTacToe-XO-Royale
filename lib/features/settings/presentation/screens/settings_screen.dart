@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tictactoe_xo_royale/app/router/app_router.dart';
 import 'package:tictactoe_xo_royale/core/providers/settings_provider.dart';
+import 'package:tictactoe_xo_royale/core/providers/theme_provider.dart';
 import 'package:tictactoe_xo_royale/core/widgets/performance_monitor.dart';
 import 'package:tictactoe_xo_royale/features/settings/presentation/widgets/about_section.dart';
 import 'package:tictactoe_xo_royale/features/settings/presentation/widgets/settings_section.dart';
@@ -15,8 +15,32 @@ class SettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
-    final settings = ref.watch(settingsProvider);
+
+    // ✅ OPTIMIZED: Use select for granular rebuilds - only rebuild when specific values change
     final themeMode = ref.watch(themeModeProvider);
+
+    // Use select for frequently accessed settings to minimize rebuilds
+    final soundEnabled = ref.watch(
+      settingsProvider.select((state) => state.soundEnabled),
+    );
+    final musicEnabled = ref.watch(
+      settingsProvider.select((state) => state.musicEnabled),
+    );
+    final vibrationEnabled = ref.watch(
+      settingsProvider.select((state) => state.vibrationEnabled),
+    );
+    final hapticFeedbackEnabled = ref.watch(
+      settingsProvider.select((state) => state.hapticFeedbackEnabled),
+    );
+    final autoSaveEnabled = ref.watch(
+      settingsProvider.select((state) => state.autoSaveEnabled),
+    );
+    final notificationsEnabled = ref.watch(
+      settingsProvider.select((state) => state.notificationsEnabled),
+    );
+    final performanceMode = ref.watch(
+      settingsProvider.select((state) => state.performanceMode),
+    );
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -45,7 +69,7 @@ class SettingsScreen extends ConsumerWidget {
                     title: 'Sound',
                     subtitle: 'Enable sound effects',
                     icon: Icons.volume_up,
-                    value: settings.soundEnabled,
+                    value: soundEnabled, // Use optimized value
                     onChanged: (value) => ref
                         .read(settingsProvider.notifier)
                         .setSoundEnabled(enabled: value),
@@ -55,7 +79,7 @@ class SettingsScreen extends ConsumerWidget {
                     title: 'Music',
                     subtitle: 'Enable background music',
                     icon: Icons.music_note,
-                    value: settings.musicEnabled,
+                    value: musicEnabled, // Use optimized value
                     onChanged: (value) => ref
                         .read(settingsProvider.notifier)
                         .setMusicEnabled(enabled: value),
@@ -65,7 +89,7 @@ class SettingsScreen extends ConsumerWidget {
                     title: 'Vibration',
                     subtitle: 'Enable vibration feedback',
                     icon: Icons.vibration,
-                    value: settings.vibrationEnabled,
+                    value: vibrationEnabled, // Use optimized value
                     onChanged: (value) => ref
                         .read(settingsProvider.notifier)
                         .setVibrationEnabled(enabled: value),
@@ -75,7 +99,7 @@ class SettingsScreen extends ConsumerWidget {
                     title: 'Haptic Feedback',
                     subtitle: 'Enable haptic feedback on supported devices',
                     icon: Icons.touch_app,
-                    value: settings.hapticFeedbackEnabled,
+                    value: hapticFeedbackEnabled, // Use optimized value
                     onChanged: (value) => ref
                         .read(settingsProvider.notifier)
                         .setHapticFeedbackEnabled(enabled: value),
@@ -91,7 +115,9 @@ class SettingsScreen extends ConsumerWidget {
                   ThemeSelector(
                     currentTheme: themeMode,
                     onThemeChanged: (themeMode) {
-                      ref.read(themeModeProvider.notifier).state = themeMode;
+                      ref
+                          .read(themeModeProvider.notifier)
+                          .setThemeMode(themeMode);
                     },
                   ),
                 ],
@@ -106,7 +132,7 @@ class SettingsScreen extends ConsumerWidget {
                     title: 'Auto Save',
                     subtitle: 'Automatically save game progress',
                     icon: Icons.save,
-                    value: settings.autoSaveEnabled,
+                    value: autoSaveEnabled, // Use optimized value
                     onChanged: (value) => ref
                         .read(settingsProvider.notifier)
                         .setAutoSaveEnabled(enabled: value),
@@ -116,7 +142,7 @@ class SettingsScreen extends ConsumerWidget {
                     title: 'Notifications',
                     subtitle: 'Show game notifications',
                     icon: Icons.notifications,
-                    value: settings.notificationsEnabled,
+                    value: notificationsEnabled, // Use optimized value
                     onChanged: (value) => ref
                         .read(settingsProvider.notifier)
                         .setNotificationsEnabled(enabled: value),
@@ -160,7 +186,7 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                     leading: Icon(Icons.speed, color: colorScheme.primary),
                     trailing: DropdownButton<PerformanceMode>(
-                      value: settings.performanceMode,
+                      value: performanceMode, // Use optimized value
                       onChanged: (PerformanceMode? newValue) {
                         if (newValue != null) {
                           ref

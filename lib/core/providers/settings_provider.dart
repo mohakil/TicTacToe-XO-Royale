@@ -139,7 +139,7 @@ enum PerformanceMode {
   }
 }
 
-// Settings notifier
+// Settings notifier with proper disposal
 class SettingsNotifier extends StateNotifier<AppSettings> {
   SettingsNotifier() : super(AppSettings.defaults()) {
     _loadSettings();
@@ -147,74 +147,95 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   static const String _storageKey = 'app_settings';
 
-  // Load settings from storage
+  // Mounted flag for proper disposal
+  bool _mounted = true;
+
+  // Load settings from storage with mounted checks
   Future<void> _loadSettings() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final settingsJson = prefs.getString(_storageKey);
-      if (settingsJson != null) {
+      if (_mounted && settingsJson != null) {
         final settingsMap = Map<String, dynamic>.from(
           json.decode(settingsJson) as Map,
         );
         state = AppSettings.fromJson(settingsMap);
       }
     } on Exception catch (e) {
-      debugPrint('Failed to load settings: $e');
+      if (_mounted) {
+        debugPrint('Failed to load settings: $e');
+      }
       // Keep default settings if loading fails
     }
   }
 
-  // Save settings to storage
+  // Save settings to storage with mounted checks
   Future<void> _saveSettings() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final settingsJson = json.encode(state.toJson());
       await prefs.setString(_storageKey, settingsJson);
     } on Exception catch (e) {
-      debugPrint('Failed to save settings: $e');
+      if (_mounted) {
+        debugPrint('Failed to save settings: $e');
+      }
     }
   }
 
   // Update sound setting
   Future<void> setSoundEnabled({required bool enabled}) async {
-    state = state.copyWith(soundEnabled: enabled);
-    await _saveSettings();
+    if (_mounted) {
+      state = state.copyWith(soundEnabled: enabled);
+      await _saveSettings();
+    }
   }
 
   // Update music setting
   Future<void> setMusicEnabled({required bool enabled}) async {
-    state = state.copyWith(musicEnabled: enabled);
-    await _saveSettings();
+    if (_mounted) {
+      state = state.copyWith(musicEnabled: enabled);
+      await _saveSettings();
+    }
   }
 
   // Update vibration setting
   Future<void> setVibrationEnabled({required bool enabled}) async {
-    state = state.copyWith(vibrationEnabled: enabled);
-    await _saveSettings();
+    if (_mounted) {
+      state = state.copyWith(vibrationEnabled: enabled);
+      await _saveSettings();
+    }
   }
 
   // Update haptic feedback setting
   Future<void> setHapticFeedbackEnabled({required bool enabled}) async {
-    state = state.copyWith(hapticFeedbackEnabled: enabled);
-    await _saveSettings();
+    if (_mounted) {
+      state = state.copyWith(hapticFeedbackEnabled: enabled);
+      await _saveSettings();
+    }
   }
 
   // Update auto save setting
   Future<void> setAutoSaveEnabled({required bool enabled}) async {
-    state = state.copyWith(autoSaveEnabled: enabled);
-    await _saveSettings();
+    if (_mounted) {
+      state = state.copyWith(autoSaveEnabled: enabled);
+      await _saveSettings();
+    }
   }
 
   // Update notifications setting
   Future<void> setNotificationsEnabled({required bool enabled}) async {
-    state = state.copyWith(notificationsEnabled: enabled);
-    await _saveSettings();
+    if (_mounted) {
+      state = state.copyWith(notificationsEnabled: enabled);
+      await _saveSettings();
+    }
   }
 
   // Update performance mode
   Future<void> setPerformanceMode(PerformanceMode mode) async {
-    state = state.copyWith(performanceMode: mode);
-    await _saveSettings();
+    if (_mounted) {
+      state = state.copyWith(performanceMode: mode);
+      await _saveSettings();
+    }
   }
 
   // Toggle sound
@@ -239,8 +260,10 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   // Reset to defaults
   Future<void> resetToDefaults() async {
-    state = AppSettings.defaults();
-    await _saveSettings();
+    if (_mounted) {
+      state = AppSettings.defaults();
+      await _saveSettings();
+    }
   }
 
   // Check if any audio is enabled
@@ -249,6 +272,12 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
   // Check if any haptic feedback is enabled
   bool get isHapticEnabled =>
       state.vibrationEnabled || state.hapticFeedbackEnabled;
+
+  @override
+  void dispose() {
+    _mounted = false;
+    super.dispose();
+  }
 }
 
 // ✅ OPTIMIZED: Main settings provider with KeepAlive for persistence

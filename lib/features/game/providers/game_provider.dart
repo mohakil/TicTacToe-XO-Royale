@@ -20,8 +20,91 @@ final gameStateProvider = StateNotifierProvider<GameNotifier, GameLogic>((ref) {
   return GameNotifier(gameLogic);
 });
 
+// ✅ OPTIMIZED: Use select for granular rebuilds instead of individual providers
+// Individual game data providers for granular rebuilds
+final currentPlayerProvider = Provider<CellState>(
+  (ref) =>
+      ref.watch(gameStateProvider.select((state) => state.getNextPlayer())),
+);
+
+final gameBoardProvider = Provider<List<List<CellState>>>(
+  (ref) => ref.watch(gameStateProvider.select((state) => state.board)),
+);
+
+final isGameOverProvider = Provider<bool>(
+  (ref) => ref.watch(
+    gameStateProvider.select((state) => state.checkGameState().isGameOver),
+  ),
+);
+
+final gameResultProvider = Provider<GameResult>(
+  (ref) =>
+      ref.watch(gameStateProvider.select((state) => state.checkGameState())),
+);
+
+final availableMovesProvider = Provider<List<Position>>(
+  (ref) =>
+      ref.watch(gameStateProvider.select((state) => state.getAvailableMoves())),
+);
+
+final gameConfigFromStateProvider = Provider<GameConfig>(
+  (ref) => ref.watch(gameStateProvider.select((state) => state.config)),
+);
+
+// ✅ OPTIMIZED: Computed providers using select for better performance
+final gameStatusProvider =
+    Provider<({CellState currentPlayer, bool isGameOver, GameResult result})>(
+      (ref) => ref.watch(
+        gameStateProvider.select((state) {
+          final currentPlayer = state.getNextPlayer();
+          final result = state.checkGameState();
+          return (
+            currentPlayer: currentPlayer,
+            isGameOver: result.isGameOver,
+            result: result,
+          );
+        }),
+      ),
+    );
+
+final gameBoardStateProvider =
+    Provider<({List<List<CellState>> board, List<Position> availableMoves})>(
+      (ref) => ref.watch(
+        gameStateProvider.select(
+          (state) =>
+              (board: state.board, availableMoves: state.getAvailableMoves()),
+        ),
+      ),
+    );
+
+// ✅ OPTIMIZED: Extension methods for easy access with select-based providers
+extension GameProviderExtension on WidgetRef {
+  // Get game notifier
+  GameNotifier get gameNotifier => read(gameStateProvider.notifier);
+
+  // Get individual game data using select for granular rebuilds
+  CellState get currentPlayer => watch(currentPlayerProvider);
+  List<List<CellState>> get gameBoard => watch(gameBoardProvider);
+  bool get isGameOver => watch(isGameOverProvider);
+  GameResult get gameResult => watch(gameResultProvider);
+  List<Position> get availableMoves => watch(availableMovesProvider);
+  GameConfig get gameConfig => watch(gameConfigFromStateProvider);
+
+  // Get computed game data
+  ({CellState currentPlayer, bool isGameOver, GameResult result})
+  get gameStatus => watch(gameStatusProvider);
+  ({List<List<CellState>> board, List<Position> availableMoves})
+  get gameBoardState => watch(gameBoardStateProvider);
+
+  // Get all game state
+  GameLogic get gameState => watch(gameStateProvider);
+}
+
 class GameNotifier extends StateNotifier<GameLogic> {
   GameNotifier(super.gameLogic);
+
+  // Mounted flag for proper disposal
+  bool _mounted = true;
 
   void initializeGame({
     required int boardSize,
@@ -32,6 +115,7 @@ class GameNotifier extends StateNotifier<GameLogic> {
     required String difficulty,
     required String firstMove,
   }) {
+    if (!_mounted) return;
     // Convert string values to proper enums
     final gameMode = isRobotMode ? GameMode.cpu : GameMode.local;
 
@@ -80,7 +164,7 @@ class GameNotifier extends StateNotifier<GameLogic> {
   }
 
   void makeMove(int row, int col) {
-    if (state.checkGameState().isGameOver) {
+    if (!_mounted || state.checkGameState().isGameOver) {
       return;
     }
 
@@ -113,7 +197,9 @@ class GameNotifier extends StateNotifier<GameLogic> {
   }
 
   void resetGame() {
-    state = GameLogic(state.config);
+    if (_mounted) {
+      state = GameLogic(state.config);
+    }
   }
 
   GameResult checkGameResult() => state.checkGameState();
@@ -121,7 +207,7 @@ class GameNotifier extends StateNotifier<GameLogic> {
   List<Position> getAvailableMoves() => state.getAvailableMoves();
 
   void _makeRobotMove(GameLogic gameLogic) {
-    if (!gameLogic.config.isRobotMode) return;
+    if (!_mounted || !gameLogic.config.isRobotMode) return;
 
     // Get robot logic service with current game state
     final robotLogic = RobotLogic(gameLogic.config, gameLogic);
@@ -139,5 +225,11 @@ class GameNotifier extends StateNotifier<GameLogic> {
       newGameLogic.setBoardState(updatedBoard);
       state = newGameLogic;
     }
+  }
+
+  @override
+  void dispose() {
+    _mounted = false;
+    super.dispose();
   }
 }

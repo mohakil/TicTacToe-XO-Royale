@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tictactoe_xo_royale/core/services/game_logic.dart';
 import 'package:tictactoe_xo_royale/features/game/presentation/widgets/game_board/board_cell.dart';
 
-/// Grid layout wrapper for the game board
+/// Optimized grid layout wrapper for the game board
 ///
 /// This widget provides the grid structure for the Tic Tac Toe board:
 /// - Creates a responsive grid layout
@@ -49,6 +49,45 @@ class BoardGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return RepaintBoundary(
+      child: _GridContainer(
+        boardSize: boardSize,
+        boardState: boardState,
+        winningLine: winningLine,
+        hintCells: hintCells,
+        showHints: showHints,
+        isInteractive: isInteractive,
+        isGameOver: isGameOver,
+        onCellTap: onCellTap,
+      ),
+    );
+  }
+}
+
+/// Optimized grid container widget with RepaintBoundary
+class _GridContainer extends StatelessWidget {
+  final int boardSize;
+  final List<List<CellState>> boardState;
+  final List<Position>? winningLine;
+  final List<Position>? hintCells;
+  final bool showHints;
+  final bool isInteractive;
+  final bool isGameOver;
+  final Function(int, int) onCellTap;
+
+  const _GridContainer({
+    required this.boardSize,
+    required this.boardState,
+    required this.winningLine,
+    required this.hintCells,
+    required this.showHints,
+    required this.isInteractive,
+    required this.isGameOver,
+    required this.onCellTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     final availableSize = screenSize.width < screenSize.height
         ? screenSize.width * 0.8
@@ -57,55 +96,59 @@ class BoardGrid extends StatelessWidget {
     final cellSize = availableSize / boardSize;
     final gridSpacing = cellSize * 0.05; // 5% of cell size for spacing
 
-    return Container(
-      padding: EdgeInsets.all(gridSpacing),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainer,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+    return RepaintBoundary(
+      child: Container(
+        padding: EdgeInsets.all(gridSpacing),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surfaceContainer,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+          ),
         ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: List.generate(boardSize, (row) {
-          return Padding(
-            padding: EdgeInsets.only(
-              bottom: row < boardSize - 1 ? gridSpacing : 0,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: List.generate(boardSize, (col) {
-                final cellState = boardState[row][col];
-                final isWinningCell =
-                    winningLine?.any(
-                      (pos) => pos.row == row && pos.col == col,
-                    ) ??
-                    false;
-                final isHintCell =
-                    hintCells?.any((pos) => pos.row == row && pos.col == col) ??
-                    false;
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: List.generate(boardSize, (row) {
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: row < boardSize - 1 ? gridSpacing : 0,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: List.generate(boardSize, (col) {
+                  final cellState = boardState[row][col];
+                  final isWinningCell =
+                      winningLine?.any(
+                        (pos) => pos.row == row && pos.col == col,
+                      ) ??
+                      false;
+                  final isHintCell =
+                      hintCells?.any(
+                        (pos) => pos.row == row && pos.col == col,
+                      ) ??
+                      false;
 
-                return Padding(
-                  padding: EdgeInsets.only(
-                    right: col < boardSize - 1 ? gridSpacing : 0,
-                  ),
-                  child: BoardCell(
-                    row: row,
-                    col: col,
-                    cellState: cellState,
-                    isWinningCell: isWinningCell,
-                    isHintCell: isHintCell && showHints,
-                    onTap: isInteractive && !isGameOver
-                        ? onCellTap
-                        : (_, __) {},
-                    cellSize: cellSize,
-                  ),
-                );
-              }),
-            ),
-          );
-        }),
+                  return Padding(
+                    padding: EdgeInsets.only(
+                      right: col < boardSize - 1 ? gridSpacing : 0,
+                    ),
+                    child: BoardCell(
+                      row: row,
+                      col: col,
+                      cellState: cellState,
+                      isWinningCell: isWinningCell,
+                      isHintCell: isHintCell && showHints,
+                      onTap: isInteractive && !isGameOver
+                          ? onCellTap
+                          : (_, __) {},
+                      cellSize: cellSize,
+                    ),
+                  );
+                }),
+              ),
+            );
+          }),
+        ),
       ),
     );
   }

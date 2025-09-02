@@ -4,6 +4,28 @@ import 'package:tictactoe_xo_royale/app/theme/theme_extensions.dart';
 
 const int _ambientShapeCount = 6;
 
+/// Static Paint objects for ambient effects to improve performance
+class _AmbientPaints {
+  // Ambient shape paints for different colors
+  static final Paint _azurePaint = Paint()
+    ..style = PaintingStyle.fill
+    ..color = const Color(0xFF2DD4FF);
+
+  static final Paint _magentaPaint = Paint()
+    ..style = PaintingStyle.fill
+    ..color = const Color(0xFFF43F9D);
+
+  static final Paint _limePaint = Paint()
+    ..style = PaintingStyle.fill
+    ..color = const Color(0xFFA3E635);
+
+  // Getters for accessing static paints
+  static Paint get azurePaint => _azurePaint;
+  static Paint get magentaPaint => _magentaPaint;
+  static Paint get limePaint => _limePaint;
+}
+
+/// Optimized paint ambient effects
 void paintAmbient(
   Canvas canvas,
   Size size,
@@ -38,9 +60,11 @@ void _drawAmbientShape(
   double opacity,
   int index,
 ) {
+  // Use static paint with animated opacity
+  final basePaint = _getAmbientPaint(index);
   final paint = Paint()
-    ..color = _getAmbientColor(index).withValues(alpha: opacity)
-    ..style = PaintingStyle.fill;
+    ..color = basePaint.color.withValues(alpha: opacity)
+    ..style = basePaint.style;
 
   switch (index % 3) {
     case 0:
@@ -67,12 +91,15 @@ void _drawAmbientShape(
   }
 }
 
-Color _getAmbientColor(int index) {
-  final colors = [
-    const Color(0xFF2DD4FF), // Azure
-    const Color(0xFFF43F9D), // Magenta
-    const Color(0xFFA3E635), // Lime
-  ];
-
-  return colors[index % colors.length];
+Paint _getAmbientPaint(int index) {
+  switch (index % 3) {
+    case 0:
+      return _AmbientPaints.azurePaint;
+    case 1:
+      return _AmbientPaints.magentaPaint;
+    case 2:
+      return _AmbientPaints.limePaint;
+    default:
+      return _AmbientPaints.azurePaint;
+  }
 }
