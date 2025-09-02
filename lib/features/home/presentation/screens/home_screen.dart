@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tictactoe_xo_royale/app/router/routes.dart';
+import 'package:tictactoe_xo_royale/core/services/animation_pool.dart';
 import 'package:tictactoe_xo_royale/features/home/presentation/widgets/ambient_particles.dart';
 import 'package:tictactoe_xo_royale/features/home/presentation/widgets/game_mode_cards.dart';
 import 'package:tictactoe_xo_royale/features/home/presentation/widgets/quick_stats_ribbon.dart';
@@ -31,10 +32,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   void initState() {
     super.initState();
 
-    // Hero animation controller
-    _heroAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 1200),
+    // Hero animation controller - get from pool
+    _heroAnimationController = AnimationPool.getController(
       vsync: this,
+      poolName: 'home',
+      duration: const Duration(milliseconds: 1200),
     );
 
     _heroFadeAnimation = Tween<double>(begin: 0, end: 1).animate(
@@ -52,10 +54,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           ),
         );
 
-    // Content animation controller
-    _contentAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 800),
+    // Content animation controller - get from pool
+    _contentAnimationController = AnimationPool.getController(
       vsync: this,
+      poolName: 'home',
+      duration: const Duration(milliseconds: 800),
     );
 
     _contentFadeAnimation = Tween<double>(begin: 0, end: 1).animate(
@@ -82,20 +85,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   @override
   void dispose() {
-    _heroAnimationController.dispose();
-    _contentAnimationController.dispose();
+    // Return controllers to the pool instead of disposing them directly
+    AnimationPool.returnController(_heroAnimationController, 'home');
+    AnimationPool.returnController(_contentAnimationController, 'home');
     super.dispose();
   }
 
   void _onLocalModeSelected() {
     // Navigate to setup screen with local mode pre-selected
-    final setupRoute = AppRoutes.getSetupRoute(gameMode: 'local');
+    final setupRoute = AppRoutes.buildSetupRoute(gameMode: 'local');
     context.go(setupRoute);
   }
 
   void _onRobotModeSelected() {
     // Navigate to setup screen with robot mode pre-selected
-    final setupRoute = AppRoutes.getSetupRoute(gameMode: 'robot');
+    final setupRoute = AppRoutes.buildSetupRoute(gameMode: 'robot');
     context.go(setupRoute);
   }
 

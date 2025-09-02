@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tictactoe_xo_royale/core/services/animation_pool.dart';
 
 class LogoAnimation extends StatefulWidget {
   const LogoAnimation({super.key});
@@ -19,16 +20,18 @@ class _LogoAnimationState extends State<LogoAnimation>
   void initState() {
     super.initState();
 
-    // Pulse animation for subtle scaling
-    _pulseController = AnimationController(
-      duration: const Duration(milliseconds: 2000),
+    // Pulse animation for subtle scaling - get from pool
+    _pulseController = AnimationPool.getController(
       vsync: this,
+      poolName: 'loading',
+      duration: const Duration(milliseconds: 2000),
     )..repeat(reverse: true);
 
-    // Glow animation for color transition
-    _glowController = AnimationController(
-      duration: const Duration(milliseconds: 3000),
+    // Glow animation for color transition - get from pool
+    _glowController = AnimationPool.getController(
       vsync: this,
+      poolName: 'loading',
+      duration: const Duration(milliseconds: 3000),
     )..repeat();
 
     _pulseAnimation = Tween<double>(begin: 1, end: 1.05).animate(
@@ -50,8 +53,9 @@ class _LogoAnimationState extends State<LogoAnimation>
 
   @override
   void dispose() {
-    _pulseController.dispose();
-    _glowController.dispose();
+    // Return controllers to the pool instead of disposing them directly
+    AnimationPool.returnController(_pulseController, 'loading');
+    AnimationPool.returnController(_glowController, 'loading');
     super.dispose();
   }
 

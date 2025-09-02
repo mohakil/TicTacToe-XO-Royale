@@ -246,8 +246,9 @@ class _DefaultErrorWidget extends StatelessWidget {
   }
 }
 
-/// Provider for error logging service
+/// ✅ OPTIMIZED: Error logging provider with keepAlive for persistent error handling
 final errorLoggingProvider = Provider<ErrorLoggingService>((ref) {
+  ref.keepAlive(); // Keep alive since error logging should persist
   return ErrorLoggingService();
 });
 

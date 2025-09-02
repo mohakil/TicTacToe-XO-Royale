@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:tictactoe_xo_royale/core/services/memory_manager.dart';
 
 part 'setup_provider.freezed.dart';
 part 'setup_provider.g.dart';
@@ -204,43 +205,54 @@ class SetupNotifier extends StateNotifier<GameSetup> {
   }
 }
 
-final setupProvider = StateNotifierProvider<SetupNotifier, GameSetup>(
-  (ref) => SetupNotifier(),
-);
+// ✅ OPTIMIZED: Setup provider with autoDispose for temporary setup data
+final setupProvider =
+    StateNotifierProvider.autoDispose<SetupNotifier, GameSetup>((ref) {
+      ref.trackMemory('setup', keepAlive: false);
+      return SetupNotifier();
+    });
 
-// ✅ OPTIMIZED: Use select for granular rebuilds instead of individual providers
+// ✅ OPTIMIZED: Use select for granular rebuilds with autoDispose for temporary data
 // Individual setup data providers for granular rebuilds
-final setupModeProvider = Provider<GameMode>(
-  (ref) => ref.watch(setupProvider.select((state) => state.mode)),
-);
+final setupModeProvider = Provider.autoDispose<GameMode>((ref) {
+  ref.trackMemory('setupMode', keepAlive: false);
+  return ref.watch(setupProvider.select((state) => state.mode));
+});
 
-final setupPlayer1NameProvider = Provider<String>(
-  (ref) => ref.watch(setupProvider.select((state) => state.player1Name)),
-);
+final setupPlayer1NameProvider = Provider.autoDispose<String>((ref) {
+  ref.trackMemory('setupPlayer1Name', keepAlive: false);
+  return ref.watch(setupProvider.select((state) => state.player1Name));
+});
 
-final setupPlayer2NameProvider = Provider<String>(
-  (ref) => ref.watch(setupProvider.select((state) => state.player2Name)),
-);
+final setupPlayer2NameProvider = Provider.autoDispose<String>((ref) {
+  ref.trackMemory('setupPlayer2Name', keepAlive: false);
+  return ref.watch(setupProvider.select((state) => state.player2Name));
+});
 
-final setupFirstMoveProvider = Provider<FirstMove>(
-  (ref) => ref.watch(setupProvider.select((state) => state.firstMove)),
-);
+final setupFirstMoveProvider = Provider.autoDispose<FirstMove>((ref) {
+  ref.trackMemory('setupFirstMove', keepAlive: false);
+  return ref.watch(setupProvider.select((state) => state.firstMove));
+});
 
-final setupDifficultyProvider = Provider<Difficulty>(
-  (ref) => ref.watch(setupProvider.select((state) => state.difficulty)),
-);
+final setupDifficultyProvider = Provider.autoDispose<Difficulty>((ref) {
+  ref.trackMemory('setupDifficulty', keepAlive: false);
+  return ref.watch(setupProvider.select((state) => state.difficulty));
+});
 
-final setupBoardSizeProvider = Provider<BoardSize>(
-  (ref) => ref.watch(setupProvider.select((state) => state.boardSize)),
-);
+final setupBoardSizeProvider = Provider.autoDispose<BoardSize>((ref) {
+  ref.trackMemory('setupBoardSize', keepAlive: false);
+  return ref.watch(setupProvider.select((state) => state.boardSize));
+});
 
-final setupWinConditionProvider = Provider<WinCondition>(
-  (ref) => ref.watch(setupProvider.select((state) => state.winCondition)),
-);
+final setupWinConditionProvider = Provider.autoDispose<WinCondition>((ref) {
+  ref.trackMemory('setupWinCondition', keepAlive: false);
+  return ref.watch(setupProvider.select((state) => state.winCondition));
+});
 
-// ✅ OPTIMIZED: Computed providers using select for better performance
-final setupIsValidProvider = Provider<bool>(
-  (ref) => ref.watch(
+// ✅ OPTIMIZED: Computed providers using select with autoDispose for temporary data
+final setupIsValidProvider = Provider.autoDispose<bool>((ref) {
+  ref.trackMemory('setupIsValid', keepAlive: false);
+  return ref.watch(
     setupProvider.select((state) {
       if (state.player1Name.trim().isEmpty) {
         return false;
@@ -250,8 +262,8 @@ final setupIsValidProvider = Provider<bool>(
       }
       return true;
     }),
-  ),
-);
+  );
+});
 
 final setupGameConfigProvider =
     Provider<

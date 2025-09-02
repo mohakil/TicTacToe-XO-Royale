@@ -8,14 +8,13 @@ import 'package:tictactoe_xo_royale/features/game/presentation/widgets/game_boar
 
 void main() {
   group('Additional Game Widget Optimization Tests', () {
-    testWidgets('ExitConfirmationOverlay has RepaintBoundary for performance', (tester) async {
+    testWidgets('ExitConfirmationOverlay has RepaintBoundary for performance', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: ExitConfirmationOverlay(
-              onContinue: () {},
-              onExit: () {},
-            ),
+            body: ExitConfirmationOverlay(onContinue: () {}, onExit: () {}),
           ),
         ),
       );
@@ -27,14 +26,12 @@ void main() {
       expect(find.text('Exit'), findsOneWidget);
     });
 
-    testWidgets('GameSettingsOverlay has RepaintBoundary for performance', (tester) async {
+    testWidgets('GameSettingsOverlay has RepaintBoundary for performance', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: GameSettingsOverlay(
-              onClose: () {},
-            ),
-          ),
+          home: Scaffold(body: GameSettingsOverlay(onClose: () {})),
         ),
       );
 
@@ -47,7 +44,9 @@ void main() {
       expect(find.text('Close'), findsOneWidget);
     });
 
-    testWidgets('BoardCell has RepaintBoundary for performance', (tester) async {
+    testWidgets('BoardCell has RepaintBoundary for performance', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -70,8 +69,13 @@ void main() {
       expect(find.text('X'), findsOneWidget);
     });
 
-    testWidgets('BoardGrid has RepaintBoundary for performance', (tester) async {
-      final boardState = List.generate(3, (i) => List.generate(3, (j) => CellState.empty));
+    testWidgets('BoardGrid has RepaintBoundary for performance', (
+      tester,
+    ) async {
+      final boardState = List.generate(
+        3,
+        (i) => List.generate(3, (j) => CellState.empty),
+      );
 
       await tester.pumpWidget(
         MaterialApp(
@@ -149,7 +153,10 @@ void main() {
 
     testWidgets('BoardGrid creates correct number of cells', (tester) async {
       // Test 3x3 grid
-      final boardState3x3 = List.generate(3, (i) => List.generate(3, (j) => CellState.empty));
+      final boardState3x3 = List.generate(
+        3,
+        (i) => List.generate(3, (j) => CellState.empty),
+      );
 
       await tester.pumpWidget(
         MaterialApp(
@@ -166,7 +173,10 @@ void main() {
       expect(find.byType(BoardCell), findsNWidgets(9));
 
       // Test 4x4 grid
-      final boardState4x4 = List.generate(4, (i) => List.generate(4, (j) => CellState.empty));
+      final boardState4x4 = List.generate(
+        4,
+        (i) => List.generate(4, (j) => CellState.empty),
+      );
 
       await tester.pumpWidget(
         MaterialApp(
@@ -184,17 +194,16 @@ void main() {
     });
 
     group('Performance Benchmarks', () {
-      testWidgets('ExitConfirmationOverlay creation performance', (tester) async {
+      testWidgets('ExitConfirmationOverlay creation performance', (
+        tester,
+      ) async {
         final stopwatch = Stopwatch()..start();
 
         for (int i = 0; i < 50; i++) {
           await tester.pumpWidget(
             MaterialApp(
               home: Scaffold(
-                body: ExitConfirmationOverlay(
-                  onContinue: () {},
-                  onExit: () {},
-                ),
+                body: ExitConfirmationOverlay(onContinue: () {}, onExit: () {}),
               ),
             ),
           );
@@ -204,7 +213,9 @@ void main() {
 
         // Should create 50 ExitConfirmationOverlays in reasonable time
         expect(stopwatch.elapsedMilliseconds, lessThan(1000));
-        print('Created 50 ExitConfirmationOverlays in ${stopwatch.elapsedMilliseconds}ms');
+        debugPrint(
+          'Created 50 ExitConfirmationOverlays in ${stopwatch.elapsedMilliseconds}ms',
+        );
       });
 
       testWidgets('GameSettingsOverlay creation performance', (tester) async {
@@ -213,11 +224,7 @@ void main() {
         for (int i = 0; i < 50; i++) {
           await tester.pumpWidget(
             MaterialApp(
-              home: Scaffold(
-                body: GameSettingsOverlay(
-                  onClose: () {},
-                ),
-              ),
+              home: Scaffold(body: GameSettingsOverlay(onClose: () {})),
             ),
           );
         }
@@ -226,7 +233,9 @@ void main() {
 
         // Should create 50 GameSettingsOverlays in reasonable time
         expect(stopwatch.elapsedMilliseconds, lessThan(1000));
-        print('Created 50 GameSettingsOverlays in ${stopwatch.elapsedMilliseconds}ms');
+        debugPrint(
+          'Created 50 GameSettingsOverlays in ${stopwatch.elapsedMilliseconds}ms',
+        );
       });
 
       testWidgets('BoardCell creation performance', (tester) async {
@@ -239,7 +248,9 @@ void main() {
                 body: BoardCell(
                   row: i % 3,
                   col: i % 3,
-                  cellState: i % 3 == 0 ? CellState.X : (i % 3 == 1 ? CellState.O : null),
+                  cellState: i % 3 == 0
+                      ? CellState.X
+                      : (i % 3 == 1 ? CellState.O : null),
                   onTap: (_, __) {},
                   cellSize: 100.0,
                   isWinningCell: i % 5 == 0,
@@ -255,7 +266,9 @@ void main() {
 
         // Should create 100 BoardCells in reasonable time
         expect(stopwatch.elapsedMilliseconds, lessThan(1500));
-        print('Created 100 BoardCells in ${stopwatch.elapsedMilliseconds}ms');
+        debugPrint(
+          'Created 100 BoardCells in ${stopwatch.elapsedMilliseconds}ms',
+        );
       });
 
       testWidgets('BoardGrid creation performance', (tester) async {
@@ -270,8 +283,8 @@ void main() {
               (col) => (row + col) % 3 == 0
                   ? CellState.X
                   : (row + col) % 3 == 1
-                      ? CellState.O
-                      : CellState.empty,
+                  ? CellState.O
+                  : CellState.empty,
             ),
           );
 
@@ -294,7 +307,9 @@ void main() {
 
         // Should create 20 BoardGrids in reasonable time
         expect(stopwatch.elapsedMilliseconds, lessThan(2000));
-        print('Created 20 BoardGrids in ${stopwatch.elapsedMilliseconds}ms');
+        debugPrint(
+          'Created 20 BoardGrids in ${stopwatch.elapsedMilliseconds}ms',
+        );
       });
     });
   });

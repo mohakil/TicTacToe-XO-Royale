@@ -9,103 +9,119 @@ import 'package:tictactoe_xo_royale/features/profile/profile.dart';
 import 'package:tictactoe_xo_royale/features/settings/settings.dart';
 import 'package:tictactoe_xo_royale/features/setup/setup.dart';
 import 'package:tictactoe_xo_royale/features/store/store.dart';
-import 'package:tictactoe_xo_royale/core/widgets/error_boundary.dart';
 
-// Provider for the router
+/// Simple router provider for the app
 final routerProvider = Provider<GoRouter>((ref) {
-  final errorLoggingService = ref.watch(errorLoggingProvider);
-
   return GoRouter(
     initialLocation: '/loading',
     routes: appRoutes,
     debugLogDiagnostics: kDebugMode,
-    errorBuilder: (context, state) => _ErrorPage(
-      error: state.error,
-      location: state.matchedLocation,
-      onRetry: () => context.go('/home'),
-    ),
-    redirect: (context, state) {
-      // Global redirect logic with error handling
-      try {
-        return _handleRedirect(context, state, errorLoggingService);
-      } catch (error, stackTrace) {
-        errorLoggingService.logError(
-          error,
-          stackTrace,
-          context: 'RouterRedirect',
-          additionalData: {
-            'location': state.matchedLocation,
-            'uri': state.uri.toString(),
-          },
-        );
-        // Fallback to home on redirect error
-        return '/home';
-      }
-    },
+    errorBuilder: (context, state) =>
+        ErrorPage(error: state.error, location: state.matchedLocation),
   );
 });
 
-/// Handle router redirects with error recovery
-String? _handleRedirect(
-  BuildContext context,
-  GoRouterState state,
-  ErrorLoggingService errorLoggingService,
-) {
-  // Add any global redirect logic here
-  // For example: authentication checks, maintenance mode, etc.
-
-  // Example: Redirect to maintenance page if needed
-  // if (isMaintenanceMode) {
-  //   return '/maintenance';
-  // }
-
-  // Example: Redirect to login if not authenticated
-  // if (requiresAuth(state.matchedLocation) && !isAuthenticated) {
-  //   return '/login';
-  // }
-
-  return null; // No redirect needed
-}
-
 // App routes configuration with shell route for bottom navigation
 final List<RouteBase> appRoutes = [
-  // Loading screen (separate route)
+  // Loading screen (separate route) - Fade transition
   GoRoute(
     path: '/loading',
     name: 'loading',
-    builder: (context, state) => const LoadingScreen(),
+    pageBuilder: (context, state) => CustomTransitionPage<void>(
+      key: state.pageKey,
+      child: const LoadingScreen(),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(opacity: animation, child: child);
+      },
+    ),
   ),
 
   // Main app shell route with bottom navigation (4 items as per PRD)
   ShellRoute(
     builder: (context, state, child) => MainAppShell(child: child),
     routes: [
-      // Home tab
+      // Home tab - Slide transition
       GoRoute(
         path: '/home',
         name: 'home',
-        builder: (context, state) => const HomeScreen(),
+        pageBuilder: (context, state) => CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const HomeScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return SlideTransition(
+              position: animation.drive(
+                Tween(
+                  begin: const Offset(1.0, 0.0),
+                  end: Offset.zero,
+                ).chain(CurveTween(curve: Curves.easeInOut)),
+              ),
+              child: child,
+            );
+          },
+        ),
       ),
 
-      // Store tab
+      // Store tab - Slide transition
       GoRoute(
         path: '/store',
         name: 'store',
-        builder: (context, state) => const StoreScreen(),
+        pageBuilder: (context, state) => CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const StoreScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return SlideTransition(
+              position: animation.drive(
+                Tween(
+                  begin: const Offset(1.0, 0.0),
+                  end: Offset.zero,
+                ).chain(CurveTween(curve: Curves.easeInOut)),
+              ),
+              child: child,
+            );
+          },
+        ),
       ),
 
-      // Profile tab
+      // Profile tab - Slide transition
       GoRoute(
         path: '/profile',
         name: 'profile',
-        builder: (context, state) => const ProfileScreen(),
+        pageBuilder: (context, state) => CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const ProfileScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return SlideTransition(
+              position: animation.drive(
+                Tween(
+                  begin: const Offset(1.0, 0.0),
+                  end: Offset.zero,
+                ).chain(CurveTween(curve: Curves.easeInOut)),
+              ),
+              child: child,
+            );
+          },
+        ),
       ),
 
-      // Settings tab
+      // Settings tab - Slide transition
       GoRoute(
         path: '/settings',
         name: 'settings',
-        builder: (context, state) => const SettingsScreen(),
+        pageBuilder: (context, state) => CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const SettingsScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return SlideTransition(
+              position: animation.drive(
+                Tween(
+                  begin: const Offset(1.0, 0.0),
+                  end: Offset.zero,
+                ).chain(CurveTween(curve: Curves.easeInOut)),
+              ),
+              child: child,
+            );
+          },
+        ),
       ),
     ],
   ),
@@ -114,11 +130,11 @@ final List<RouteBase> appRoutes = [
   GoRoute(
     path: '/setup',
     name: 'setup',
-    builder: (context, state) {
+    pageBuilder: (context, state) {
       // Extract query parameters from the URL
       final queryParams = state.uri.queryParameters;
 
-      return SetupScreen(
+      final setupScreen = SetupScreen(
         challengeId: queryParams['challengeId'],
         tournamentId: queryParams['tournamentId'],
         boardSize: int.tryParse(queryParams['boardSize'] ?? '3') == 3
@@ -137,17 +153,34 @@ final List<RouteBase> appRoutes = [
         player2: queryParams['player2'],
         firstMove: queryParams['firstMove'],
       );
+
+      // Vertical slide transition for setup screen
+      return CustomTransitionPage<void>(
+        key: state.pageKey,
+        child: setupScreen,
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return SlideTransition(
+            position: animation.drive(
+              Tween(
+                begin: const Offset(0.0, 1.0),
+                end: Offset.zero,
+              ).chain(CurveTween(curve: Curves.easeInOut)),
+            ),
+            child: child,
+          );
+        },
+      );
     },
   ),
 
   GoRoute(
     path: '/game',
     name: 'game',
-    builder: (context, state) {
+    pageBuilder: (context, state) {
       // Extract query parameters from the URL
       final queryParams = state.uri.queryParameters;
 
-      return GameScreen(
+      final gameScreen = GameScreen(
         boardSize: int.tryParse(queryParams['boardSize'] ?? '3') ?? 3,
         winCondition: int.tryParse(queryParams['winCondition'] ?? '3') ?? 3,
         player1Name: queryParams['player1'] ?? 'Player 1',
@@ -155,6 +188,23 @@ final List<RouteBase> appRoutes = [
         isRobotMode: queryParams['gameMode'] == 'robot',
         difficulty: queryParams['difficulty'] ?? 'medium',
         firstMove: queryParams['firstMove'] ?? 'random',
+      );
+
+      // Scale transition for game screen
+      return CustomTransitionPage<void>(
+        key: state.pageKey,
+        child: gameScreen,
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return ScaleTransition(
+            scale: animation.drive(
+              Tween(
+                begin: 0.0,
+                end: 1.0,
+              ).chain(CurveTween(curve: Curves.easeInOut)),
+            ),
+            child: child,
+          );
+        },
       );
     },
   ),
@@ -267,155 +317,40 @@ class _MainAppShellState extends State<MainAppShell> {
   }
 }
 
-/// Error page widget for router errors
-class _ErrorPage extends StatelessWidget {
+/// Simple error page widget for router errors
+class ErrorPage extends StatelessWidget {
   final Exception? error;
   final String location;
-  final VoidCallback? onRetry;
 
-  const _ErrorPage({this.error, required this.location, this.onRetry});
+  const ErrorPage({super.key, this.error, required this.location});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
     return Scaffold(
-      backgroundColor: colorScheme.surface,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Error icon
-              Icon(Icons.route_outlined, size: 80, color: colorScheme.error),
-
+              const Icon(Icons.error_outline, size: 80),
               const SizedBox(height: 24),
-
-              // Error title
-              Text(
+              const Text(
                 'Page Not Found',
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  color: colorScheme.onSurface,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
-
               const SizedBox(height: 16),
-
-              // Error message
-              Text(
-                'The page you\'re looking for doesn\'t exist or has been moved.',
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
+              const Text(
+                'The page you\'re looking for doesn\'t exist.',
                 textAlign: TextAlign.center,
               ),
-
-              const SizedBox(height: 8),
-
-              // Location info
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainerHighest.withValues(
-                    alpha: 0.5,
-                  ),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  'Location: $location',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                    fontFamily: 'monospace',
-                  ),
-                ),
-              ),
-
               const SizedBox(height: 32),
-
-              // Action buttons
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Go back button
-                  OutlinedButton.icon(
-                    onPressed: () => context.pop(),
-                    icon: const Icon(Icons.arrow_back),
-                    label: const Text('Go Back'),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: colorScheme.primary,
-                      side: BorderSide(color: colorScheme.primary),
-                    ),
-                  ),
-
-                  const SizedBox(width: 16),
-
-                  // Go home button
-                  ElevatedButton.icon(
-                    onPressed: () => context.go('/home'),
-                    icon: const Icon(Icons.home),
-                    label: const Text('Go Home'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: colorScheme.primary,
-                      foregroundColor: colorScheme.onPrimary,
-                    ),
-                  ),
-                ],
+              ElevatedButton.icon(
+                onPressed: () => context.go('/home'),
+                icon: const Icon(Icons.home),
+                label: const Text('Go Home'),
               ),
-
-              // Retry button (if provided)
-              if (onRetry != null) ...[
-                const SizedBox(height: 16),
-                TextButton.icon(
-                  onPressed: onRetry,
-                  icon: const Icon(Icons.refresh),
-                  label: const Text('Retry'),
-                  style: TextButton.styleFrom(
-                    foregroundColor: colorScheme.secondary,
-                  ),
-                ),
-              ],
-
-              // Error details (debug mode only)
-              if (kDebugMode && error != null) ...[
-                const SizedBox(height: 32),
-                const Divider(),
-                const SizedBox(height: 16),
-
-                Text(
-                  'Error Details (Debug Mode)',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: colorScheme.error,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-
-                const SizedBox(height: 8),
-
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: colorScheme.errorContainer.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: colorScheme.error.withValues(alpha: 0.3),
-                    ),
-                  ),
-                  child: SingleChildScrollView(
-                    child: Text(
-                      error.toString(),
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: colorScheme.error,
-                        fontFamily: 'monospace',
-                      ),
-                    ),
-                  ),
-                ),
-              ],
             ],
           ),
         ),

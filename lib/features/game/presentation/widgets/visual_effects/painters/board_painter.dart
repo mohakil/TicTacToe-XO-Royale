@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tictactoe_xo_royale/app/theme/theme_extensions.dart';
+
 import 'package:tictactoe_xo_royale/features/game/presentation/widgets/visual_effects/painters/cell_painter.dart';
 import 'package:tictactoe_xo_royale/features/game/presentation/widgets/visual_effects/effects/ambient_painter.dart';
 import 'package:tictactoe_xo_royale/features/game/presentation/widgets/visual_effects/effects/confetti_painter.dart';
@@ -46,6 +47,12 @@ class BoardPainter extends CustomPainter {
   late final double _hintAnimValue;
   late final double _ambientAnimValue;
 
+  // Always use maximum quality settings for best visual experience
+  static const bool _shouldUseHighQualityEffects = true;
+  static const bool _shouldUseParticleEffects = true;
+  static const bool _shouldUseGlowEffects = true;
+  static const bool _shouldUseShadows = true;
+
   BoardPainter({
     required this.boardSize,
     required this.boardState,
@@ -76,6 +83,8 @@ class BoardPainter extends CustomPainter {
     _winningLineAnimValue = winningLineAnimation.value;
     _hintAnimValue = hintAnimation.value;
     _ambientAnimValue = ambientAnimation.value;
+
+    // Quality settings are now hardcoded to maximum for best visual experience
   }
 
   void _updateStaticPaints() {
@@ -93,8 +102,8 @@ class BoardPainter extends CustomPainter {
     // Draw background - use static cached paint
     canvas.drawRect(Offset.zero & size, _staticBackgroundPaint);
 
-    // Draw ambient effects - use cached animation value
-    if (_ambientAnimValue > 0) {
+    // Draw ambient effects - only if particle effects are enabled and performance allows
+    if (_ambientAnimValue > 0 && _shouldUseParticleEffects) {
       paintAmbient(canvas, size, _ambientAnimValue, gameColors);
     }
 
@@ -104,24 +113,33 @@ class BoardPainter extends CustomPainter {
     // Draw cells with marks - use cached animation value
     _drawCellsOptimized(canvas, size, cellSize);
 
-    // Draw hover effects
-    if (hoveredCell != null) {
+    // Draw hover effects - only if high quality effects are enabled
+    if (hoveredCell != null && _shouldUseHighQualityEffects) {
       _drawHoverEffect(canvas, size, cellSize, hoveredCell!);
     }
 
     // Draw winning line - use cached animation value
     if (winningLine != null && _winningLineAnimValue > 0) {
-      _drawWinningLine(canvas, size, cellSize, winningLine!);
+      _drawWinningLine(
+        canvas,
+        size,
+        cellSize,
+        winningLine!,
+        _shouldUseGlowEffects,
+      );
     }
 
-    // Draw hint effects - use cached animation value
-    if (showHints && hintCells != null && _hintAnimValue > 0) {
+    // Draw hint effects - only if high quality effects are enabled
+    if (showHints &&
+        hintCells != null &&
+        _hintAnimValue > 0 &&
+        _shouldUseHighQualityEffects) {
       _drawHintEffects(canvas, size, cellSize, hintCells!);
     }
 
-    // Draw confetti for wins
-    if (isGameOver && winningLine != null) {
-      _drawConfetti(canvas, size);
+    // Draw confetti for wins - only if particle effects are enabled
+    if (isGameOver && winningLine != null && _shouldUseParticleEffects) {
+      _drawConfetti(canvas, size, _shouldUseShadows);
     }
   }
 
@@ -233,6 +251,7 @@ class BoardPainter extends CustomPainter {
     Size size,
     double cellSize,
     List<int> winningLine,
+    bool useGlowEffects,
   ) {
     if (winningLine.length >= 6) {
       // At least 3 cells (row1, col1, row2, col2, row3, col3)
@@ -274,7 +293,7 @@ class BoardPainter extends CustomPainter {
     }
   }
 
-  void _drawConfetti(Canvas canvas, Size size) {
+  void _drawConfetti(Canvas canvas, Size size, bool useShadows) {
     paintConfetti(canvas, size, gameColors);
   }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tictactoe_xo_royale/core/services/animation_pool.dart';
 
 /// A typewriter text widget that animates text character by character
 /// Used for the hero section in the home screen
@@ -36,16 +37,18 @@ class _TypewriterTextState extends State<TypewriterText>
   void initState() {
     super.initState();
 
-    _typewriterController = AnimationController(
+    _typewriterController = AnimationPool.getController(
+      vsync: this,
+      poolName: 'ui',
       duration: Duration(
         milliseconds: widget.text.length * widget.speed.inMilliseconds,
       ),
-      vsync: this,
     );
 
-    _caretController = AnimationController(
-      duration: widget.caretBlinkDuration,
+    _caretController = AnimationPool.getController(
       vsync: this,
+      poolName: 'ui',
+      duration: widget.caretBlinkDuration,
     );
 
     _typewriterAnimation = IntTween(begin: 0, end: widget.text.length).animate(
@@ -56,17 +59,8 @@ class _TypewriterTextState extends State<TypewriterText>
       CurvedAnimation(parent: _caretController, curve: Curves.easeInOut),
     );
 
-    _typewriterController.addListener(() {
-      setState(() {
-        _currentLength = _typewriterAnimation.value;
-      });
-    });
-
-    _caretController.addListener(() {
-      setState(() {
-        _showCaret = _caretAnimation.value > 0.5;
-      });
-    });
+    _typewriterController.addListener(_typewriterListener);
+    _caretController.addListener(_caretListener);
 
     // Start the typewriter animation
     _typewriterController.forward();
@@ -75,10 +69,31 @@ class _TypewriterTextState extends State<TypewriterText>
     _caretController.repeat();
   }
 
+  void _typewriterListener() {
+    if (mounted) {
+      setState(() {
+        _currentLength = _typewriterAnimation.value;
+      });
+    }
+  }
+
+  void _caretListener() {
+    if (mounted) {
+      setState(() {
+        _showCaret = _caretAnimation.value > 0.5;
+      });
+    }
+  }
+
   @override
   void dispose() {
-    _typewriterController.dispose();
-    _caretController.dispose();
+    // Remove listeners before returning controllers to pool
+    _typewriterController.removeListener(_typewriterListener);
+    _caretController.removeListener(_caretListener);
+
+    // Return controllers to the pool instead of disposing them directly
+    AnimationPool.returnController(_typewriterController, 'ui');
+    AnimationPool.returnController(_caretController, 'ui');
     super.dispose();
   }
 

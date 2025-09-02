@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tictactoe_xo_royale/core/providers/settings_provider.dart';
 import 'package:tictactoe_xo_royale/core/providers/theme_provider.dart';
-import 'package:tictactoe_xo_royale/core/widgets/performance_monitor.dart';
+
 import 'package:tictactoe_xo_royale/features/settings/presentation/widgets/about_section.dart';
 import 'package:tictactoe_xo_royale/features/settings/presentation/widgets/settings_section.dart';
 import 'package:tictactoe_xo_royale/features/settings/presentation/widgets/theme_selector.dart';
@@ -37,9 +37,6 @@ class SettingsScreen extends ConsumerWidget {
     );
     final notificationsEnabled = ref.watch(
       settingsProvider.select((state) => state.notificationsEnabled),
-    );
-    final performanceMode = ref.watch(
-      settingsProvider.select((state) => state.performanceMode),
     );
 
     return Scaffold(
@@ -172,41 +169,6 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                     onTap: () => _showClearDataDialog(context, ref),
                   ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              SettingsSection(
-                title: 'Performance',
-                subtitle: 'Optimize app performance and battery usage',
-                children: [
-                  ListTile(
-                    title: const Text('Performance Mode'),
-                    subtitle: const Text(
-                      'Optimize for performance or battery life',
-                    ),
-                    leading: Icon(Icons.speed, color: colorScheme.primary),
-                    trailing: DropdownButton<PerformanceMode>(
-                      value: performanceMode, // Use optimized value
-                      onChanged: (PerformanceMode? newValue) {
-                        if (newValue != null) {
-                          ref
-                              .read(settingsProvider.notifier)
-                              .setPerformanceMode(newValue);
-                        }
-                      },
-                      items: PerformanceMode.values
-                          .map(
-                            (PerformanceMode mode) =>
-                                DropdownMenuItem<PerformanceMode>(
-                                  value: mode,
-                                  child: Text(mode.name),
-                                ),
-                          )
-                          .toList(),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  const PerformanceMonitor(),
                 ],
               ),
 

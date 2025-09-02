@@ -518,12 +518,16 @@ class HapticService {
   }
 }
 
-/// Provider for HapticService
-final hapticServiceProvider = Provider<HapticService>((ref) => HapticService());
+/// ✅ OPTIMIZED: HapticService provider with keepAlive for persistent haptic management
+final hapticServiceProvider = Provider<HapticService>((ref) {
+  ref.keepAlive(); // Keep alive since haptic service should persist
+  return HapticService();
+});
 
-/// Provider for haptic settings
+/// ✅ OPTIMIZED: Haptic settings provider with keepAlive for persistent settings
 final hapticSettingsProvider =
     Provider<({bool vibrationEnabled, bool hapticFeedbackEnabled})>((ref) {
+      ref.keepAlive(); // Keep alive since settings are persistent
       final settings = ref.watch(settingsProvider);
       return (
         vibrationEnabled: settings.vibrationEnabled,

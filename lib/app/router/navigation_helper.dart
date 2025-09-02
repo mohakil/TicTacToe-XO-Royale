@@ -61,7 +61,7 @@ class NavigationHelper {
     String? player2,
     String? firstMove,
   }) {
-    final route = AppRoutes.getGameRoute(
+    final route = AppRoutes.buildGameRoute(
       boardSize: boardSize,
       winCondition: winCondition,
       gameMode: gameMode,

@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tictactoe_xo_royale/core/services/memory_manager.dart';
 
 /// Home screen state data
 class HomeState {
@@ -87,37 +88,48 @@ class HomeNotifier extends StateNotifier<HomeState> {
   }
 }
 
-/// Provider for home screen state
-final homeProvider = StateNotifierProvider<HomeNotifier, HomeState>(
-  (ref) => HomeNotifier(),
+// ✅ OPTIMIZED: Home provider with autoDispose for temporary home data
+final homeProvider = StateNotifierProvider.autoDispose<HomeNotifier, HomeState>(
+  (ref) {
+    ref.trackMemory('home', keepAlive: false);
+    return HomeNotifier();
+  },
 );
 
-// ✅ OPTIMIZED: Use select for granular rebuilds instead of individual providers
+// ✅ OPTIMIZED: Use select for granular rebuilds with autoDispose for temporary data
 // Individual home data providers for granular rebuilds
-final lastResultProvider = Provider<String>(
-  (ref) => ref.watch(homeProvider.select((state) => state.lastResult)),
-);
+final lastResultProvider = Provider.autoDispose<String>((ref) {
+  ref.trackMemory('lastResult', keepAlive: false);
+  return ref.watch(homeProvider.select((state) => state.lastResult));
+});
 
-final streakProvider = Provider<int>(
-  (ref) => ref.watch(homeProvider.select((state) => state.streak)),
-);
+final streakProvider = Provider.autoDispose<int>((ref) {
+  ref.trackMemory('streak', keepAlive: false);
+  return ref.watch(homeProvider.select((state) => state.streak));
+});
 
-final gemsCountProvider = Provider<int>(
-  (ref) => ref.watch(homeProvider.select((state) => state.gemsCount)),
-);
+final gemsCountProvider = Provider.autoDispose<int>((ref) {
+  ref.trackMemory('gemsCount', keepAlive: false);
+  return ref.watch(homeProvider.select((state) => state.gemsCount));
+});
 
-final hintCountProvider = Provider<int>(
-  (ref) => ref.watch(homeProvider.select((state) => state.hintCount)),
-);
+final hintCountProvider = Provider.autoDispose<int>((ref) {
+  ref.trackMemory('hintCount', keepAlive: false);
+  return ref.watch(homeProvider.select((state) => state.hintCount));
+});
 
-final homeLoadingProvider = Provider<bool>(
-  (ref) => ref.watch(homeProvider.select((state) => state.isLoading)),
-);
+final homeLoadingProvider = Provider.autoDispose<bool>((ref) {
+  ref.trackMemory('homeLoading', keepAlive: false);
+  return ref.watch(homeProvider.select((state) => state.isLoading));
+});
 
-// ✅ OPTIMIZED: Computed providers using select for better performance
+// ✅ OPTIMIZED: Computed providers using select with autoDispose for temporary data
 final homeStatsProvider =
-    Provider<({String lastResult, int streak, int gemsCount, int hintCount})>(
-      (ref) => ref.watch(
+    Provider.autoDispose<
+      ({String lastResult, int streak, int gemsCount, int hintCount})
+    >((ref) {
+      ref.trackMemory('homeStats', keepAlive: false);
+      return ref.watch(
         homeProvider.select(
           (state) => (
             lastResult: state.lastResult,
@@ -126,12 +138,13 @@ final homeStatsProvider =
             hintCount: state.hintCount,
           ),
         ),
-      ),
-    );
+      );
+    });
 
-final homeIsLoadingProvider = Provider<bool>(
-  (ref) => ref.watch(homeProvider.select((state) => state.isLoading)),
-);
+final homeIsLoadingProvider = Provider.autoDispose<bool>((ref) {
+  ref.trackMemory('homeIsLoading', keepAlive: false);
+  return ref.watch(homeProvider.select((state) => state.isLoading));
+});
 
 // ✅ OPTIMIZED: Extension methods for easy access with select-based providers
 extension HomeProviderExtension on WidgetRef {

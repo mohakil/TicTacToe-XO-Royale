@@ -6,3 +6,6 @@ export 'profile_provider.dart';
 export 'settings_provider.dart';
 export 'store_provider.dart';
 export 'theme_provider.dart';
+
+// Memory management
+export '../services/memory_manager.dart';

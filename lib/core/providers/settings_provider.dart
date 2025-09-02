@@ -14,7 +14,6 @@ class AppSettings {
     required this.hapticFeedbackEnabled,
     required this.autoSaveEnabled,
     required this.notificationsEnabled,
-    required this.performanceMode,
   });
 
   final bool soundEnabled;
@@ -23,7 +22,6 @@ class AppSettings {
   final bool hapticFeedbackEnabled;
   final bool autoSaveEnabled;
   final bool notificationsEnabled;
-  final PerformanceMode performanceMode;
 
   // Copy with method for immutable updates
   AppSettings copyWith({
@@ -33,7 +31,6 @@ class AppSettings {
     bool? hapticFeedbackEnabled,
     bool? autoSaveEnabled,
     bool? notificationsEnabled,
-    PerformanceMode? performanceMode,
   }) => AppSettings(
     soundEnabled: soundEnabled ?? this.soundEnabled,
     musicEnabled: musicEnabled ?? this.musicEnabled,
@@ -41,7 +38,6 @@ class AppSettings {
     hapticFeedbackEnabled: hapticFeedbackEnabled ?? this.hapticFeedbackEnabled,
     autoSaveEnabled: autoSaveEnabled ?? this.autoSaveEnabled,
     notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
-    performanceMode: performanceMode ?? this.performanceMode,
   );
 
   // Default settings
@@ -52,7 +48,6 @@ class AppSettings {
     hapticFeedbackEnabled: true,
     autoSaveEnabled: true,
     notificationsEnabled: true,
-    performanceMode: PerformanceMode.balanced,
   );
 
   // Convert to JSON for storage
@@ -63,7 +58,6 @@ class AppSettings {
     'hapticFeedbackEnabled': hapticFeedbackEnabled,
     'autoSaveEnabled': autoSaveEnabled,
     'notificationsEnabled': notificationsEnabled,
-    'performanceMode': performanceMode.index,
   };
 
   // Create from JSON
@@ -74,7 +68,6 @@ class AppSettings {
     hapticFeedbackEnabled: json['hapticFeedbackEnabled'] ?? true,
     autoSaveEnabled: json['autoSaveEnabled'] ?? true,
     notificationsEnabled: json['notificationsEnabled'] ?? true,
-    performanceMode: PerformanceMode.values[json['performanceMode'] ?? 0],
   );
 
   @override
@@ -87,8 +80,7 @@ class AppSettings {
           vibrationEnabled == other.vibrationEnabled &&
           hapticFeedbackEnabled == other.hapticFeedbackEnabled &&
           autoSaveEnabled == other.autoSaveEnabled &&
-          notificationsEnabled == other.notificationsEnabled &&
-          performanceMode == other.performanceMode;
+          notificationsEnabled == other.notificationsEnabled;
 
   @override
   int get hashCode => Object.hash(
@@ -99,44 +91,13 @@ class AppSettings {
     hapticFeedbackEnabled,
     autoSaveEnabled,
     notificationsEnabled,
-    performanceMode,
   );
 
   @override
   String toString() =>
       'AppSettings(soundEnabled: $soundEnabled, musicEnabled: $musicEnabled, '
       'vibrationEnabled: $vibrationEnabled, hapticFeedbackEnabled: $hapticFeedbackEnabled, '
-      'autoSaveEnabled: $autoSaveEnabled, notificationsEnabled: $notificationsEnabled, '
-      'performanceMode: $performanceMode)';
-}
-
-// Performance mode enum
-enum PerformanceMode {
-  powerSaving,
-  balanced,
-  performance;
-
-  String get displayName {
-    switch (this) {
-      case PerformanceMode.powerSaving:
-        return 'Power Saving';
-      case PerformanceMode.balanced:
-        return 'Balanced';
-      case PerformanceMode.performance:
-        return 'Performance';
-    }
-  }
-
-  String get description {
-    switch (this) {
-      case PerformanceMode.powerSaving:
-        return 'Optimized for battery life, reduced visual effects';
-      case PerformanceMode.balanced:
-        return 'Balanced performance and battery usage';
-      case PerformanceMode.performance:
-        return 'Maximum visual quality and smooth animations';
-    }
-  }
+      'autoSaveEnabled: $autoSaveEnabled, notificationsEnabled: $notificationsEnabled)';
 }
 
 // Settings notifier with proper disposal
@@ -230,14 +191,6 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     }
   }
 
-  // Update performance mode
-  Future<void> setPerformanceMode(PerformanceMode mode) async {
-    if (_mounted) {
-      state = state.copyWith(performanceMode: mode);
-      await _saveSettings();
-    }
-  }
-
   // Toggle sound
   Future<void> toggleSound() async {
     await setSoundEnabled(enabled: !state.soundEnabled);
@@ -281,9 +234,12 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 }
 
 // ✅ OPTIMIZED: Main settings provider with KeepAlive for persistence
-final settingsProvider = StateNotifierProvider<SettingsNotifier, AppSettings>(
-  (ref) => SettingsNotifier(),
-);
+final settingsProvider = StateNotifierProvider<SettingsNotifier, AppSettings>((
+  ref,
+) {
+  ref.keepAlive(); // Keep alive since settings should persist
+  return SettingsNotifier();
+});
 
 // ✅ OPTIMIZED: Use select for granular rebuilds instead of individual providers
 // Individual settings providers for granular rebuilds
@@ -329,29 +285,24 @@ final notificationsEnabledProvider = Provider<bool>((ref) {
   );
 });
 
-final performanceModeProvider = Provider<PerformanceMode>((ref) {
+// ✅ OPTIMIZED: Computed providers using select for better performance with keepAlive
+final isAudioEnabledProvider = Provider<bool>((ref) {
   ref.keepAlive(); // Keep alive since settings are persistent
   return ref.watch(
-    settingsProvider.select((settings) => settings.performanceMode),
-  );
-});
-
-// ✅ OPTIMIZED: Computed providers using select for better performance
-final isAudioEnabledProvider = Provider<bool>(
-  (ref) => ref.watch(
     settingsProvider.select(
       (settings) => settings.soundEnabled || settings.musicEnabled,
     ),
-  ),
-);
+  );
+});
 
-final isHapticEnabledProvider = Provider<bool>(
-  (ref) => ref.watch(
+final isHapticEnabledProvider = Provider<bool>((ref) {
+  ref.keepAlive(); // Keep alive since settings are persistent
+  return ref.watch(
     settingsProvider.select(
       (settings) => settings.vibrationEnabled || settings.hapticFeedbackEnabled,
     ),
-  ),
-);
+  );
+});
 
 // ✅ OPTIMIZED: Extension methods for easy access with select-based providers
 extension SettingsProviderExtension on WidgetRef {
@@ -365,7 +316,6 @@ extension SettingsProviderExtension on WidgetRef {
   bool get hapticFeedbackEnabled => watch(hapticFeedbackEnabledProvider);
   bool get autoSaveEnabled => watch(autoSaveEnabledProvider);
   bool get notificationsEnabled => watch(notificationsEnabledProvider);
-  PerformanceMode get performanceMode => watch(performanceModeProvider);
 
   // Get computed settings
   bool get isAudioEnabled => watch(isAudioEnabledProvider);

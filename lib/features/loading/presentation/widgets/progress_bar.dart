@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tictactoe_xo_royale/core/services/animation_pool.dart';
 
 class ProgressBar extends StatefulWidget {
   final double progress;
@@ -22,9 +23,10 @@ class _ProgressBarState extends State<ProgressBar>
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      duration: widget.duration,
+    _animationController = AnimationPool.getController(
       vsync: this,
+      poolName: 'loading',
+      duration: widget.duration,
     );
 
     _progressAnimation = Tween<double>(begin: 0, end: widget.progress).animate(
@@ -54,7 +56,8 @@ class _ProgressBarState extends State<ProgressBar>
 
   @override
   void dispose() {
-    _animationController.dispose();
+    // Return controller to the pool instead of disposing it directly
+    AnimationPool.returnController(_animationController, 'loading');
     super.dispose();
   }
 

@@ -2,7 +2,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:tictactoe_xo_royale/app/constants/dimensions.dart';
-import 'package:tictactoe_xo_royale/core/services/performance_service.dart';
 
 /// Utility functions for comprehensive verification of accessibility,
 /// responsiveness, and performance features
@@ -54,69 +53,6 @@ List<String> verifyResponsiveBreakpoints() {
     results.add(
       '❌ Large tablet breakpoint should be 1200px, '
       'found ${AppDimensions.largeTabletBreakpoint}px',
-    );
-  }
-
-  return results;
-}
-
-/// Verify performance targets are met
-List<String> verifyPerformanceTargets(PerformanceMetrics metrics) {
-  final results = <String>[];
-
-  // Verify frame rate targets (60-144 FPS)
-  if (metrics.frameRate >= 60.0) {
-    results.add(
-      '✅ Frame rate ${metrics.frameRate.toStringAsFixed(1)} FPS '
-      'meets 60 FPS minimum',
-    );
-  } else {
-    results.add(
-      '❌ Frame rate ${metrics.frameRate.toStringAsFixed(1)} FPS '
-      'below 60 FPS minimum',
-    );
-  }
-
-  if (metrics.frameRate <= 144.0) {
-    results.add(
-      '✅ Frame rate ${metrics.frameRate.toStringAsFixed(1)} FPS '
-      'within 144 FPS maximum',
-    );
-  } else {
-    results.add(
-      '⚠️ Frame rate ${metrics.frameRate.toStringAsFixed(1)} FPS '
-      'exceeds 144 FPS maximum',
-    );
-  }
-
-  // Verify frame time targets (≤16.67ms for 60 FPS)
-  if (metrics.averageFrameTime <= 16.67) {
-    results.add(
-      '✅ Average frame time ${metrics.averageFrameTime.toStringAsFixed(2)}ms '
-      'meets 16.67ms target',
-    );
-  } else {
-    results.add(
-      '❌ Average frame time ${metrics.averageFrameTime.toStringAsFixed(2)}ms '
-      'exceeds 16.67ms target',
-    );
-  }
-
-  // Verify memory usage targets
-  if (metrics.memoryUsage <= 200) {
-    results.add('✅ Memory usage ${metrics.memoryUsage}MB within 200MB limit');
-  } else {
-    results.add('❌ Memory usage ${metrics.memoryUsage}MB exceeds 200MB limit');
-  }
-
-  // Verify CPU usage targets
-  if (metrics.cpuUsage <= 80.0) {
-    results.add(
-      '✅ CPU usage ${metrics.cpuUsage.toStringAsFixed(1)}% within 80% limit',
-    );
-  } else {
-    results.add(
-      '❌ CPU usage ${metrics.cpuUsage.toStringAsFixed(1)}% exceeds 80% limit',
     );
   }
 
@@ -273,7 +209,6 @@ double _calculateContrastRatio(double luminance1, double luminance2) {
 /// Generate comprehensive verification report
 String generateVerificationReport({
   required BuildContext context,
-  required PerformanceMetrics? performanceMetrics,
   required List<Size> tapTargetSizes,
   required List<String> tapTargetContexts,
   required List<Color> foregroundColors,
@@ -337,18 +272,6 @@ String generateVerificationReport({
     }
   }
   report.writeln();
-
-  // Performance verification
-  if (performanceMetrics != null) {
-    report
-      ..writeln('⚡ PERFORMANCE VERIFICATION')
-      ..writeln('------------------------------');
-    final performanceResults = verifyPerformanceTargets(performanceMetrics);
-    for (final result in performanceResults) {
-      report.writeln(result);
-    }
-    report.writeln();
-  }
 
   // Summary
   report

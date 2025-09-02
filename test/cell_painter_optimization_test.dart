@@ -47,7 +47,9 @@ void main() {
 
         // Should create 50 custom painters in reasonable time
         expect(stopwatch.elapsedMilliseconds, lessThan(1000));
-        print('Created 50 cell painters in ${stopwatch.elapsedMilliseconds}ms');
+        debugPrint(
+          'Created 50 cell painters in ${stopwatch.elapsedMilliseconds}ms',
+        );
       });
     });
   });

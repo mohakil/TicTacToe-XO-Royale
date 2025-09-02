@@ -1,7 +1,6 @@
-// Route constants for the app
-// ignore: avoid_classes_with_only_static_members
+/// Simple route constants for the app
 class AppRoutes {
-  // Base routes
+  // Route paths
   static const String loading = '/loading';
   static const String home = '/home';
   static const String setup = '/setup';
@@ -10,7 +9,7 @@ class AppRoutes {
   static const String profile = '/profile';
   static const String settings = '/settings';
 
-  // Route names for navigation
+  // Route names
   static const String loadingName = 'loading';
   static const String homeName = 'home';
   static const String setupName = 'setup';
@@ -19,17 +18,8 @@ class AppRoutes {
   static const String profileName = 'profile';
   static const String settingsName = 'settings';
 
-  // Route parameters
-  static const String boardSizeParam = 'boardSize';
-  static const String winConditionParam = 'winCondition';
-  static const String gameModeParam = 'gameMode';
-  static const String difficultyParam = 'difficulty';
-  static const String player1Param = 'player1';
-  static const String player2Param = 'player2';
-  static const String firstMoveParam = 'firstMove';
-
-  // Route builders
-  static String getSetupRoute({
+  // Helper method to build setup route with parameters
+  static String buildSetupRoute({
     String? gameMode,
     int? boardSize,
     int? winCondition,
@@ -40,50 +30,29 @@ class AppRoutes {
     String? challengeId,
     String? tournamentId,
   }) {
-    final queryParams = <String, String>{};
+    final params = <String, String>{};
 
-    if (gameMode != null) {
-      queryParams[gameModeParam] = gameMode;
-    }
-    if (boardSize != null) {
-      queryParams[boardSizeParam] = boardSize.toString();
-    }
-    if (winCondition != null) {
-      queryParams[winConditionParam] = winCondition.toString();
-    }
-    if (difficulty != null) {
-      queryParams[difficultyParam] = difficulty;
-    }
-    if (player1 != null) {
-      queryParams[player1Param] = player1;
-    }
-    if (player2 != null) {
-      queryParams[player2Param] = player2;
-    }
-    if (firstMove != null) {
-      queryParams[firstMoveParam] = firstMove;
-    }
-    if (challengeId != null) {
-      queryParams['challengeId'] = challengeId;
-    }
-    if (tournamentId != null) {
-      queryParams['tournamentId'] = tournamentId;
-    }
+    if (gameMode != null) params['gameMode'] = gameMode;
+    if (boardSize != null) params['boardSize'] = boardSize.toString();
+    if (winCondition != null) params['winCondition'] = winCondition.toString();
+    if (difficulty != null) params['difficulty'] = difficulty;
+    if (player1 != null) params['player1'] = player1;
+    if (player2 != null) params['player2'] = player2;
+    if (firstMove != null) params['firstMove'] = firstMove;
+    if (challengeId != null) params['challengeId'] = challengeId;
+    if (tournamentId != null) params['tournamentId'] = tournamentId;
 
-    if (queryParams.isEmpty) {
-      return setup;
-    }
+    if (params.isEmpty) return setup;
 
-    final queryString = queryParams.entries
+    final queryString = params.entries
         .map((e) => '${e.key}=${Uri.encodeComponent(e.value)}')
         .join('&');
 
-    final result = '$setup?$queryString';
-    // print('DEBUG: getSetupRoute called with gameMode=$gameMode, result=$result');
-    return result;
+    return '$setup?$queryString';
   }
 
-  static String getGameRoute({
+  // Helper method to build game route with parameters
+  static String buildGameRoute({
     int? boardSize,
     int? winCondition,
     String? gameMode,
@@ -92,117 +61,22 @@ class AppRoutes {
     String? player2,
     String? firstMove,
   }) {
-    final queryParams = <String, String>{};
+    final params = <String, String>{};
 
-    if (boardSize != null) {
-      queryParams[boardSizeParam] = boardSize.toString();
-    }
-    if (winCondition != null) {
-      queryParams[winConditionParam] = winCondition.toString();
-    }
-    if (gameMode != null) {
-      queryParams[gameModeParam] = gameMode;
-    }
-    if (difficulty != null) {
-      queryParams[difficultyParam] = difficulty;
-    }
-    if (player1 != null) {
-      queryParams[player1Param] = player1;
-    }
-    if (player2 != null) {
-      queryParams[player2Param] = player2;
-    }
-    if (firstMove != null) {
-      queryParams[firstMoveParam] = firstMove;
-    }
+    if (boardSize != null) params['boardSize'] = boardSize.toString();
+    if (winCondition != null) params['winCondition'] = winCondition.toString();
+    if (gameMode != null) params['gameMode'] = gameMode;
+    if (difficulty != null) params['difficulty'] = difficulty;
+    if (player1 != null) params['player1'] = player1;
+    if (player2 != null) params['player2'] = player2;
+    if (firstMove != null) params['firstMove'] = firstMove;
 
-    if (queryParams.isEmpty) {
-      return game;
-    }
+    if (params.isEmpty) return game;
 
-    final queryString = queryParams.entries
+    final queryString = params.entries
         .map((e) => '${e.key}=${Uri.encodeComponent(e.value)}')
         .join('&');
 
     return '$game?$queryString';
   }
-
-  // Route validation
-  static bool isValidRoute(String route) =>
-      [loading, home, setup, game, store, profile, settings].contains(route);
-
-  // Route grouping
-  static const List<String> mainRoutes = [home, store, profile, settings];
-
-  static const List<String> gameRoutes = [setup, game];
-
-  static const List<String> utilityRoutes = [loading];
-
-  // Route metadata
-  static const Map<String, Map<String, dynamic>> routeMetadata = {
-    loading: {
-      'title': 'Loading',
-      'icon': 'hourglass_empty',
-      'requiresAuth': false,
-      'showInNav': false,
-    },
-    home: {
-      'title': 'Home',
-      'icon': 'home',
-      'requiresAuth': false,
-      'showInNav': true,
-    },
-    setup: {
-      'title': 'Game Setup',
-      'icon': 'settings',
-      'requiresAuth': false,
-      'showInNav': false,
-    },
-    game: {
-      'title': 'Game',
-      'icon': 'sports_esports',
-      'requiresAuth': false,
-      'showInNav': false,
-    },
-    store: {
-      'title': 'Store',
-      'icon': 'storefront',
-      'requiresAuth': false,
-      'showInNav': true,
-    },
-    profile: {
-      'title': 'Profile',
-      'icon': 'account_circle',
-      'requiresAuth': false,
-      'showInNav': true,
-    },
-    settings: {
-      'title': 'Settings',
-      'icon': 'tune',
-      'requiresAuth': false,
-      'showInNav': true,
-    },
-  };
-
-  // Get route title
-  static String getRouteTitle(String route) =>
-      routeMetadata[route]?['title'] ?? 'Unknown';
-
-  // Get route icon
-  static String getRouteIcon(String route) =>
-      routeMetadata[route]?['icon'] ?? 'help';
-
-  // Check if route requires auth
-  static bool requiresAuth(String route) =>
-      routeMetadata[route]?['requiresAuth'] ?? false;
-
-  // Check if route should show in navigation
-  static bool showInNavigation(String route) =>
-      routeMetadata[route]?['showInNav'] ?? false;
-
-  // Get navigation routes
-  static List<String> getNavigationRoutes() => routeMetadata.entries
-      .where((entry) => entry.value['showInNav'] == true)
-      .map((entry) => entry.key)
-      .toList();
 }

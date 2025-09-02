@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tictactoe_xo_royale/core/services/game_logic.dart';
-import 'package:tictactoe_xo_royale/core/services/performance_monitor.dart';
+
 import 'package:tictactoe_xo_royale/features/game/presentation/widgets/game_board/game_board.dart';
 import 'package:tictactoe_xo_royale/features/game/presentation/widgets/visual_effects/painters/board_painter.dart';
 
@@ -62,30 +62,6 @@ void main() {
         ValueKey('game_board_${boardState.hashCode}'),
       );
       expect(repaintBoundaryWithKey, findsOneWidget);
-    });
-
-    test('PerformanceMonitor tracks frame rates correctly', () {
-      final monitor = PerformanceMonitor();
-
-      // Start monitoring
-      monitor.startMonitoring();
-      expect(monitor.getPerformanceReport().isMonitoring, isTrue);
-
-      // Stop monitoring
-      monitor.stopMonitoring();
-      expect(monitor.getPerformanceReport().isMonitoring, isFalse);
-
-      // Reset metrics
-      monitor.reset();
-      final report = monitor.getPerformanceReport();
-      expect(report.averageFPS, equals(0.0));
-      expect(report.frameDrops, equals(0));
-    });
-
-    test('PerformanceMonitor provides recommendations', () {
-      final monitor = PerformanceMonitor();
-      final recommendations = monitor.getRecommendations();
-      expect(recommendations, isA<List<String>>());
     });
 
     test('BoardPainter shouldRepaint optimization works correctly', () {
@@ -202,7 +178,7 @@ void main() {
 
         // Should create 100 painters in less than 100ms with static Paint caching
         expect(stopwatch.elapsedMilliseconds, lessThan(100));
-        print(
+        debugPrint(
           'Created 100 BoardPainters in ${stopwatch.elapsedMilliseconds}ms',
         );
       });
@@ -237,7 +213,7 @@ void main() {
 
         // Should perform 1000 shouldRepaint checks in less than 10ms
         expect(stopwatch.elapsedMilliseconds, lessThan(10));
-        print(
+        debugPrint(
           'Performed 1000 shouldRepaint checks in ${stopwatch.elapsedMilliseconds}ms',
         );
       });

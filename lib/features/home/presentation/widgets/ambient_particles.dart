@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:tictactoe_xo_royale/core/services/animation_pool.dart';
 
 /// Ambient floating X/O shapes with subtle animations
 /// Creates a background effect with floating game symbols
@@ -35,9 +36,10 @@ class _AmbientParticlesState extends State<AmbientParticles>
 
     _controllers = List.generate(
       widget.particleCount,
-      (index) => AnimationController(
-        duration: Duration(milliseconds: (8000 + index * 500).toInt()),
+      (index) => AnimationPool.getController(
         vsync: this,
+        poolName: 'home',
+        duration: Duration(milliseconds: (8000 + index * 500).toInt()),
       ),
     );
 
@@ -80,8 +82,9 @@ class _AmbientParticlesState extends State<AmbientParticles>
 
   @override
   void dispose() {
+    // Return controllers to the pool instead of disposing them directly
     for (final controller in _controllers) {
-      controller.dispose();
+      AnimationPool.returnController(controller, 'home');
     }
     super.dispose();
   }

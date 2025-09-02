@@ -4,12 +4,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tictactoe_xo_royale/app/theme/app_theme.dart';
 
 // ✅ OPTIMIZED: Provider for theme mode with KeepAlive for persistence
-final themeModeProvider = StateNotifierProvider<ThemeModeNotifier, ThemeMode>(
-  (ref) => ThemeModeNotifier(),
-);
+final themeModeProvider = StateNotifierProvider<ThemeModeNotifier, ThemeMode>((
+  ref,
+) {
+  ref.keepAlive(); // Keep alive since theme mode should persist
+  return ThemeModeNotifier();
+});
 
-// ✅ OPTIMIZED: Theme data provider using select for granular rebuilds
+// ✅ OPTIMIZED: Theme data provider using select for granular rebuilds with keepAlive
 final themeDataProvider = Provider<ThemeData>((ref) {
+  ref.keepAlive(); // Keep alive since theme data is expensive to create
   final themeMode = ref.watch(themeModeProvider);
   return themeMode == ThemeMode.light
       ? AppTheme.lightTheme
@@ -38,11 +42,12 @@ final systemThemeProvider = Provider<ThemeData>((ref) {
       : AppTheme.darkTheme;
 });
 
-// ✅ OPTIMIZED: Responsive theme provider using select for granular rebuilds
+// ✅ OPTIMIZED: Responsive theme provider using select for granular rebuilds with keepAlive
 final responsiveThemeProvider = Provider.family<ThemeData, double>((
   ref,
   scaleFactor,
 ) {
+  ref.keepAlive(); // Keep alive since responsive theme calculations are expensive
   final baseTheme = ref.watch(themeDataProvider);
   return AppTheme.getResponsiveTheme(baseTheme, scaleFactor);
 });

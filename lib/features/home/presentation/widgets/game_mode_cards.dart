@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:tictactoe_xo_royale/core/services/animation_pool.dart';
 
 /// Game mode card for Local Player and Robot modes
 /// Features hover/press states and slight parallax icon movement
@@ -37,9 +38,10 @@ class _GameModeCardState extends State<GameModeCard>
   void initState() {
     super.initState();
 
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 200),
+    _animationController = AnimationPool.getController(
       vsync: this,
+      poolName: 'ui',
+      duration: const Duration(milliseconds: 200),
     );
 
     _scaleAnimation = Tween<double>(begin: 1, end: 0.96).animate(
@@ -64,7 +66,8 @@ class _GameModeCardState extends State<GameModeCard>
 
   @override
   void dispose() {
-    _animationController.dispose();
+    // Return controller to the pool instead of disposing it directly
+    AnimationPool.returnController(_animationController, 'ui');
     super.dispose();
   }
 

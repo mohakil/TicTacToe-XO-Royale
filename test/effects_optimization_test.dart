@@ -89,7 +89,7 @@ void main() {
 
         // Should create 50 ambient painters in reasonable time
         expect(stopwatch.elapsedMilliseconds, lessThan(1000));
-        print(
+        debugPrint(
           'Created 50 ambient painters in ${stopwatch.elapsedMilliseconds}ms',
         );
       });
@@ -117,7 +117,7 @@ void main() {
 
         // Should create 50 confetti painters in reasonable time
         expect(stopwatch.elapsedMilliseconds, lessThan(1000));
-        print(
+        debugPrint(
           'Created 50 confetti painters in ${stopwatch.elapsedMilliseconds}ms',
         );
       });
@@ -145,7 +145,7 @@ void main() {
 
         // Should create 50 hint sparkle painters in reasonable time
         expect(stopwatch.elapsedMilliseconds, lessThan(1000));
-        print(
+        debugPrint(
           'Created 50 hint sparkle painters in ${stopwatch.elapsedMilliseconds}ms',
         );
       });

@@ -290,7 +290,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                       isValid // Use optimized value
                       ? () {
                           // Navigate to game screen with setup data
-                          final gameRoute = AppRoutes.getGameRoute(
+                          final gameRoute = AppRoutes.buildGameRoute(
                             boardSize: setupNotifier.boardSizeValue,
                             winCondition: setupNotifier.winConditionValue,
                             gameMode: setupNotifier.gameModeValue,

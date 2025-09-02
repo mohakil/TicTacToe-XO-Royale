@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:tictactoe_xo_royale/core/services/animation_pool.dart';
 
 class AmbientBackground extends StatefulWidget {
   const AmbientBackground({super.key});
@@ -17,9 +18,10 @@ class _AmbientBackgroundState extends State<AmbientBackground>
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      duration: const Duration(seconds: 8),
+    _animationController = AnimationPool.getController(
       vsync: this,
+      poolName: 'loading',
+      duration: const Duration(seconds: 8),
     )..repeat();
 
     _fadeAnimation = Tween<double>(begin: 0.3, end: 0.7).animate(
@@ -33,7 +35,8 @@ class _AmbientBackgroundState extends State<AmbientBackground>
 
   @override
   void dispose() {
-    _animationController.dispose();
+    // Return controller to the pool instead of disposing it directly
+    AnimationPool.returnController(_animationController, 'loading');
     super.dispose();
   }
 

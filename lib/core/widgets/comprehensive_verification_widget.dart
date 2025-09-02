@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tictactoe_xo_royale/core/services/performance_service.dart';
+
 import 'package:tictactoe_xo_royale/core/utils/responsive_builder.dart';
 import 'package:tictactoe_xo_royale/core/utils/verification_utils.dart';
 
@@ -73,14 +73,9 @@ class _ComprehensiveVerificationWidgetState
     });
 
     try {
-      // Get current performance metrics
-      final performanceService = ref.read(performanceServiceProvider);
-      final performanceMetrics = performanceService.getCurrentMetrics();
-
-      // Generate comprehensive report
+      // Generate comprehensive report (without performance metrics)
       final report = generateVerificationReport(
         context: context,
-        performanceMetrics: performanceMetrics,
         tapTargetSizes: _tapTargetSizes,
         tapTargetContexts: _tapTargetContexts,
         foregroundColors: _foregroundColors,

@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tictactoe_xo_royale/core/services/memory_manager.dart';
 
 class LoadingState {
   final double progress;
@@ -72,6 +73,9 @@ class LoadingNotifier extends StateNotifier<LoadingState> {
   }
 }
 
-final loadingProvider = StateNotifierProvider<LoadingNotifier, LoadingState>(
-  (ref) => LoadingNotifier(),
-);
+// ✅ OPTIMIZED: Loading provider with autoDispose for temporary loading data
+final loadingProvider =
+    StateNotifierProvider.autoDispose<LoadingNotifier, LoadingState>((ref) {
+      ref.trackMemory('loading', keepAlive: false);
+      return LoadingNotifier();
+    });

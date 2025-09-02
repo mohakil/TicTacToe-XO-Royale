@@ -3,18 +3,18 @@ import 'package:tictactoe_xo_royale/app/router/routes.dart';
 
 void main() {
   group('Route Generation Tests', () {
-    test('getSetupRoute generates correct robot mode URL', () {
-      final result = AppRoutes.getSetupRoute(gameMode: 'robot');
+    test('buildSetupRoute generates correct robot mode URL', () {
+      final result = AppRoutes.buildSetupRoute(gameMode: 'robot');
       expect(result, '/setup?gameMode=robot');
     });
 
-    test('getSetupRoute generates correct local mode URL', () {
-      final result = AppRoutes.getSetupRoute(gameMode: 'local');
+    test('buildSetupRoute generates correct local mode URL', () {
+      final result = AppRoutes.buildSetupRoute(gameMode: 'local');
       expect(result, '/setup?gameMode=local');
     });
 
-    test('getSetupRoute without parameters returns base route', () {
-      final result = AppRoutes.getSetupRoute();
+    test('buildSetupRoute without parameters returns base route', () {
+      final result = AppRoutes.buildSetupRoute();
       expect(result, '/setup');
     });
   });

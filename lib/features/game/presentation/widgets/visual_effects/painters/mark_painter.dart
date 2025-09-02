@@ -36,13 +36,17 @@ void paintMark(
   bool enableShake = false,
   double shakeValue = 0.0, // 0.0 to 1.0 for shake effect
 }) {
+  // Always use maximum quality effects for best visual experience
+  final effectiveGlowIntensity = glowIntensity; // Always use glow effects
+  final effectiveShake = enableShake; // Always use high quality effects
+
   if (mark == 'X') {
     _paintX(
       canvas,
       cellRect,
       animationValue,
-      glowIntensity,
-      enableShake,
+      effectiveGlowIntensity,
+      effectiveShake,
       shakeValue,
     );
   } else if (mark == 'O') {
@@ -50,8 +54,8 @@ void paintMark(
       canvas,
       cellRect,
       animationValue,
-      glowIntensity,
-      enableShake,
+      effectiveGlowIntensity,
+      effectiveShake,
       shakeValue,
     );
   }

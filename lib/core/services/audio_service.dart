@@ -487,12 +487,16 @@ class AudioService {
   }
 }
 
-/// Provider for AudioService
-final audioServiceProvider = Provider<AudioService>((ref) => AudioService());
+/// ✅ OPTIMIZED: AudioService provider with keepAlive for persistent audio management
+final audioServiceProvider = Provider<AudioService>((ref) {
+  ref.keepAlive(); // Keep alive since audio service should persist
+  return AudioService();
+});
 
-/// Provider for audio settings
+/// ✅ OPTIMIZED: Audio settings provider with keepAlive for persistent settings
 final audioSettingsProvider =
     Provider<({bool soundEnabled, bool musicEnabled})>((ref) {
+      ref.keepAlive(); // Keep alive since settings are persistent
       final settings = ref.watch(settingsProvider);
       return (
         soundEnabled: settings.soundEnabled,

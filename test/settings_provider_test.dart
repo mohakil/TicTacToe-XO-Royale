@@ -25,7 +25,6 @@ void main() {
         expect(settings.musicEnabled, isTrue);
         expect(settings.hapticFeedbackEnabled, isTrue);
         expect(settings.autoSaveEnabled, isTrue);
-        expect(settings.performanceMode, equals(PerformanceMode.balanced));
       });
 
       test('Should provide default boolean settings', () {
@@ -38,11 +37,6 @@ void main() {
         expect(musicEnabled, isTrue);
         expect(hapticEnabled, isTrue);
         expect(autoSaveEnabled, isTrue);
-      });
-
-      test('Should provide default performance mode', () {
-        final performanceMode = container.read(performanceModeProvider);
-        expect(performanceMode, equals(PerformanceMode.balanced));
       });
     });
 
@@ -77,14 +71,6 @@ void main() {
 
         final settings = container.read(settingsProvider);
         expect(settings.autoSaveEnabled, isFalse);
-      });
-
-      test('Should update performance mode', () async {
-        final notifier = container.read(settingsProvider.notifier);
-        await notifier.setPerformanceMode(PerformanceMode.performance);
-
-        final settings = container.read(settingsProvider);
-        expect(settings.performanceMode, equals(PerformanceMode.performance));
       });
     });
 

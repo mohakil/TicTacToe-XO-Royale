@@ -1,6 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+/// Custom page class that wraps PageRouteBuilder for go_router compatibility
+class AppTransitionPage<T> extends Page<T> {
+  final Widget child;
+  final PageTransitionType transitionType;
+  final Duration? duration;
+  final String? tag;
+
+  const AppTransitionPage({
+    required this.child,
+    required this.transitionType,
+    this.duration,
+    this.tag,
+    super.key,
+    super.name,
+    super.arguments,
+    super.restorationId,
+  });
+
+  @override
+  Route<T> createRoute(BuildContext context) {
+    switch (transitionType) {
+      case PageTransitionType.sharedAxisHorizontal:
+        return AppRouteTransitions.sharedAxisHorizontal<T>(child: child);
+      case PageTransitionType.sharedAxisVertical:
+        return AppRouteTransitions.sharedAxisVertical<T>(child: child);
+      case PageTransitionType.fade:
+        return AppRouteTransitions.fade<T>(child: child, duration: duration);
+      case PageTransitionType.scale:
+        return AppRouteTransitions.scale<T>(child: child, duration: duration);
+      case PageTransitionType.hero:
+        return AppRouteTransitions.hero<T>(
+          child: child,
+          tag: tag ?? 'default',
+          duration: duration,
+        );
+      case PageTransitionType.combined:
+        return AppRouteTransitions.combined<T>(
+          child: child,
+          duration: duration,
+        );
+    }
+  }
+}
+
 // ignore: avoid_classes_with_only_static_members
 /// Custom route transitions for the TicTacToe XO Royale app
 /// Implements shared axis and fade transitions as specified in the PRD

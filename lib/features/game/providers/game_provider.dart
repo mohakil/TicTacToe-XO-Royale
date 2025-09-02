@@ -2,59 +2,72 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tictactoe_xo_royale/core/models/game_config.dart';
 import 'package:tictactoe_xo_royale/core/services/game_logic.dart';
 import 'package:tictactoe_xo_royale/core/services/robot_logic.dart';
+import 'package:tictactoe_xo_royale/core/services/memory_manager.dart';
 
-// Provider for game configuration
-final gameConfigProvider = StateProvider<GameConfig>(
-  (ref) => GameConfig.defaultConfig(),
-);
+// ✅ OPTIMIZED: Game configuration provider with autoDispose for temporary data
+final gameConfigProvider = StateProvider.autoDispose<GameConfig>((ref) {
+  ref.trackMemory('gameConfig', keepAlive: false);
+  return GameConfig.defaultConfig();
+});
 
-// Provider for game logic service
-final gameLogicProvider = Provider<GameLogic>((ref) {
+// ✅ OPTIMIZED: Game logic service provider with autoDispose
+final gameLogicProvider = Provider.autoDispose<GameLogic>((ref) {
+  ref.trackMemory('gameLogic', keepAlive: false);
   final config = ref.watch(gameConfigProvider);
   return GameLogic(config);
 });
 
-// Provider for current game state
-final gameStateProvider = StateNotifierProvider<GameNotifier, GameLogic>((ref) {
-  final gameLogic = ref.watch(gameLogicProvider);
-  return GameNotifier(gameLogic);
+// ✅ OPTIMIZED: Game state provider with autoDispose for temporary game sessions
+final gameStateProvider =
+    StateNotifierProvider.autoDispose<GameNotifier, GameLogic>((ref) {
+      ref.trackMemory('gameState', keepAlive: false);
+      final gameLogic = ref.watch(gameLogicProvider);
+      return GameNotifier(gameLogic);
+    });
+
+// ✅ OPTIMIZED: Use select for granular rebuilds with autoDispose for temporary data
+// Individual game data providers for granular rebuilds
+final currentPlayerProvider = Provider.autoDispose<CellState>((ref) {
+  ref.trackMemory('currentPlayer', keepAlive: false);
+  return ref.watch(gameStateProvider.select((state) => state.getNextPlayer()));
 });
 
-// ✅ OPTIMIZED: Use select for granular rebuilds instead of individual providers
-// Individual game data providers for granular rebuilds
-final currentPlayerProvider = Provider<CellState>(
-  (ref) =>
-      ref.watch(gameStateProvider.select((state) => state.getNextPlayer())),
-);
+final gameBoardProvider = Provider.autoDispose<List<List<CellState>>>((ref) {
+  ref.trackMemory('gameBoard', keepAlive: false);
+  return ref.watch(gameStateProvider.select((state) => state.board));
+});
 
-final gameBoardProvider = Provider<List<List<CellState>>>(
-  (ref) => ref.watch(gameStateProvider.select((state) => state.board)),
-);
-
-final isGameOverProvider = Provider<bool>(
-  (ref) => ref.watch(
+final isGameOverProvider = Provider.autoDispose<bool>((ref) {
+  ref.trackMemory('isGameOver', keepAlive: false);
+  return ref.watch(
     gameStateProvider.select((state) => state.checkGameState().isGameOver),
-  ),
-);
+  );
+});
 
-final gameResultProvider = Provider<GameResult>(
-  (ref) =>
-      ref.watch(gameStateProvider.select((state) => state.checkGameState())),
-);
+final gameResultProvider = Provider.autoDispose<GameResult>((ref) {
+  ref.trackMemory('gameResult', keepAlive: false);
+  return ref.watch(gameStateProvider.select((state) => state.checkGameState()));
+});
 
-final availableMovesProvider = Provider<List<Position>>(
-  (ref) =>
-      ref.watch(gameStateProvider.select((state) => state.getAvailableMoves())),
-);
+final availableMovesProvider = Provider.autoDispose<List<Position>>((ref) {
+  ref.trackMemory('availableMoves', keepAlive: false);
+  return ref.watch(
+    gameStateProvider.select((state) => state.getAvailableMoves()),
+  );
+});
 
-final gameConfigFromStateProvider = Provider<GameConfig>(
-  (ref) => ref.watch(gameStateProvider.select((state) => state.config)),
-);
+final gameConfigFromStateProvider = Provider.autoDispose<GameConfig>((ref) {
+  ref.trackMemory('gameConfigFromState', keepAlive: false);
+  return ref.watch(gameStateProvider.select((state) => state.config));
+});
 
-// ✅ OPTIMIZED: Computed providers using select for better performance
+// ✅ OPTIMIZED: Computed providers using select with autoDispose for temporary data
 final gameStatusProvider =
-    Provider<({CellState currentPlayer, bool isGameOver, GameResult result})>(
-      (ref) => ref.watch(
+    Provider.autoDispose<
+      ({CellState currentPlayer, bool isGameOver, GameResult result})
+    >((ref) {
+      ref.trackMemory('gameStatus', keepAlive: false);
+      return ref.watch(
         gameStateProvider.select((state) {
           final currentPlayer = state.getNextPlayer();
           final result = state.checkGameState();
@@ -64,18 +77,21 @@ final gameStatusProvider =
             result: result,
           );
         }),
-      ),
-    );
+      );
+    });
 
 final gameBoardStateProvider =
-    Provider<({List<List<CellState>> board, List<Position> availableMoves})>(
-      (ref) => ref.watch(
+    Provider.autoDispose<
+      ({List<List<CellState>> board, List<Position> availableMoves})
+    >((ref) {
+      ref.trackMemory('gameBoardState', keepAlive: false);
+      return ref.watch(
         gameStateProvider.select(
           (state) =>
               (board: state.board, availableMoves: state.getAvailableMoves()),
         ),
-      ),
-    );
+      );
+    });
 
 // ✅ OPTIMIZED: Extension methods for easy access with select-based providers
 extension GameProviderExtension on WidgetRef {

@@ -205,7 +205,9 @@ void main() {
 
         // Should create 100 GameHeaders in reasonable time (test environment is slower)
         expect(stopwatch.elapsedMilliseconds, lessThan(2000));
-        print('Created 100 GameHeaders in ${stopwatch.elapsedMilliseconds}ms');
+        debugPrint(
+          'Created 100 GameHeaders in ${stopwatch.elapsedMilliseconds}ms',
+        );
       });
 
       testWidgets('GameStatus creation performance', (tester) async {
@@ -228,7 +230,7 @@ void main() {
 
         // Should create 100 GameStatus widgets in reasonable time (test environment is slower)
         expect(stopwatch.elapsedMilliseconds, lessThan(1000));
-        print(
+        debugPrint(
           'Created 100 GameStatus widgets in ${stopwatch.elapsedMilliseconds}ms',
         );
       });
@@ -254,7 +256,9 @@ void main() {
 
         // Should create 100 GameControls in reasonable time (test environment is slower)
         expect(stopwatch.elapsedMilliseconds, lessThan(2000));
-        print('Created 100 GameControls in ${stopwatch.elapsedMilliseconds}ms');
+        debugPrint(
+          'Created 100 GameControls in ${stopwatch.elapsedMilliseconds}ms',
+        );
       });
     });
   });
