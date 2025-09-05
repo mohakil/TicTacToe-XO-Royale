@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tictactoe_xo_royale/features/setup/providers/setup_provider.dart';
+import 'package:tictactoe_xo_royale/core/models/game_enums.dart';
 
 class BoardPreview extends StatelessWidget {
   const BoardPreview({

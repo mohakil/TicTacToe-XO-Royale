@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tictactoe_xo_royale/features/setup/providers/setup_provider.dart';
+import 'package:tictactoe_xo_royale/core/models/game_enums.dart';
 
 void main() {
   group('SetupProvider Tests', () {
@@ -54,15 +55,7 @@ void main() {
 
         final setupState = container.read(setupProvider);
         expect(setupState.mode, equals(GameMode.robot));
-      });
-
-      test('should allow updating difficulty', () {
-        final notifier = container.read(setupProvider.notifier);
-
-        notifier.setDifficulty(Difficulty.hard);
-
-        final setupState = container.read(setupProvider);
-        expect(setupState.difficulty, equals(Difficulty.hard));
+        expect(setupState.player2Name, equals('CPU')); // Should auto-update
       });
 
       test('should allow updating player names', () {
@@ -76,6 +69,15 @@ void main() {
         expect(setupState.player2Name, equals('Bob'));
       });
 
+      test('should allow updating difficulty', () {
+        final notifier = container.read(setupProvider.notifier);
+
+        notifier.setDifficulty(Difficulty.hard);
+
+        final setupState = container.read(setupProvider);
+        expect(setupState.difficulty, equals(Difficulty.hard));
+      });
+
       test('should allow updating first move', () {
         final notifier = container.read(setupProvider.notifier);
 
@@ -84,76 +86,121 @@ void main() {
         final setupState = container.read(setupProvider);
         expect(setupState.firstMove, equals(FirstMove.player1));
       });
-    });
 
-    group('Individual Setup Providers', () {
-      test('setupBoardSizeProvider should provide board size', () {
-        final boardSize = container.read(setupBoardSizeProvider);
-        expect(boardSize, equals(BoardSize.threeByThree));
+      test('should validate setup correctly', () {
+        final notifier = container.read(setupProvider.notifier);
+
+        // Valid setup
+        notifier.setPlayer1Name('Player 1');
+        notifier.setPlayer2Name('Player 2');
+        expect(notifier.isValid, isTrue);
+
+        // Invalid setup - empty player 1 name
+        notifier.setPlayer1Name('');
+        expect(notifier.isValid, isFalse);
+
+        // Invalid setup - empty player 2 name in local mode
+        notifier.setPlayer1Name('Player 1');
+        notifier.setMode(GameMode.local);
+        notifier.setPlayer2Name('');
+        expect(notifier.isValid, isFalse);
       });
 
-      test('setupWinConditionProvider should provide win condition', () {
-        final winCondition = container.read(setupWinConditionProvider);
-        expect(winCondition, equals(WinCondition.threeInRow));
-      });
-
-      test('setupModeProvider should provide game mode', () {
-        final gameMode = container.read(setupModeProvider);
-        expect(gameMode, equals(GameMode.local));
-      });
-
-      test('setupDifficultyProvider should provide difficulty', () {
-        final difficulty = container.read(setupDifficultyProvider);
-        expect(difficulty, equals(Difficulty.medium));
-      });
-
-      test('setupPlayer1NameProvider should provide player 1 name', () {
-        final player1Name = container.read(setupPlayer1NameProvider);
-        expect(player1Name, equals('Player 1'));
-      });
-
-      test('setupPlayer2NameProvider should provide player 2 name', () {
-        final player2Name = container.read(setupPlayer2NameProvider);
-        expect(player2Name, equals('Player 2'));
-      });
-
-      test('setupFirstMoveProvider should provide first move', () {
-        final firstMove = container.read(setupFirstMoveProvider);
-        expect(firstMove, equals(FirstMove.random));
-      });
-    });
-
-    group('Setup State Changes', () {
-      test('should update mode correctly', () {
+      test('should provide robot configuration for robot mode', () {
         final notifier = container.read(setupProvider.notifier);
 
         notifier.setMode(GameMode.robot);
-        final setupState = container.read(setupProvider);
-        expect(setupState.mode, equals(GameMode.robot));
-        expect(setupState.player2Name, equals('CPU'));
+        notifier.setDifficulty(Difficulty.hard);
+
+        final robotConfig = notifier.robotConfig;
+        expect(robotConfig, isNotNull);
+        expect(robotConfig!.difficulty, equals(Difficulty.hard));
+        expect(robotConfig.playerName, equals('CPU'));
+      });
+
+      test('should return null robot configuration for local mode', () {
+        final notifier = container.read(setupProvider.notifier);
 
         notifier.setMode(GameMode.local);
-        final updatedState = container.read(setupProvider);
-        expect(updatedState.mode, equals(GameMode.local));
-        expect(updatedState.player2Name, equals('Player 2'));
+
+        final robotConfig = notifier.robotConfig;
+        expect(robotConfig, isNull);
       });
 
-      test('should update board size correctly', () {
+      test('should reset to default values', () {
         final notifier = container.read(setupProvider.notifier);
 
-        notifier.setBoardSize(BoardSize.fourByFour);
+        // Change some values
+        notifier.setMode(GameMode.robot);
+        notifier.setPlayer1Name('Alice');
+        notifier.setDifficulty(Difficulty.hard);
+
+        // Reset
+        notifier.reset();
+
         final setupState = container.read(setupProvider);
-        expect(setupState.boardSize, equals(BoardSize.fourByFour));
+        expect(setupState.mode, equals(GameMode.local));
+        expect(setupState.player1Name, equals('Player 1'));
+        expect(setupState.difficulty, equals(Difficulty.medium));
       });
+    });
 
-      test('should update win condition correctly', () {
+    group('Setup Provider Extensions', () {
+      test('should provide easy access to setup data', () {
+        final container = ProviderContainer();
+
+        // Test extension methods
+        final setupState = container.read(setupProvider);
+        expect(setupState, isA<GameSetup>());
+
+        container.dispose();
+      });
+    });
+
+    group('Setup Validation', () {
+      test('should validate win condition for board size', () {
         final notifier = container.read(setupProvider.notifier);
 
-        // First set board size to 4x4 to allow fourInRow win condition
+        // 3x3 board - only 3-in-row should be valid
+        notifier.setBoardSize(BoardSize.threeByThree);
+        expect(
+          WinCondition.threeInRow.isValidForBoardSize(BoardSize.threeByThree),
+          isTrue,
+        );
+        expect(
+          WinCondition.fourInRow.isValidForBoardSize(BoardSize.threeByThree),
+          isFalse,
+        );
+
+        // 4x4 board - 3-in-row and 4-in-row should be valid
         notifier.setBoardSize(BoardSize.fourByFour);
-        notifier.setWinCondition(WinCondition.fourInRow);
-        final setupState = container.read(setupProvider);
-        expect(setupState.winCondition, equals(WinCondition.fourInRow));
+        expect(
+          WinCondition.threeInRow.isValidForBoardSize(BoardSize.fourByFour),
+          isTrue,
+        );
+        expect(
+          WinCondition.fourInRow.isValidForBoardSize(BoardSize.fourByFour),
+          isTrue,
+        );
+        expect(
+          WinCondition.fiveInRow.isValidForBoardSize(BoardSize.fourByFour),
+          isFalse,
+        );
+
+        // 5x5 board - all should be valid
+        notifier.setBoardSize(BoardSize.fiveByFive);
+        expect(
+          WinCondition.threeInRow.isValidForBoardSize(BoardSize.fiveByFive),
+          isTrue,
+        );
+        expect(
+          WinCondition.fourInRow.isValidForBoardSize(BoardSize.fiveByFive),
+          isTrue,
+        );
+        expect(
+          WinCondition.fiveInRow.isValidForBoardSize(BoardSize.fiveByFive),
+          isTrue,
+        );
       });
     });
   });

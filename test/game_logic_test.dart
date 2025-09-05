@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tictactoe_xo_royale/core/models/game_config.dart';
+import 'package:tictactoe_xo_royale/core/models/game_enums.dart';
 import 'package:tictactoe_xo_royale/core/services/game_logic.dart';
 
 void main() {
@@ -285,14 +286,12 @@ void main() {
     group('Large Board Tests', () {
       test('4x4 board with 4-in-a-row win condition', () {
         const largeConfig = GameConfig(
-          boardSize: 4,
-          winCondition: 4,
+          boardSize: BoardSize.fourByFour,
+          winCondition: WinCondition.fourInRow,
           gameMode: GameMode.local,
           firstMove: FirstMove.player1,
-          difficulty: Difficulty.medium,
           player1Name: 'Player 1',
           player2Name: 'Player 2',
-          isRobotMode: false,
         );
         final largeGameLogic = GameLogic(largeConfig);
 
@@ -304,14 +303,12 @@ void main() {
 
       test('5x5 board with 5-in-a-row win condition', () {
         const largeConfig = GameConfig(
-          boardSize: 5,
-          winCondition: 5,
+          boardSize: BoardSize.fiveByFive,
+          winCondition: WinCondition.fiveInRow,
           gameMode: GameMode.local,
           firstMove: FirstMove.player1,
-          difficulty: Difficulty.medium,
           player1Name: 'Player 1',
           player2Name: 'Player 2',
-          isRobotMode: false,
         );
         final largeGameLogic = GameLogic(largeConfig);
 

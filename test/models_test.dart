@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tictactoe_xo_royale/core/models/mock_data.dart';
 import 'package:tictactoe_xo_royale/core/models/models.dart';
+import 'package:tictactoe_xo_royale/core/models/game_enums.dart';
 
 void main() {
   group('PlayerProfile Model Tests', () {
@@ -85,7 +86,7 @@ void main() {
       final config = GameConfig.cpuConfig(difficulty: Difficulty.hard);
       expect(config.boardSize, equals(3));
       expect(config.winCondition, equals(3));
-      expect(config.gameMode, GameMode.cpu);
+      expect(config.gameMode, GameMode.robot);
       expect(config.firstMove, FirstMove.player1);
       expect(config.difficulty, Difficulty.hard);
       expect(config.player1Name, equals('You'));
@@ -96,8 +97,8 @@ void main() {
     test('should copy with new values', () {
       final config = GameConfig.defaultConfig();
       final newConfig = config.copyWith(
-        boardSize: 4,
-        winCondition: 4,
+        boardSize: BoardSize.fourByFour,
+        winCondition: WinCondition.fourInRow,
         player1Name: 'Alice',
         player2Name: 'Bob',
       );

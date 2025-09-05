@@ -36,52 +36,55 @@ class _LoadingScreenState extends ConsumerState<LoadingScreen> {
       });
     }
 
-    return Scaffold(
-      body: Stack(
-        children: [
-          // Animated background
-          const AmbientBackground(),
+    return PopScope(
+      canPop: false, // Disable back button on loading screen
+      child: Scaffold(
+        body: Stack(
+          children: [
+            // Animated background
+            const AmbientBackground(),
 
-          // Main content
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Spacer(flex: 2),
+            // Main content
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Spacer(flex: 2),
 
-                  // Logo animation
-                  const LogoAnimation(),
+                    // Logo animation
+                    const LogoAnimation(),
 
-                  const SizedBox(height: 48),
+                    const SizedBox(height: 48),
 
-                  // Progress bar
-                  ProgressBar(progress: loadingState.progress),
+                    // Progress bar
+                    ProgressBar(progress: loadingState.progress),
 
-                  const SizedBox(height: 24),
+                    const SizedBox(height: 24),
 
-                  // Loading text
-                  Text(
-                    'Loading...',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w500,
-                      color: theme.colorScheme.onSurfaceVariant,
+                    // Loading text
+                    Text(
+                      'Loading...',
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w500,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
                     ),
-                  ),
 
-                  const Spacer(),
+                    const Spacer(),
 
-                  // Tips carousel
-                  const TipsCarousel(),
+                    // Tips carousel
+                    const TipsCarousel(),
 
-                  const SizedBox(height: 32),
-                ],
+                    const SizedBox(height: 32),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

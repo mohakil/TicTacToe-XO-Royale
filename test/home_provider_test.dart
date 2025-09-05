@@ -64,12 +64,12 @@ void main() {
       test('should allow setting loading state', () {
         final notifier = container.read(homeProvider.notifier);
 
-        notifier.setLoading(loading: true);
+        notifier.setLoading(true);
 
         final homeState = container.read(homeProvider);
         expect(homeState.isLoading, isTrue);
 
-        notifier.setLoading(loading: false);
+        notifier.setLoading(false);
 
         final updatedState = container.read(homeProvider);
         expect(updatedState.isLoading, isFalse);
@@ -95,10 +95,10 @@ void main() {
       test('should handle loading state changes', () {
         final notifier = container.read(homeProvider.notifier);
 
-        notifier.setLoading(loading: true);
+        notifier.setLoading(true);
         expect(container.read(homeProvider).isLoading, isTrue);
 
-        notifier.setLoading(loading: false);
+        notifier.setLoading(false);
         expect(container.read(homeProvider).isLoading, isFalse);
       });
     });

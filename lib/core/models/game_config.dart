@@ -1,95 +1,121 @@
 import 'package:flutter/foundation.dart';
-
-enum GameMode { local, cpu, online }
-
-enum FirstMove { player1, player2, random }
-
-enum Difficulty { easy, medium, hard, impossible }
+import 'package:tictactoe_xo_royale/core/models/game_enums.dart';
+import 'package:tictactoe_xo_royale/core/models/robot_config.dart';
 
 @immutable
 class GameConfig {
-  final int boardSize;
-  final int winCondition;
+  final BoardSize boardSize;
+  final WinCondition winCondition;
   final GameMode gameMode;
   final FirstMove firstMove;
-  final Difficulty difficulty;
   final String player1Name;
   final String player2Name;
-  final bool isRobotMode;
+  final RobotConfig? robotConfig;
 
   const GameConfig({
     required this.boardSize,
     required this.winCondition,
     required this.gameMode,
     required this.firstMove,
-    required this.difficulty,
     required this.player1Name,
     required this.player2Name,
-    required this.isRobotMode,
+    this.robotConfig,
   });
 
+  /// Get robot configuration, returns null if not in robot mode
+  RobotConfig? get robot => gameMode == GameMode.robot ? robotConfig : null;
+
+  /// Check if this is robot mode
+  bool get isRobotMode => gameMode == GameMode.robot;
+
+  /// Get difficulty level (for backward compatibility)
+  Difficulty get difficulty => robotConfig?.difficulty ?? Difficulty.medium;
+
   factory GameConfig.defaultConfig() => const GameConfig(
-    boardSize: 3,
-    winCondition: 3,
+    boardSize: BoardSize.threeByThree,
+    winCondition: WinCondition.threeInRow,
     gameMode: GameMode.local,
     firstMove: FirstMove.player1,
-    difficulty: Difficulty.medium,
     player1Name: 'Player 1',
     player2Name: 'Player 2',
-    isRobotMode: false,
   );
 
-  factory GameConfig.cpuConfig({
+  factory GameConfig.robotConfig({
     required Difficulty difficulty,
-    int boardSize = 3,
-    int winCondition = 3,
+    BoardSize boardSize = BoardSize.threeByThree,
+    WinCondition winCondition = WinCondition.threeInRow,
     String player1Name = 'You',
     String player2Name = 'CPU',
+    FirstMove firstMove = FirstMove.player1,
   }) => GameConfig(
     boardSize: boardSize,
     winCondition: winCondition,
-    gameMode: GameMode.cpu,
-    firstMove: FirstMove.player1,
-    difficulty: difficulty,
+    gameMode: GameMode.robot,
+    firstMove: firstMove,
     player1Name: player1Name,
     player2Name: player2Name,
-    isRobotMode: true,
+    robotConfig: RobotConfig.forDifficulty(difficulty),
+  );
+
+  /// Legacy method for backward compatibility
+  factory GameConfig.cpuConfig({
+    required Difficulty difficulty,
+    BoardSize boardSize = BoardSize.threeByThree,
+    WinCondition winCondition = WinCondition.threeInRow,
+    String player1Name = 'You',
+    String player2Name = 'CPU',
+    FirstMove firstMove = FirstMove.player1,
+  }) => GameConfig.robotConfig(
+    difficulty: difficulty,
+    boardSize: boardSize,
+    winCondition: winCondition,
+    player1Name: player1Name,
+    player2Name: player2Name,
+    firstMove: firstMove,
   );
 
   GameConfig copyWith({
-    int? boardSize,
-    int? winCondition,
+    BoardSize? boardSize,
+    WinCondition? winCondition,
     GameMode? gameMode,
     FirstMove? firstMove,
-    Difficulty? difficulty,
     String? player1Name,
     String? player2Name,
-    bool? isRobotMode,
+    RobotConfig? robotConfig,
   }) => GameConfig(
     boardSize: boardSize ?? this.boardSize,
     winCondition: winCondition ?? this.winCondition,
     gameMode: gameMode ?? this.gameMode,
     firstMove: firstMove ?? this.firstMove,
-    difficulty: difficulty ?? this.difficulty,
     player1Name: player1Name ?? this.player1Name,
     player2Name: player2Name ?? this.player2Name,
-    isRobotMode: isRobotMode ?? this.isRobotMode,
+    robotConfig: robotConfig ?? this.robotConfig,
   );
+
+  // Helper methods using extension methods
+  int get boardSizeValue => boardSize.value;
+  int get winConditionValue => winCondition.value;
+
+  // Validation methods
+  bool get isValid {
+    if (player1Name.trim().isEmpty) return false;
+    if (gameMode == GameMode.local && player2Name.trim().isEmpty) return false;
+    if (gameMode == GameMode.robot && robotConfig == null) return false;
+    if (gameMode == GameMode.robot && !robotConfig!.isValid) return false;
+    return winCondition.isValidForBoardSize(boardSize);
+  }
 
   @override
   bool operator ==(Object other) {
-    if (identical(this, other)) {
-      return true;
-    }
+    if (identical(this, other)) return true;
     return other is GameConfig &&
         other.boardSize == boardSize &&
         other.winCondition == winCondition &&
         other.gameMode == gameMode &&
         other.firstMove == firstMove &&
-        other.difficulty == difficulty &&
         other.player1Name == player1Name &&
         other.player2Name == player2Name &&
-        other.isRobotMode == isRobotMode;
+        other.robotConfig == robotConfig;
   }
 
   @override
@@ -98,13 +124,20 @@ class GameConfig {
     winCondition,
     gameMode,
     firstMove,
-    difficulty,
     player1Name,
     player2Name,
-    isRobotMode,
+    robotConfig,
   );
 
   @override
   String toString() =>
-      'GameConfig(boardSize: $boardSize, winCondition: $winCondition, gameMode: $gameMode, firstMove: $firstMove, difficulty: $difficulty, player1Name: $player1Name, player2Name: $player2Name, isRobotMode: $isRobotMode)';
+      'GameConfig('
+      'boardSize: $boardSize, '
+      'winCondition: $winCondition, '
+      'gameMode: $gameMode, '
+      'firstMove: $firstMove, '
+      'player1Name: $player1Name, '
+      'player2Name: $player2Name, '
+      'robotConfig: $robotConfig'
+      ')';
 }

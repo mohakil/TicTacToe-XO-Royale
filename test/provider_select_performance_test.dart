@@ -166,10 +166,11 @@ void main() {
               body: Consumer(
                 builder: (context, ref, child) {
                   // Test extension methods
-                  final lastResult = ref.lastResult;
-                  final streak = ref.streak;
-                  final gemsCount = ref.gemsCount;
-                  final hintCount = ref.hintCount;
+                  final homeState = ref.homeState;
+                  final lastResult = homeState.lastResult;
+                  final streak = homeState.streak;
+                  final gemsCount = homeState.gemsCount;
+                  final hintCount = homeState.hintCount;
 
                   return Column(
                     children: [
@@ -202,7 +203,13 @@ void main() {
             home: Scaffold(
               body: Consumer(
                 builder: (context, ref, child) {
-                  final homeStats = ref.homeStats;
+                  final homeState = ref.homeState;
+                  final homeStats = (
+                    lastResult: homeState.lastResult,
+                    streak: homeState.streak,
+                    gemsCount: homeState.gemsCount,
+                    hintCount: homeState.hintCount,
+                  );
                   return Column(
                     children: [
                       Text('Stats - Last Result: ${homeStats.lastResult}'),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tictactoe_xo_royale/features/setup/setup.dart';
+import 'package:tictactoe_xo_royale/core/models/game_enums.dart';
 
 void main() {
   group('SetupScreen Widget Tests', () {

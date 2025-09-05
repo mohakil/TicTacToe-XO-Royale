@@ -343,11 +343,6 @@ Implementation notes (Flutter specifics)
 - Board sizing
   - Board fits min(width, height * 0.64) with paddings; maintain square grid.
   - Cell tap areas >= 48 px.
-- Hint system (mock logic)
-  - For CPU or local mode: suggest winning/blocking cell prioritizing immediate win > block opponent > center > corners > edges.
-- Celebrations (Flutter)
-  - Win: Confetti-like effects using AnimatedBuilder with CustomPainter, hue sweep azure→magenta, gravity simulation, lifespan 1.2 s.
-  - Optional ribbon burst: triangle shapes with additive blending simulation.
 - Fonts
   - Bundle Sora, Inter, JetBrains Mono; set textTheme accordingly.
 

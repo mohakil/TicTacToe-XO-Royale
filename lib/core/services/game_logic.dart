@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:tictactoe_xo_royale/core/models/game_config.dart';
+import 'package:tictactoe_xo_royale/core/models/game_enums.dart';
 
 /// Represents a position on the game board
 @immutable
@@ -58,8 +59,8 @@ class GameLogic {
   late final int _winCondition;
 
   GameLogic(this.config) {
-    _boardSize = config.boardSize;
-    _winCondition = config.winCondition;
+    _boardSize = config.boardSizeValue;
+    _winCondition = config.winConditionValue;
     _initializeBoard();
   }
 

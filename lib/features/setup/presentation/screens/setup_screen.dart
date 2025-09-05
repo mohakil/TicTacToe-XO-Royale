@@ -7,6 +7,7 @@ import 'package:tictactoe_xo_royale/features/setup/presentation/widgets/selectio
 import 'package:tictactoe_xo_royale/features/setup/presentation/widgets/player_name_input.dart';
 import 'package:tictactoe_xo_royale/features/setup/presentation/widgets/win_condition_selector.dart';
 import 'package:tictactoe_xo_royale/features/setup/providers/setup_provider.dart';
+import 'package:tictactoe_xo_royale/core/models/game_enums.dart';
 
 class SetupScreen extends ConsumerStatefulWidget {
   const SetupScreen({
@@ -157,170 +158,181 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
 
     // Provider state is now properly initialized in initState
 
-    return Scaffold(
-      backgroundColor: colorScheme.surface,
-      appBar: AppBar(
+    return PopScope(
+      canPop: true, // Allow back button to go to home
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          context.go('/home');
+        }
+      },
+      child: Scaffold(
         backgroundColor: colorScheme.surface,
-        elevation: 0,
-        leading: IconButton(
-          onPressed: () => context.go('/home'),
-          icon: Icon(Icons.arrow_back, color: colorScheme.onSurface),
-          tooltip: 'Back to Home',
-        ),
-        title: Text(
-          'Game Setup',
-          style: theme.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: colorScheme.onSurface,
+        appBar: AppBar(
+          backgroundColor: colorScheme.surface,
+          elevation: 0,
+          leading: IconButton(
+            onPressed: () => context.go('/home'),
+            icon: Icon(Icons.arrow_back, color: colorScheme.onSurface),
+            tooltip: 'Back to Home',
           ),
+          title: Text(
+            'Game Setup',
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: colorScheme.onSurface,
+            ),
+          ),
+          centerTitle: true,
         ),
-        centerTitle: true,
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Player Names Section
-              Text(
-                'Player Names',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: colorScheme.onSurface,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Player Names Section
+                Text(
+                  'Player Names',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: colorScheme.onSurface,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-              PlayerNameInput(
-                label: 'Player 1',
-                value: player1Name, // Use optimized value
-                onChanged: setupNotifier.setPlayer1Name,
-              ),
+                PlayerNameInput(
+                  label: 'Player 1',
+                  value: player1Name, // Use optimized value
+                  onChanged: setupNotifier.setPlayer1Name,
+                ),
 
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-              PlayerNameInput(
-                label: 'Player 2',
-                value: player2Name, // Use optimized value
-                onChanged: setupNotifier.setPlayer2Name,
-                enabled: mode == GameMode.local, // Use optimized value
-                hintText:
-                    mode ==
-                        GameMode
-                            .robot // Use optimized value
-                    ? 'CPU'
-                    : 'Enter player name',
-              ),
-
-              const SizedBox(height: 32),
-
-              // First Move Selection
-              SelectionChips<FirstMove>(
-                label: 'First Move',
-                subText: 'Choose who goes first',
-                options: const [
-                  SelectionChipOption(
-                    label: 'Player 1 (X)',
-                    value: FirstMove.player1,
-                  ),
-                  SelectionChipOption(
-                    label: 'Player 2 (O)',
-                    value: FirstMove.player2,
-                  ),
-                  SelectionChipOption(label: 'Random', value: FirstMove.random),
-                ],
-                selectedOption: firstMove, // Use optimized value
-                onOptionSelected: setupNotifier.setFirstMove,
-              ),
-
-              const SizedBox(height: 32),
-
-              // Difficulty Selection (Robot mode only)
-              if (mode == GameMode.robot) ...[
-                // Use optimized value
-                SelectionChips<Difficulty>(
-                  label: 'Difficulty',
-                  options: const [
-                    SelectionChipOption(
-                      label: 'Easy',
-                      value: Difficulty.easy,
-                      description: 'Random moves with occasional blunders',
-                    ),
-                    SelectionChipOption(
-                      label: 'Medium',
-                      value: Difficulty.medium,
-                      description: 'Strategic play with limited depth',
-                    ),
-                    SelectionChipOption(
-                      label: 'Hard',
-                      value: Difficulty.hard,
-                      description: 'Optimal play with full analysis',
-                    ),
-                  ],
-                  selectedOption: difficulty, // Use optimized value
-                  onOptionSelected: setupNotifier.setDifficulty,
+                PlayerNameInput(
+                  label: 'Player 2',
+                  value: player2Name, // Use optimized value
+                  onChanged: setupNotifier.setPlayer2Name,
+                  enabled: mode == GameMode.local, // Use optimized value
+                  hintText:
+                      mode ==
+                          GameMode
+                              .robot // Use optimized value
+                      ? 'CPU'
+                      : 'Enter player name',
                 ),
 
                 const SizedBox(height: 32),
-              ],
 
-              // Board Size Carousel
-              BoardSizeSelector(
-                selectedBoardSize: boardSize, // Use optimized value
-                onBoardSizeChanged: setupNotifier.setBoardSize,
-              ),
-
-              const SizedBox(height: 32),
-
-              // Win Condition Carousel
-              WinConditionSelector(
-                selectedWinCondition: winCondition, // Use optimized value
-                onWinConditionChanged: setupNotifier.setWinCondition,
-                boardSize: boardSize, // Use optimized value
-              ),
-
-              const SizedBox(height: 48),
-
-              // Start Button
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: FilledButton(
-                  onPressed:
-                      isValid // Use optimized value
-                      ? () {
-                          // Navigate to game screen with setup data
-                          final gameRoute = AppRoutes.buildGameRoute(
-                            boardSize: setupNotifier.boardSizeValue,
-                            winCondition: setupNotifier.winConditionValue,
-                            gameMode: setupNotifier.gameModeValue,
-                            difficulty: setupNotifier.difficultyValue,
-                            player1: player1Name, // Use optimized value
-                            player2: player2Name, // Use optimized value
-                            firstMove: setupNotifier.firstMoveValue,
-                          );
-
-                          // Use go to navigate to game route
-                          GoRouter.of(context).go(gameRoute);
-                        }
-                      : null,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: colorScheme.primary,
-                    foregroundColor: colorScheme.onPrimary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                // First Move Selection
+                SelectionChips<FirstMove>(
+                  label: 'First Move',
+                  subText: 'Choose who goes first',
+                  options: const [
+                    SelectionChipOption(
+                      label: 'Player 1 (X)',
+                      value: FirstMove.player1,
                     ),
+                    SelectionChipOption(
+                      label: 'Player 2 (O)',
+                      value: FirstMove.player2,
+                    ),
+                    SelectionChipOption(
+                      label: 'Random',
+                      value: FirstMove.random,
+                    ),
+                  ],
+                  selectedOption: firstMove, // Use optimized value
+                  onOptionSelected: setupNotifier.setFirstMove,
+                ),
+
+                const SizedBox(height: 32),
+
+                // Difficulty Selection (Robot mode only)
+                if (mode == GameMode.robot) ...[
+                  // Use optimized value
+                  SelectionChips<Difficulty>(
+                    label: 'Difficulty',
+                    options: const [
+                      SelectionChipOption(
+                        label: 'Easy',
+                        value: Difficulty.easy,
+                        description: 'Random moves with occasional blunders',
+                      ),
+                      SelectionChipOption(
+                        label: 'Medium',
+                        value: Difficulty.medium,
+                        description: 'Strategic play with limited depth',
+                      ),
+                      SelectionChipOption(
+                        label: 'Hard',
+                        value: Difficulty.hard,
+                        description: 'Optimal play with full analysis',
+                      ),
+                    ],
+                    selectedOption: difficulty, // Use optimized value
+                    onOptionSelected: setupNotifier.setDifficulty,
                   ),
-                  child: Text(
-                    'Start Game',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      color: colorScheme.onPrimary,
-                      fontWeight: FontWeight.w600,
+
+                  const SizedBox(height: 32),
+                ],
+
+                // Board Size Carousel
+                BoardSizeSelector(
+                  selectedBoardSize: boardSize, // Use optimized value
+                  onBoardSizeChanged: setupNotifier.setBoardSize,
+                ),
+
+                const SizedBox(height: 32),
+
+                // Win Condition Carousel
+                WinConditionSelector(
+                  selectedWinCondition: winCondition, // Use optimized value
+                  onWinConditionChanged: setupNotifier.setWinCondition,
+                  boardSize: boardSize, // Use optimized value
+                ),
+
+                const SizedBox(height: 48),
+
+                // Start Button
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: FilledButton(
+                    onPressed:
+                        isValid // Use optimized value
+                        ? () {
+                            // Navigate to game screen with setup data
+                            final gameRoute = AppRoutes.buildGameRoute(
+                              boardSize: boardSize.value,
+                              winCondition: winCondition.value,
+                              gameMode: mode.value,
+                              difficulty: difficulty.value,
+                              player1: player1Name, // Use optimized value
+                              player2: player2Name, // Use optimized value
+                              firstMove: firstMove.value,
+                            );
+
+                            // Use go to navigate to game route
+                            GoRouter.of(context).go(gameRoute);
+                          }
+                        : null,
+                    style: FilledButton.styleFrom(
+                      backgroundColor: colorScheme.primary,
+                      foregroundColor: colorScheme.onPrimary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    child: Text(
+                      'Start Game',
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        color: colorScheme.onPrimary,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

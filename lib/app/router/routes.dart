@@ -18,40 +18,7 @@ class AppRoutes {
   static const String profileName = 'profile';
   static const String settingsName = 'settings';
 
-  // Helper method to build setup route with parameters
-  static String buildSetupRoute({
-    String? gameMode,
-    int? boardSize,
-    int? winCondition,
-    String? difficulty,
-    String? player1,
-    String? player2,
-    String? firstMove,
-    String? challengeId,
-    String? tournamentId,
-  }) {
-    final params = <String, String>{};
-
-    if (gameMode != null) params['gameMode'] = gameMode;
-    if (boardSize != null) params['boardSize'] = boardSize.toString();
-    if (winCondition != null) params['winCondition'] = winCondition.toString();
-    if (difficulty != null) params['difficulty'] = difficulty;
-    if (player1 != null) params['player1'] = player1;
-    if (player2 != null) params['player2'] = player2;
-    if (firstMove != null) params['firstMove'] = firstMove;
-    if (challengeId != null) params['challengeId'] = challengeId;
-    if (tournamentId != null) params['tournamentId'] = tournamentId;
-
-    if (params.isEmpty) return setup;
-
-    final queryString = params.entries
-        .map((e) => '${e.key}=${Uri.encodeComponent(e.value)}')
-        .join('&');
-
-    return '$setup?$queryString';
-  }
-
-  // Helper method to build game route with parameters
+  /// Build game route with parameters
   static String buildGameRoute({
     int? boardSize,
     int? winCondition,
@@ -78,5 +45,34 @@ class AppRoutes {
         .join('&');
 
     return '$game?$queryString';
+  }
+
+  /// Build setup route with parameters
+  static String buildSetupRoute({
+    String? gameMode,
+    int? boardSize,
+    int? winCondition,
+    String? difficulty,
+    String? player1,
+    String? player2,
+    String? firstMove,
+  }) {
+    final params = <String, String>{};
+
+    if (gameMode != null) params['gameMode'] = gameMode;
+    if (boardSize != null) params['boardSize'] = boardSize.toString();
+    if (winCondition != null) params['winCondition'] = winCondition.toString();
+    if (difficulty != null) params['difficulty'] = difficulty;
+    if (player1 != null) params['player1'] = player1;
+    if (player2 != null) params['player2'] = player2;
+    if (firstMove != null) params['firstMove'] = firstMove;
+
+    if (params.isEmpty) return setup;
+
+    final queryString = params.entries
+        .map((e) => '${e.key}=${Uri.encodeComponent(e.value)}')
+        .join('&');
+
+    return '$setup?$queryString';
   }
 }

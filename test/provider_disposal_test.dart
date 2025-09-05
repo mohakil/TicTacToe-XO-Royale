@@ -9,6 +9,8 @@ import 'package:tictactoe_xo_royale/features/setup/providers/setup_provider.dart
 import 'package:tictactoe_xo_royale/features/game/providers/game_provider.dart';
 import 'package:tictactoe_xo_royale/features/home/providers/home_provider.dart';
 import 'package:tictactoe_xo_royale/features/loading/providers/loading_provider.dart';
+import 'package:tictactoe_xo_royale/core/models/game_enums.dart';
+import 'package:tictactoe_xo_royale/core/models/game_config.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -191,21 +193,14 @@ void main() {
 
     test('GameProvider should dispose properly', () {
       // Create a game provider instance
-      final gameNotifier = container.read(gameStateProvider.notifier);
+      final gameNotifier = container.read(gameProvider.notifier);
 
       // Verify initial state
       expect(gameNotifier.state, isNotNull);
 
       // Initialize game
-      gameNotifier.initializeGame(
-        boardSize: 3,
-        winCondition: 3,
-        player1Name: 'Player 1',
-        player2Name: 'Player 2',
-        isRobotMode: false,
-        difficulty: 'medium',
-        firstMove: 'player1',
-      );
+      final config = GameConfig.defaultConfig();
+      gameNotifier.initializeGame(config);
 
       // Dispose the container
       container.dispose();

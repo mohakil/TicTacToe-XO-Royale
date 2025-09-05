@@ -1,319 +1,177 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:tictactoe_xo_royale/core/services/memory_manager.dart';
+import 'package:tictactoe_xo_royale/core/models/game_enums.dart';
+import 'package:tictactoe_xo_royale/core/models/robot_config.dart';
 
-part 'setup_provider.freezed.dart';
-part 'setup_provider.g.dart';
+/// Simplified game setup state
+class GameSetup {
+  final GameMode mode;
+  final String player1Name;
+  final String player2Name;
+  final FirstMove firstMove;
+  final Difficulty difficulty;
+  final BoardSize boardSize;
+  final WinCondition winCondition;
 
-@freezed
-abstract class GameSetup with _$GameSetup {
-  const factory GameSetup({
-    @Default(GameMode.local) GameMode mode,
-    @Default('Player 1') String player1Name,
-    @Default('Player 2') String player2Name,
-    @Default(FirstMove.random) FirstMove firstMove,
-    @Default(Difficulty.medium) Difficulty difficulty,
-    @Default(BoardSize.threeByThree) BoardSize boardSize,
-    @Default(WinCondition.threeInRow) WinCondition winCondition,
-  }) = _GameSetup;
+  const GameSetup({
+    this.mode = GameMode.local,
+    this.player1Name = 'Player 1',
+    this.player2Name = 'Player 2',
+    this.firstMove = FirstMove.random,
+    this.difficulty = Difficulty.medium,
+    this.boardSize = BoardSize.threeByThree,
+    this.winCondition = WinCondition.threeInRow,
+  });
 
-  factory GameSetup.fromJson(Map<String, dynamic> json) =>
-      _$GameSetupFromJson(json);
+  GameSetup copyWith({
+    GameMode? mode,
+    String? player1Name,
+    String? player2Name,
+    FirstMove? firstMove,
+    Difficulty? difficulty,
+    BoardSize? boardSize,
+    WinCondition? winCondition,
+  }) {
+    return GameSetup(
+      mode: mode ?? this.mode,
+      player1Name: player1Name ?? this.player1Name,
+      player2Name: player2Name ?? this.player2Name,
+      firstMove: firstMove ?? this.firstMove,
+      difficulty: difficulty ?? this.difficulty,
+      boardSize: boardSize ?? this.boardSize,
+      winCondition: winCondition ?? this.winCondition,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is GameSetup &&
+        other.mode == mode &&
+        other.player1Name == player1Name &&
+        other.player2Name == player2Name &&
+        other.firstMove == firstMove &&
+        other.difficulty == difficulty &&
+        other.boardSize == boardSize &&
+        other.winCondition == winCondition;
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    mode,
+    player1Name,
+    player2Name,
+    firstMove,
+    difficulty,
+    boardSize,
+    winCondition,
+  );
 }
 
-enum GameMode { local, robot }
-
-enum FirstMove { player1, player2, random }
-
-enum Difficulty { easy, medium, hard }
-
-enum BoardSize { threeByThree, fourByFour, fiveByFive }
-
-enum WinCondition { threeInRow, fourInRow, fiveInRow }
-
+/// Simplified setup notifier without over-engineering
 class SetupNotifier extends StateNotifier<GameSetup> {
   SetupNotifier() : super(const GameSetup());
 
-  // Mounted flag for proper disposal
-  bool _mounted = true;
-
   void setMode(GameMode mode) {
-    if (_mounted) {
-      state = state.copyWith(mode: mode);
-      // Reset player 2 name for robot mode
-      if (mode == GameMode.robot) {
-        state = state.copyWith(player2Name: 'CPU');
-      } else {
-        state = state.copyWith(player2Name: 'Player 2');
-      }
+    state = state.copyWith(mode: mode);
+
+    // Auto-update player 2 name based on mode
+    if (mode == GameMode.robot) {
+      state = state.copyWith(player2Name: 'CPU');
+    } else {
+      state = state.copyWith(player2Name: 'Player 2');
     }
   }
 
   void setPlayer1Name(String name) {
-    if (_mounted) {
-      state = state.copyWith(player1Name: name);
+    if (name.trim().isNotEmpty) {
+      state = state.copyWith(player1Name: name.trim());
     }
   }
 
   void setPlayer2Name(String name) {
-    if (_mounted) {
-      state = state.copyWith(player2Name: name);
+    if (name.trim().isNotEmpty) {
+      state = state.copyWith(player2Name: name.trim());
     }
   }
 
   void setFirstMove(FirstMove firstMove) {
-    if (_mounted) {
-      state = state.copyWith(firstMove: firstMove);
-    }
+    state = state.copyWith(firstMove: firstMove);
   }
 
   void setDifficulty(Difficulty difficulty) {
-    if (_mounted) {
-      state = state.copyWith(difficulty: difficulty);
-    }
+    state = state.copyWith(difficulty: difficulty);
   }
 
   void setBoardSize(BoardSize boardSize) {
-    // Don't update if the board size is the same or not mounted
-    if (!_mounted || state.boardSize == boardSize) return;
-
-    // Update board size first
     state = state.copyWith(boardSize: boardSize);
 
-    // Automatically adjust win condition to be valid for the new board size
-    WinCondition newWinCondition = state.winCondition;
-    bool winConditionChanged = false;
-
-    switch (boardSize) {
-      case BoardSize.threeByThree:
-        // 3x3 board can only have 3-in-row win condition
-        if (newWinCondition != WinCondition.threeInRow) {
-          newWinCondition = WinCondition.threeInRow;
-          winConditionChanged = true;
-        }
-        break;
-      case BoardSize.fourByFour:
-        // 4x4 board can have 3-in-row or 4-in-row
-        if (newWinCondition == WinCondition.fiveInRow) {
-          newWinCondition = WinCondition.fourInRow;
-          winConditionChanged = true;
-        }
-        break;
-      case BoardSize.fiveByFive:
-        // 5x5 board can have 3-in-row, 4-in-row, or 5-in-row
-        // No adjustment needed, all win conditions are valid
-        break;
-    }
-
-    // Update the win condition if it changed
-    if (winConditionChanged && _mounted) {
+    // Auto-adjust win condition if invalid
+    if (!state.winCondition.isValidForBoardSize(boardSize)) {
+      final newWinCondition = _getValidWinCondition(boardSize);
       state = state.copyWith(winCondition: newWinCondition);
     }
   }
 
   void setWinCondition(WinCondition winCondition) {
-    // Validate win condition against current board size
-    bool isValidCombination = _isValidBoardWinCombination(
-      state.boardSize,
-      winCondition,
-    );
-
-    if (isValidCombination && _mounted) {
+    if (winCondition.isValidForBoardSize(state.boardSize)) {
       state = state.copyWith(winCondition: winCondition);
     }
   }
 
-  /// Check if a board size and win condition combination is valid
-  bool _isValidBoardWinCombination(
-    BoardSize boardSize,
-    WinCondition winCondition,
-  ) {
+  /// Get a valid win condition for the given board size
+  WinCondition _getValidWinCondition(BoardSize boardSize) {
     switch (boardSize) {
       case BoardSize.threeByThree:
-        return winCondition == WinCondition.threeInRow;
+        return WinCondition.threeInRow;
       case BoardSize.fourByFour:
-        return winCondition == WinCondition.threeInRow ||
-            winCondition == WinCondition.fourInRow;
+        return WinCondition.threeInRow;
       case BoardSize.fiveByFive:
-        return winCondition == WinCondition.threeInRow ||
-            winCondition == WinCondition.fourInRow ||
-            winCondition == WinCondition.fiveInRow;
+        return WinCondition.threeInRow;
     }
   }
 
+  /// Check if the current setup is valid
   bool get isValid {
-    if (state.player1Name.trim().isEmpty) {
-      return false;
-    }
+    if (state.player1Name.trim().isEmpty) return false;
     if (state.mode == GameMode.local && state.player2Name.trim().isEmpty) {
       return false;
     }
-    return true;
+    return state.winCondition.isValidForBoardSize(state.boardSize);
   }
 
-  // Helper methods to convert enums to values for navigation
-  int get boardSizeValue {
-    switch (state.boardSize) {
-      case BoardSize.threeByThree:
-        return 3;
-      case BoardSize.fourByFour:
-        return 4;
-      case BoardSize.fiveByFive:
-        return 5;
+  /// Get robot configuration if in robot mode
+  RobotConfig? get robotConfig {
+    if (state.mode == GameMode.robot) {
+      return RobotConfig.forDifficulty(state.difficulty);
     }
+    return null;
   }
 
-  int get winConditionValue {
-    switch (state.winCondition) {
-      case WinCondition.threeInRow:
-        return 3;
-      case WinCondition.fourInRow:
-        return 4;
-      case WinCondition.fiveInRow:
-        return 5;
-    }
-  }
-
-  String get gameModeValue => state.mode == GameMode.robot ? 'robot' : 'local';
-
-  String get difficultyValue {
-    switch (state.difficulty) {
-      case Difficulty.easy:
-        return 'easy';
-      case Difficulty.medium:
-        return 'medium';
-      case Difficulty.hard:
-        return 'hard';
-    }
-  }
-
-  String get firstMoveValue {
-    switch (state.firstMove) {
-      case FirstMove.player1:
-        return 'player1';
-      case FirstMove.player2:
-        return 'player2';
-      case FirstMove.random:
-        return 'random';
-    }
-  }
-
-  @override
-  void dispose() {
-    _mounted = false;
-    super.dispose();
+  /// Reset to default values
+  void reset() {
+    state = const GameSetup();
   }
 }
 
-// ✅ OPTIMIZED: Setup provider with autoDispose for temporary setup data
-final setupProvider =
-    StateNotifierProvider.autoDispose<SetupNotifier, GameSetup>((ref) {
-      ref.trackMemory('setup', keepAlive: false);
-      return SetupNotifier();
-    });
-
-// ✅ OPTIMIZED: Use select for granular rebuilds with autoDispose for temporary data
-// Individual setup data providers for granular rebuilds
-final setupModeProvider = Provider.autoDispose<GameMode>((ref) {
-  ref.trackMemory('setupMode', keepAlive: false);
-  return ref.watch(setupProvider.select((state) => state.mode));
+/// Main setup provider - simple and clean
+final setupProvider = StateNotifierProvider<SetupNotifier, GameSetup>((ref) {
+  return SetupNotifier();
 });
 
-final setupPlayer1NameProvider = Provider.autoDispose<String>((ref) {
-  ref.trackMemory('setupPlayer1Name', keepAlive: false);
-  return ref.watch(setupProvider.select((state) => state.player1Name));
+/// Computed provider for validation
+final setupIsValidProvider = Provider<bool>((ref) {
+  return ref.watch(setupProvider.notifier).isValid;
 });
 
-final setupPlayer2NameProvider = Provider.autoDispose<String>((ref) {
-  ref.trackMemory('setupPlayer2Name', keepAlive: false);
-  return ref.watch(setupProvider.select((state) => state.player2Name));
+/// Computed provider for robot configuration
+final setupRobotConfigProvider = Provider<RobotConfig?>((ref) {
+  return ref.watch(setupProvider.notifier).robotConfig;
 });
 
-final setupFirstMoveProvider = Provider.autoDispose<FirstMove>((ref) {
-  ref.trackMemory('setupFirstMove', keepAlive: false);
-  return ref.watch(setupProvider.select((state) => state.firstMove));
-});
-
-final setupDifficultyProvider = Provider.autoDispose<Difficulty>((ref) {
-  ref.trackMemory('setupDifficulty', keepAlive: false);
-  return ref.watch(setupProvider.select((state) => state.difficulty));
-});
-
-final setupBoardSizeProvider = Provider.autoDispose<BoardSize>((ref) {
-  ref.trackMemory('setupBoardSize', keepAlive: false);
-  return ref.watch(setupProvider.select((state) => state.boardSize));
-});
-
-final setupWinConditionProvider = Provider.autoDispose<WinCondition>((ref) {
-  ref.trackMemory('setupWinCondition', keepAlive: false);
-  return ref.watch(setupProvider.select((state) => state.winCondition));
-});
-
-// ✅ OPTIMIZED: Computed providers using select with autoDispose for temporary data
-final setupIsValidProvider = Provider.autoDispose<bool>((ref) {
-  ref.trackMemory('setupIsValid', keepAlive: false);
-  return ref.watch(
-    setupProvider.select((state) {
-      if (state.player1Name.trim().isEmpty) {
-        return false;
-      }
-      if (state.mode == GameMode.local && state.player2Name.trim().isEmpty) {
-        return false;
-      }
-      return true;
-    }),
-  );
-});
-
-final setupGameConfigProvider =
-    Provider<
-      ({
-        int boardSize,
-        int winCondition,
-        String gameMode,
-        String difficulty,
-        String firstMove,
-      })
-    >(
-      (ref) => ref.watch(
-        setupProvider.select((state) {
-          final notifier = ref.read(setupProvider.notifier);
-          return (
-            boardSize: notifier.boardSizeValue,
-            winCondition: notifier.winConditionValue,
-            gameMode: notifier.gameModeValue,
-            difficulty: notifier.difficultyValue,
-            firstMove: notifier.firstMoveValue,
-          );
-        }),
-      ),
-    );
-
-// ✅ OPTIMIZED: Extension methods for easy access with select-based providers
+/// Extension for easy access to setup data
 extension SetupProviderExtension on WidgetRef {
-  // Get setup notifier
   SetupNotifier get setupNotifier => read(setupProvider.notifier);
-
-  // Get individual setup data using select for granular rebuilds
-  GameMode get setupMode => watch(setupModeProvider);
-  String get setupPlayer1Name => watch(setupPlayer1NameProvider);
-  String get setupPlayer2Name => watch(setupPlayer2NameProvider);
-  FirstMove get setupFirstMove => watch(setupFirstMoveProvider);
-  Difficulty get setupDifficulty => watch(setupDifficultyProvider);
-  BoardSize get setupBoardSize => watch(setupBoardSizeProvider);
-  WinCondition get setupWinCondition => watch(setupWinConditionProvider);
-
-  // Get computed setup data
-  bool get setupIsValid => watch(setupIsValidProvider);
-  ({
-    int boardSize,
-    int winCondition,
-    String gameMode,
-    String difficulty,
-    String firstMove,
-  })
-  get setupGameConfig => watch(setupGameConfigProvider);
-
-  // Get all setup state
   GameSetup get setupState => watch(setupProvider);
+  bool get setupIsValid => watch(setupIsValidProvider);
+  RobotConfig? get setupRobotConfig => watch(setupRobotConfigProvider);
 }

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tictactoe_xo_royale/core/providers/providers.dart';
+import 'package:tictactoe_xo_royale/core/models/game_enums.dart';
+import 'package:tictactoe_xo_royale/core/models/robot_config.dart';
+import 'package:tictactoe_xo_royale/core/models/game_config.dart';
 import 'package:tictactoe_xo_royale/core/services/game_logic.dart';
 import 'package:tictactoe_xo_royale/features/game/presentation/widgets/game_interface/game_controls.dart';
 import 'package:tictactoe_xo_royale/features/game/presentation/widgets/game_board/game_board.dart';
@@ -78,25 +81,33 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   }
 
   void _initializeGameConfig() {
-    final gameNotifier = ref.read(gameStateProvider.notifier);
-    gameNotifier.initializeGame(
-      boardSize: widget.boardSize,
-      winCondition: widget.winCondition,
+    final gameNotifier = ref.read(gameProvider.notifier);
+
+    // Create game configuration
+    final config = GameConfig(
+      boardSize: BoardSizeExtension.fromInt(widget.boardSize),
+      winCondition: WinConditionExtension.fromInt(widget.winCondition),
+      gameMode: widget.isRobotMode ? GameMode.robot : GameMode.local,
+      firstMove: FirstMoveExtension.fromString(widget.firstMove),
       player1Name: widget.player1Name,
       player2Name: widget.player2Name,
-      isRobotMode: widget.isRobotMode,
-      difficulty: widget.difficulty,
-      firstMove: widget.firstMove,
+      robotConfig: widget.isRobotMode
+          ? RobotConfig.forDifficulty(
+              DifficultyExtension.fromString(widget.difficulty),
+            )
+          : null,
     );
+
+    gameNotifier.initializeGame(config);
   }
 
   void _onCellTap(int row, int col) {
     // Use ref.read to get the notifier and make the move
-    final gameNotifier = ref.read(gameStateProvider.notifier);
+    final gameNotifier = ref.read(gameProvider.notifier);
     gameNotifier.makeMove(row, col);
 
     // Check game result after move
-    final gameResult = gameNotifier.checkGameResult();
+    final gameResult = gameNotifier.gameResult;
 
     // Show result overlay if game is over
     if (gameResult.isGameOver) {
@@ -142,151 +153,154 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // ✅ OPTIMIZED: Use select for granular rebuilds - only rebuild when specific values change
-    final gameLogic = ref.watch(gameStateProvider);
-    final gameResult = gameLogic.checkGameState();
+    // Use simplified providers
+    final gameLogic = ref.watch(gameProvider);
+    final gameResult = ref.gameResult;
+    final currentPlayer = ref.currentPlayer;
+    final isGameOver = ref.isGameOver;
+    final boardState = gameLogic.board;
 
-    // Use select for frequently accessed properties to minimize rebuilds
-    final currentPlayer = ref.watch(
-      gameStateProvider.select((state) => state.getNextPlayer()),
-    );
-    final isGameOver = ref.watch(
-      gameStateProvider.select((state) => state.checkGameState().isGameOver),
-    );
-    final boardState = ref.watch(
-      gameStateProvider.select((state) => state.board),
-    );
-
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      body: Stack(
-        children: [
-          // Game board - positioned above turn indicator
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 320,
-            left: 0,
-            right: 0,
-            child: RepaintBoundary(
-              child: Center(
-                child: Container(
-                  constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width * 0.9,
-                    maxHeight: MediaQuery.of(context).size.height * 0.6,
-                  ),
-                  child: GameBoard(
-                    boardSize: widget.boardSize,
-                    winCondition: widget.winCondition,
-                    boardState: boardState, // Use optimized board state
-                    currentPlayer:
-                        currentPlayer, // Use optimized current player
-                    isGameOver: isGameOver, // Use optimized game over state
-                    winningLine: gameResult.winningLine,
-                    onCellTap: _onCellTap,
-                    showHints: _showHint,
-                    hintCells: _showHint
-                        ? [const Position(1, 1)]
-                        : null, // Example hint cell
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (!didPop) {
+          // Show game exit overlay
+          setState(() {
+            _showExitDialog = true;
+          });
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        body: Stack(
+          children: [
+            // Game board - positioned above turn indicator
+            Positioned(
+              top: MediaQuery.of(context).padding.top + 320,
+              left: 0,
+              right: 0,
+              child: RepaintBoundary(
+                child: Center(
+                  child: Container(
+                    constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width * 0.9,
+                      maxHeight: MediaQuery.of(context).size.height * 0.6,
+                    ),
+                    child: GameBoard(
+                      boardSize: widget.boardSize,
+                      winCondition: widget.winCondition,
+                      boardState: boardState, // Use optimized board state
+                      currentPlayer:
+                          currentPlayer, // Use optimized current player
+                      isGameOver: isGameOver, // Use optimized game over state
+                      winningLine: gameResult.winningLine,
+                      onCellTap: _onCellTap,
+                      showHints: _showHint,
+                      hintCells: _showHint
+                          ? [const Position(1, 1)]
+                          : null, // Example hint cell
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
 
-          // Top controls - positioned just below safe area
-          Positioned(
-            top: MediaQuery.of(context).padding.top - 16,
-            left: 16,
-            child: RepaintBoundary(
-              child: IconButton(
-                onPressed: _exitGame,
-                icon: const Icon(Icons.close),
-                iconSize: 28,
-                color: Theme.of(context).colorScheme.onSurface,
+            // Top controls - positioned just below safe area
+            Positioned(
+              top: MediaQuery.of(context).padding.top - 16,
+              left: 16,
+              child: RepaintBoundary(
+                child: IconButton(
+                  onPressed: _exitGame,
+                  icon: const Icon(Icons.close),
+                  iconSize: 28,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
             ),
-          ),
 
-          Positioned(
-            top: MediaQuery.of(context).padding.top - 16,
-            right: 16,
-            child: RepaintBoundary(
-              child: IconButton(
-                onPressed: _showSettingsOverlay,
-                icon: const Icon(Icons.settings),
-                iconSize: 28,
-                color: Theme.of(context).colorScheme.onSurface,
+            Positioned(
+              top: MediaQuery.of(context).padding.top - 16,
+              right: 16,
+              child: RepaintBoundary(
+                child: IconButton(
+                  onPressed: _showSettingsOverlay,
+                  icon: const Icon(Icons.settings),
+                  iconSize: 28,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
             ),
-          ),
 
-          // Game HUD - positioned closer to top controls
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 40,
-            left: 0,
-            right: 0,
-            child: RepaintBoundary(
-              child: GameHeader(
-                player1Name: widget.player1Name,
-                player2Name: widget.player2Name,
-                player1Wins: 0, // TODO(Add win tracking to providers)
-                player2Wins: 0, // TODO(Add win tracking to providers)
-                currentPlayer:
-                    currentPlayer.name, // Use optimized current player
+            // Game HUD - positioned closer to top controls
+            Positioned(
+              top: MediaQuery.of(context).padding.top + 40,
+              left: 0,
+              right: 0,
+              child: RepaintBoundary(
+                child: GameHeader(
+                  player1Name: widget.player1Name,
+                  player2Name: widget.player2Name,
+                  player1Wins: 0, // TODO(Add win tracking to providers)
+                  player2Wins: 0, // TODO(Add win tracking to providers)
+                  currentPlayer:
+                      currentPlayer.name, // Use optimized current player
+                ),
               ),
             ),
-          ),
 
-          // Turn indicator - positioned just below game header
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 220,
-            left: 0,
-            right: 0,
-            child: RepaintBoundary(
-              child: GameStatus(
-                currentPlayer:
-                    currentPlayer.name, // Use optimized current player
-                isGameOver: isGameOver, // Use optimized game over state
+            // Turn indicator - positioned just below game header
+            Positioned(
+              top: MediaQuery.of(context).padding.top + 220,
+              left: 0,
+              right: 0,
+              child: RepaintBoundary(
+                child: GameStatus(
+                  currentPlayer:
+                      currentPlayer.name, // Use optimized current player
+                  isGameOver: isGameOver, // Use optimized game over state
+                ),
               ),
             ),
-          ),
 
-          // Control bar - positioned at bottom with proper spacing
-          Positioned(
-            bottom: MediaQuery.of(context).padding.bottom + 32,
-            left: 24,
-            right: 24,
-            child: RepaintBoundary(
-              child: GameControls(
-                hintCount: _hintCount,
-                onHint: _useHint,
-                onNewGame: _newGame,
+            // Control bar - positioned at bottom with proper spacing
+            Positioned(
+              bottom: MediaQuery.of(context).padding.bottom + 32,
+              left: 24,
+              right: 24,
+              child: RepaintBoundary(
+                child: GameControls(
+                  hintCount: _hintCount,
+                  onHint: _useHint,
+                  onNewGame: _newGame,
+                ),
               ),
             ),
-          ),
 
-          // Overlays
-          if (_showExitDialog)
-            ExitConfirmationOverlay(
-              onContinue: () => setState(() => _showExitDialog = false),
-              onExit: () => context.go('/home'),
-            ),
+            // Overlays
+            if (_showExitDialog)
+              ExitConfirmationOverlay(
+                onContinue: () => setState(() => _showExitDialog = false),
+                onExit: () => context.go('/home'),
+              ),
 
-          if (_showSettings)
-            GameSettingsOverlay(
-              onClose: () => setState(() => _showSettings = false),
-            ),
+            if (_showSettings)
+              GameSettingsOverlay(
+                onClose: () => setState(() => _showSettings = false),
+              ),
 
-          if (_showResult)
-            GameResultOverlay(
-              isWin: gameResult.isWin,
-              isDraw: gameResult.isDraw,
-              winner: gameResult.winner == CellState.X
-                  ? widget.player1Name
-                  : widget.player2Name,
-              onPlayAgain: _newGame,
-              onHome: () => context.go('/home'),
-            ),
-        ],
+            if (_showResult)
+              GameResultOverlay(
+                isWin: gameResult.isWin,
+                isDraw: gameResult.isDraw,
+                winner: gameResult.winner == CellState.X
+                    ? widget.player1Name
+                    : widget.player2Name,
+                onPlayAgain: _newGame,
+                onHome: () => context.go('/home'),
+              ),
+          ],
+        ),
       ),
     );
   }
