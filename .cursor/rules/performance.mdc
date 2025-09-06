@@ -1,8 +1,6 @@
 ---
 alwaysApply: true
 ---
-You are a senior Dart programer with experience in the Flutter framework and a preference for clean programing and design patterns.
-
 # Flutter Development Rules - Performance Optimization
 
 This document covers performance optimization strategies for Flutter applications.

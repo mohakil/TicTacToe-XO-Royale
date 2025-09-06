@@ -1,11 +1,12 @@
 # TicTacToe: XO Royale
 
-A premium Tic Tac Toe mobile game with modern UI/UX and Material 3 design, built with Flutter.
+A premium Tic Tac Toe mobile game with modern UI/UX and Material 3 design, built with Flutter. Features a robust robot AI system with multiple difficulty levels and a clean, maintainable architecture.
 
 ## 🎮 Features
 
 - **Modern Material 3 Design**: Clean, bold accents with deep neutrals and deliberate glow effects
 - **Custom Game Engine**: CustomPainter-based game board with 60-144 FPS performance
+- **Intelligent Robot AI**: Three difficulty levels (Easy, Medium, Hard) with strategic gameplay
 - **Multiple Game Modes**: Local multiplayer and AI opponents with adjustable difficulty
 - **Flexible Board Sizes**: Support for 3x3, 4x4, and 5x5 boards
 - **Adaptive Win Conditions**: Configurable win conditions (3, 4, or 5 in a row)
@@ -16,11 +17,11 @@ A premium Tic Tac Toe mobile game with modern UI/UX and Material 3 design, built
 ## 🏗️ Architecture
 
 ### Technology Stack
-- **Flutter**: Cross-platform mobile development framework
+- **Flutter 3.35.1**: Cross-platform mobile development framework
 - **Material 3**: Latest Material Design system with custom theming
 - **CustomPainter**: High-performance game board rendering and animations
-- **GoRouter**: Type-safe navigation with custom transitions
-- **Riverpod**: State management with immutable models
+- **GoRouter 16.2.0**: Type-safe navigation with custom transitions
+- **Riverpod 2.6.1**: State management with immutable models
 - **just_audio**: Low-latency audio for sound effects and music
 
 ### Project Structure
@@ -32,9 +33,23 @@ lib/
 │   └── theme/            # Material 3 theming system
 ├── core/                  # Core business logic
 │   ├── models/           # Data models and entities
+│   │   ├── game_config.dart      # Game configuration
+│   │   ├── game_enums.dart       # Centralized enums
+│   │   ├── game_state.dart       # Game state management
+│   │   ├── robot_config.dart     # Robot AI configuration
+│   │   ├── player_profile.dart   # User profile data
+│   │   └── store_item.dart       # In-app store items
 │   ├── providers/        # State management providers
-│   ├── services/         # Business logic services
-│   └── utils/            # Utility functions and helpers
+│   │   ├── profile_provider.dart
+│   │   ├── settings_provider.dart
+│   │   ├── store_provider.dart
+│   │   └── theme_provider.dart
+│   └── services/         # Business logic services
+│       ├── animation_pool.dart   # Animation controller pooling
+│       ├── audio_service.dart    # Audio management
+│       ├── game_logic.dart       # Core game logic
+│       ├── haptic_service.dart   # Haptic feedback
+│       └── robot_service.dart    # AI robot logic
 ├── features/              # Feature-based modules
 │   ├── loading/          # Loading screen with animations
 │   ├── home/             # Main home screen
@@ -43,11 +58,41 @@ lib/
 │   ├── store/            # In-app store
 │   ├── profile/          # User profile
 │   └── settings/         # App settings
-├── shared/                # Reusable components
-│   ├── widgets/          # Common UI components
-│   ├── animations/       # Reusable animations
-│   └── layouts/          # Responsive layout helpers
 └── l10n/                  # Localization
+```
+
+## 🤖 Robot AI System
+
+### Architecture
+The robot AI system uses a **Strategy Pattern** for clean, maintainable code:
+
+- **`RobotConfig`**: Configuration class with difficulty settings
+- **`RobotService`**: Main service that coordinates AI decisions
+- **`RobotStrategy`**: Interface for different AI behaviors
+- **Strategy Implementations**:
+  - `EasyRobotStrategy`: Random moves with basic blocking
+  - `MediumRobotStrategy`: Strategic play with pattern recognition
+  - `HardRobotStrategy`: Advanced tactics with lookahead
+
+### Difficulty Levels
+- **Easy**: Random moves, occasionally blocks obvious wins
+- **Medium**: Strategic positioning, blocks wins, creates threats
+- **Hard**: Advanced tactics, multiple move lookahead, optimal play
+
+### Configuration
+```dart
+// Easy robot
+final easyConfig = RobotConfig.forDifficulty(Difficulty.easy);
+
+// Medium robot with custom settings
+final mediumConfig = RobotConfig(
+  difficulty: Difficulty.medium,
+  thinkTime: Duration(milliseconds: 500),
+  useHints: true,
+);
+
+// Hard robot
+final hardConfig = RobotConfig.forDifficulty(Difficulty.hard);
 ```
 
 ## 🎨 Design System
@@ -162,6 +207,7 @@ lib/
 - **Models**: Data validation and business logic
 - **Providers**: State management and data flow
 - **Services**: Audio, storage, and game logic
+- **Robot AI**: Strategy testing and move validation
 - **Utilities**: Helper functions and calculations
 
 ### Widget Tests
@@ -172,6 +218,7 @@ lib/
 
 ### Integration Tests
 - **Game Flow**: Complete game scenarios
+- **Robot AI**: Full game against different difficulty levels
 - **State Persistence**: Data saving and loading
 - **Performance**: Frame rate and memory usage
 - **Accessibility**: Screen reader and navigation support
@@ -179,18 +226,20 @@ lib/
 ## 📦 Dependencies
 
 ### Core Dependencies
-- `flutter_riverpod`: State management
-- `go_router`: Navigation and routing
-- `just_audio`: Audio playback
-- `shared_preferences`: Local data storage
-- `flutter_animate`: UI animations
+- `flutter_riverpod: ^2.6.1` - State management
+- `go_router: ^16.2.0` - Navigation and routing
+- `just_audio: ^0.10.4` - Audio playback
+- `shared_preferences: ^2.5.3` - Local data storage
+- `flutter_animate: ^4.5.2` - UI animations
+- `google_fonts: ^6.3.0` - Typography
+- `vibration: ^3.1.3` - Haptic feedback
 
 ### Development Dependencies
-- `build_runner`: Code generation
-- `freezed`: Immutable data classes
-- `json_serializable`: JSON serialization
-- `riverpod_generator`: Provider code generation
-- `flutter_lints`: Code quality rules
+- `build_runner: ^2.4.13` - Code generation
+- `json_serializable: ^6.8.0` - JSON serialization
+- `riverpod_generator: ^2.6.5` - Provider code generation
+- `flutter_lints: ^5.0.0` - Code quality rules
+- `custom_lint: ^0.7.0` - Custom linting rules
 
 ## 🔧 Configuration
 
@@ -202,6 +251,22 @@ lib/
 - **Android**: Minimum SDK 21, target SDK 34
 - **iOS**: Minimum iOS 12.0, target iOS 17.0
 - **Web**: Modern browser support with fallbacks
+
+## 🏆 Recent Improvements
+
+### Codebase Cleanup (Latest)
+- ✅ **Removed unused files**: Eliminated 10+ unused utility files and widgets
+- ✅ **Simplified architecture**: Streamlined robot configuration system
+- ✅ **Centralized enums**: Consolidated all game enums into single source
+- ✅ **Clean dependencies**: All dependencies properly used and optimized
+- ✅ **Zero linting issues**: Complete code quality compliance
+- ✅ **Optimized performance**: Animation pooling and memory management
+
+### Robot AI Refactoring
+- ✅ **Strategy Pattern**: Clean, maintainable AI architecture
+- ✅ **Difficulty Levels**: Three distinct AI behaviors
+- ✅ **Configuration System**: Flexible robot settings
+- ✅ **Performance**: Optimized move calculation and decision making
 
 ## 📄 License
 

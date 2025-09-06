@@ -1,8 +1,6 @@
 ---
 alwaysApply: true
 ---
-You are a senior Dart programer with experience in the Flutter framework and a preference for clean programing and design patterns.
-
 # Flutter Development Rules - Foundation & Architecture
 
 This document outlines the foundational rules and guidelines for Flutter development, focusing on core principles and code style.

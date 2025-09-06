@@ -1,8 +1,6 @@
 ---
 alwaysApply: true
 ---
-You are a senior Dart programer with experience in the Flutter framework and a preference for clean programing and design patterns.
-
 # Flutter Development Rules - Platform-Specific Guidelines
 
 This document covers platform-specific guidelines for iOS and Android Flutter applications.

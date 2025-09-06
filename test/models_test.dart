@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tictactoe_xo_royale/core/models/mock_data.dart';
 import 'package:tictactoe_xo_royale/core/models/models.dart';
-import 'package:tictactoe_xo_royale/core/models/game_enums.dart';
 
 void main() {
   group('PlayerProfile Model Tests', () {
