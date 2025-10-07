@@ -1,0 +1,960 @@
+---
+alwaysApply: true
+---
+# Drift Database Rules
+
+## Drift Overview
+
+Drift is a **reactive persistence library** for Flutter and Dart applications, built on top of SQLite. It provides flexible SQL and Dart query writing with type-safe code generation, built-in threading support, and cross-platform compatibility.
+
+## Installation & Setup
+
+### Dependencies , mentioned version are example, alwasy use latest
+```yaml
+dependencies:
+  drift: ^2.28.1
+  drift_flutter: ^0.6.0         # Optional: Simplifies Flutter-specific setup
+  sqlite3_flutter_libs: ^0.5.0  # For native platforms (required for drift_flutter)
+  path_provider: ^2.0.0         # For native platforms
+  path: ^1.8.0                   # For native platforms
+
+dev_dependencies:
+  drift_dev: ^2.28.1
+  build_runner: ^2.0.0
+```
+
+### Platform-Specific Setup
+
+#### Native Platforms (Android/iOS)
+```dart
+import 'package:drift/native.dart';
+import 'package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart';
+
+class AppDatabase extends _$AppDatabase {
+  AppDatabase() : super(_openConnection());
+
+  static QueryExecutor _openConnection() {
+    return NativeDatabase.createInBackground(
+      File(await getDatabasesPath()).path + '/app.db',
+    );
+  }
+}
+```
+
+#### Native Platforms (Android/iOS) with drift_flutter (Optional Enhancement)
+```dart
+import 'package:drift_flutter/drift_flutter.dart';
+
+class AppDatabase extends _$AppDatabase {
+  // Simplified setup with drift_flutter
+  AppDatabase() : super(driftDatabase(name: 'app_db'));
+}
+```
+
+#### Web Platform
+```dart
+import 'package:drift/web.dart';
+
+class AppDatabase extends _$AppDatabase {
+  AppDatabase() : super(_openConnection());
+
+  static Future<QueryExecutor> _openConnection() async {
+    return WebDatabase.withStorage(
+      DriftWebStorage.indexedDb('app_db'),
+      logStatements: true,
+    );
+  }
+}
+```
+
+#### Web Platform with drift_flutter (Optional Enhancement)
+```dart
+import 'package:drift_flutter/drift_flutter.dart';
+
+// For web, add sqlite3.wasm and drift_worker.js to web/ folder
+// Update web/index.html: <script src="drift_worker.js"></script>
+
+class AppDatabase extends _$AppDatabase {
+  // Simplified setup with drift_flutter (handles web automatically)
+  AppDatabase() : super(driftDatabase(name: 'app_db'));
+}
+```
+
+## Database Definition & Schema
+
+### Basic Database Class
+```dart
+import 'package:drift/drift.dart';
+
+part 'database.g.dart';
+
+class Users extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get name => text()();
+  DateTimeColumn get createdAt => dateTime()();
+}
+
+class Posts extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get title => text()();
+  TextColumn get content => text()();
+  IntColumn get authorId => integer().references(Users, #id)();
+}
+
+@DriftDatabase(tables: [Users, Posts])
+class AppDatabase extends _$AppDatabase {
+  AppDatabase(QueryExecutor e) : super(e);
+
+  @override
+  int get schemaVersion => 1;
+
+  Future<List<User>> getAllUsers() => select(users).get();
+  Stream<List<User>> watchAllUsers() => select(users).watch();
+}
+```
+
+## Query Writing
+
+### Dart API (Type-Safe)
+```dart
+// Simple queries
+Future<User?> getUserById(int id) =>
+  (select(users)..where((u) => u.id.equals(id))).getSingleOrNull();
+
+// Complex queries with joins
+Future<List<UserWithPosts>> getUsersWithPosts() {
+  return (select(users).join([
+    leftOuterJoin(posts, posts.authorId.equalsExp(users.id)),
+  ])..orderBy([OrderingTerm(expression: users.name)])).get().then((rows) {
+    return rows.map((row) {
+      return UserWithPosts(
+        user: row.readTable(users),
+        posts: row.readTable(posts),
+      );
+    }).toList();
+  });
+}
+
+// Aggregations
+Future<int> getUserCount() =>
+  (select(users)..addColumns([countAll()])).getSingle().then((row) => row.read(countAll())!);
+```
+
+### SQL API (Files)
+```sql
+-- queries.drift
+getUserById: SELECT * FROM users WHERE id = ?;
+getUsersByName: SELECT * FROM users WHERE name LIKE ?;
+
+getUsersWithPosts:
+  SELECT u.*, p.title as post_title, p.content as post_content
+  FROM users u
+  LEFT JOIN posts p ON u.id = p.author_id
+  ORDER BY u.name;
+
+getUserCount: SELECT COUNT(*) as count FROM users;
+```
+
+## Best Practices
+
+### ✅ What To Do
+
+1. **Use Type-Safe Queries**: Always prefer generated, type-safe queries over raw SQL when possible
+2. **Leverage Streams**: Use `.watch()` for reactive UI updates instead of manual refresh
+3. **Proper Schema Versioning**: Always increment `schemaVersion` and handle migrations properly
+4. **Use Transactions**: Wrap multiple related operations in transactions for consistency
+5. **Batch Operations**: Use batch operations for bulk inserts/updates for better performance
+6. **Custom Row Classes**: Use custom row classes for complex queries to avoid manual mapping
+7. **Proper Error Handling**: Always handle database exceptions appropriately
+8. **Use Indexes**: Add indexes for frequently queried columns, especially foreign keys
+9. **Modular Design**: Split large databases into smaller, manageable modules
+10. **Testing**: Write comprehensive tests for database operations
+
+### ❌ What NOT To Do
+
+1. **Don't Use Raw SQL Everywhere**: Avoid raw SQL for simple queries where type-safe alternatives exist
+2. **Don't Block UI Thread**: Never perform database operations on the main thread
+3. **Don't Forget Migrations**: Never skip proper migration handling when changing schema
+4. **Don't Ignore Foreign Keys**: Always use foreign key constraints for data integrity
+5. **Don't Over-fetch**: Avoid selecting unnecessary columns or using `SELECT *`
+6. **Don't Mix Sync/Async**: Never mix synchronous and asynchronous database operations
+7. **Don't Forget Disposal**: Always dispose of database connections and streams properly
+8. **Don't Hardcode Paths**: Use proper database path resolution instead of hardcoded paths
+
+## Migration Strategy
+
+### Manual Migrations
+```dart
+@override
+MigrationStrategy get migration {
+  return MigrationStrategy(
+    onCreate: (Migrator m) async {
+      await m.createAll();
+    },
+    onUpgrade: (Migrator m, int from, int to) async {
+      if (from == 1) {
+        await m.addColumn(users, users.email);
+      }
+      if (from == 2) {
+        await m.createTable(posts);
+      }
+    },
+    beforeOpen: (details) async {
+      if (details.wasCreated) {
+        await into(users).insert(User(name: 'Admin'));
+      }
+    },
+  );
+}
+```
+
+## Advanced Features
+
+### Custom Type Converters
+```dart
+class ColorConverter extends TypeConverter<Color, int> {
+  const ColorConverter();
+
+  @override
+  Color fromSql(int fromDb) {
+    return Color(fromDb);
+  }
+
+  @override
+  int toSql(Color value) {
+    return value.value;
+  }
+}
+
+class Users extends Table {
+  IntColumn get favoriteColor => integer().map(const ColorConverter())();
+}
+```
+
+### Views and Triggers
+```dart
+class UserStats extends View {
+  const UserStats();
+
+  @override
+  Query as() => select([
+    Users.t.name,
+    count(Posts.t.id).as('post_count'),
+  ]).from(users).join([
+    leftOuterJoin(posts, posts.authorId.equalsExp(users.id))
+  ]).groupBy([users.name]);
+}
+```
+
+### DAOs (Data Access Objects)
+```dart
+@DriftAccessor(tables: [Users, Posts])
+class UserDao extends DatabaseAccessor<AppDatabase> with _$UserDaoMixin {
+  UserDao(AppDatabase db) : super(db);
+
+  Future<List<User>> getActiveUsers() =>
+    (select(users)..where((u) => u.createdAt.isBiggerThanValue(
+      DateTime.now().subtract(const Duration(days: 30))
+    ))).get();
+}
+```
+
+## Performance Optimization
+
+### Query Optimization
+```dart
+// Use specific columns instead of SELECT *
+Future<List<String>> getUserNames() =>
+  (select(users)..addColumns([users.name])).get().then(
+    (rows) => rows.map((row) => row.read(users.name)!).toList()
+  );
+
+// Use proper indexing
+class Users extends Table {
+  @override
+  List<String> get customConstraints => [
+    'CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);'
+  ];
+}
+
+// Use batch operations for bulk inserts
+Future<void> insertUsers(List<User> users) async {
+  await batch((batch) {
+    batch.insertAll(users, users.map((u) => UsersCompanion.insert(
+      name: u.name,
+      email: u.email,
+    )));
+  });
+}
+```
+
+### Memory Management
+```dart
+// Use streams wisely - they keep subscriptions alive
+Stream<List<User>> watchUsers() => select(users).watch();
+
+// Properly dispose of streams and subscriptions
+class UserRepository {
+  final AppDatabase _db;
+  StreamSubscription? _subscription;
+
+  Stream<List<User>> watchUsers() {
+    return _db.select(_db.users).watch();
+  }
+
+  void dispose() {
+    _subscription?.cancel();
+  }
+}
+```
+
+### Read Pool Configuration
+```dart
+// Create database with read pool for better performance
+final executor = await NativeDatabase.createInBackground(readPoolSize: 5);
+return MyDatabase(executor);
+```
+
+## Testing
+
+### Database Testing Setup
+```dart
+import 'package:drift/native.dart';
+import 'package:test/test.dart';
+
+void main() {
+  late AppDatabase db;
+
+  setUp(() {
+    db = AppDatabase(NativeDatabase.memory());
+  });
+
+  tearDown(() async {
+    await db.close();
+  });
+
+  test('insert and retrieve user', () async {
+    final user = User(id: 1, name: 'Test User');
+
+    final id = await db.into(db.users).insert(UsersCompanion.insert(
+      name: user.name,
+    ));
+
+    final retrieved = await db.select(db.users).getSingle();
+    expect(retrieved.name, equals(user.name));
+  });
+}
+```
+
+### Migration Testing
+```dart
+test('migration to version 2 works', () async {
+  final executor = await verifier.startAt(1);
+  final db = TestDatabase(executor);
+
+  await verifier.migrateAndValidate(db, 2);
+
+  final todos = await db.select(db.todos).get();
+  expect(todos.length, 1);
+});
+```
+
+## Cross-Platform Considerations
+
+### Platform-Specific Configuration
+```dart
+class AppDatabase extends _$AppDatabase {
+  AppDatabase._internal(QueryExecutor executor) : super(executor);
+
+  factory AppDatabase() {
+    return AppDatabase._internal(_createExecutor());
+  }
+
+  static QueryExecutor _createExecutor() {
+    if (kIsWeb) {
+      return WebDatabase.withStorage(
+        DriftWebStorage.indexedDb('app_db'),
+      );
+    } else {
+      return NativeDatabase.createInBackground(
+        File(join(await getDatabasesPath(), 'app.db')),
+      );
+    }
+  }
+}
+```
+
+## Common Patterns & Anti-Patterns
+
+### ✅ Good Patterns
+1. **Repository Pattern**: Use repositories to abstract database operations
+2. **Stream Management**: Use streams for reactive data updates
+3. **Proper Async/Await**: Always await database operations
+4. **Connection Pooling**: Use connection pooling for high-load scenarios
+5. **Data Validation**: Validate data before database operations
+
+### ❌ Anti-Patterns
+1. **Synchronous Operations**: Never perform database operations synchronously
+2. **No Error Handling**: Always handle database exceptions
+3. **Memory Leaks**: Always dispose of streams and connections
+4. **N+1 Queries**: Avoid multiple queries when one would suffice
+5. **Hardcoded Values**: Use parameterized queries instead of string concatenation
+
+## Principles
+
+1. **Type Safety First**: Always prefer type-safe generated code over raw SQL
+2. **Reactive by Default**: Use streams for data that changes over time
+3. **Performance Conscious**: Always consider the performance implications of queries
+4. **Maintainable**: Write code that's easy to understand and modify
+5. **Testable**: Structure code to be easily testable with mocks and fakes
+6. **Cross-Platform**: Write code that works consistently across all platforms
+
+## Migration from Other Libraries
+
+### From Moor (Previous Name)
+```yaml
+# Old
+dependencies:
+  moor_flutter: ^4.0.0
+
+# New
+dependencies:
+  drift: ^2.0.0
+  sqlite3_flutter_libs: ^0.1.0
+```
+
+## Advanced Drift Features
+
+### Custom Row Classes
+```dart
+class CustomRow extends DataClass {
+  final int id;
+  final String name;
+
+  CustomRow({required this.id, required this.name});
+}
+```
+
+### Window Functions
+```dart
+// Use window functions for advanced analytics
+SELECT
+  name,
+  ROW_NUMBER() OVER (ORDER BY created_at) as row_num,
+  RANK() OVER (ORDER BY score DESC) as rank
+FROM users;
+```
+
+### LIST Subqueries
+```sql
+SELECT
+  route.id,
+  route.name,
+  LIST(
+    SELECT coordinates.*
+    FROM route_points
+    WHERE route_points.routeId = route.id
+    ORDER BY route_points.index_on_route
+  ) AS points
+FROM saved_routes route
+WHERE route.id = ?;
+```
+
+### Drift File Imports
+```sql
+-- Imports are transitive
+-- All tables reachable from the other file will then also be visible
+-- import 'other.drift';
+
+-- Importing Dart files into a drift file will also work
+-- import 'package:my_package/tables.dart';
+```
+
+### Modular Generation
+```dart
+@DriftDatabase(
+  modules: [
+    UserModule(),
+    PostModule(),
+  ],
+)
+class AppDatabase extends _$AppDatabase {
+  // Database implementation
+}
+```
+
+## Error Handling
+
+### Proper Exception Handling
+```dart
+class DatabaseException implements Exception {
+  final String message;
+  final int? code;
+
+  DatabaseException(this.message, [this.code]);
+
+  @override
+  String toString() => 'DatabaseException: $message${code != null ? ' (Code: $code)' : ''}';
+}
+
+Future<void> safeDatabaseOperation() async {
+  try {
+    await db.insertUser('test');
+  } on SqliteException catch (e) {
+    throw DatabaseException('Failed to insert user: ${e.message}', e.extendedResultCode);
+  } catch (e) {
+    throw DatabaseException('Unexpected database error: $e');
+  }
+}
+```
+
+## Performance Monitoring
+
+### Database Performance Metrics
+```dart
+// Monitor query performance
+final stopwatch = Stopwatch()..start();
+await db.select(users).get();
+stopwatch.stop();
+print('Query took: ${stopwatch.elapsedMilliseconds}ms');
+
+// Use read pools for concurrent operations
+final executor = await NativeDatabase.createInBackground(readPoolSize: 4);
+```
+
+## Security Considerations
+
+### SQL Injection Prevention
+```dart
+// ✅ Safe - uses parameterized queries
+Future<User?> getUserById(int id) =>
+  (select(users)..where((u) => u.id.equals(id))).getSingleOrNull();
+
+// ❌ Unsafe - vulnerable to SQL injection
+// Future<User?> getUserByName(String name) =>
+//   customSelect('SELECT * FROM users WHERE name = \'$name\'').getSingleOrNull();
+```
+
+### Data Validation
+```dart
+// Validate data before insertion
+Future<int> createUser(String name) {
+  if (name.isEmpty) {
+    throw ArgumentError('User name cannot be empty');
+  }
+
+  return into(users).insert(UsersCompanion.insert(name: name));
+}
+```
+
+## Deployment Considerations
+
+### Database Initialization
+```dart
+class DatabaseInitializer {
+  static Future<AppDatabase> initialize() async {
+    final executor = await _createExecutor();
+    final database = AppDatabase(executor);
+
+    // Run any initialization logic
+    await _runInitialMigrations(database);
+
+    return database;
+  }
+
+  static Future<QueryExecutor> _createExecutor() async {
+    // Platform-specific executor creation
+    return NativeDatabase.createInBackground(
+      File(await getDatabasesPath()).path + '/app.db',
+    );
+  }
+}
+```
+
+## Debugging & Development Tools
+
+### Drift DevTools Integration
+```dart
+// Enable Drift DevTools for debugging
+void main() {
+  runApp(
+    ProviderScope(
+      child: DriftDevTools(
+        database: appDatabase,
+        child: MyApp(),
+      ),
+    ),
+  );
+}
+```
+
+### SQL Logging
+```dart
+// Enable SQL logging for debugging
+static Future<QueryExecutor> _openConnection() async {
+  return NativeDatabase.createInBackground(
+    File(await getDatabasesPath()).path + '/app.db',
+    logStatements: true,
+  );
+}
+```
+
+## Integration with State Management
+
+### Riverpod Integration
+```dart
+final databaseProvider = Provider<AppDatabase>((ref) {
+  throw UnimplementedError();
+});
+
+final usersProvider = StreamProvider<List<User>>((ref) {
+  final database = ref.watch(databaseProvider);
+  return database.select(database.users).watch();
+});
+```
+
+### BLoC Integration
+```dart
+class UserBloc extends Bloc<UserEvent, UserState> {
+  final AppDatabase _database;
+
+  UserBloc(this._database) : super(UserInitial()) {
+    on<LoadUsers>((event, emit) async {
+      final users = await _database.select(_database.users).get();
+      emit(UserLoaded(users));
+    });
+  }
+}
+```
+
+## Code Generation
+
+### Build Configuration
+```yaml
+targets:
+  $default:
+    builders:
+      drift_dev:
+        options:
+          # Enable SQL logging
+          log_statements: true
+          # Store date time as text
+          store_date_time_values_as_text: true
+          # Enable named parameters
+          named_parameters: true
+```
+
+### Generation Commands
+```bash
+# Generate drift code
+dart run build_runner build
+
+# Generate with delete conflicting outputs
+dart run build_runner build --delete-conflicting-outputs
+
+# Watch for changes and regenerate
+dart run build_runner watch
+```
+
+## Community Tools & Extensions
+
+### Drift DevTools Extension
+```dart
+// Add to your app for debugging
+import 'package:drift_devtools/drift_devtools.dart';
+
+void main() {
+  runApp(
+    DriftDevTools(
+      database: yourDatabase,
+      child: YourApp(),
+    ),
+  );
+}
+```
+
+### Drift SQLite Viewer
+```yaml
+dependencies:
+  drift_db_viewer:
+    git:
+      url: https://github.com/simolus3/drift
+      ref: master
+      subdir: drift_db_viewer
+```
+
+## Production Considerations
+
+### Database Backup & Recovery
+```dart
+class DatabaseBackup {
+  static Future<void> backup() async {
+    final dbPath = await getDatabasesPath();
+    final backupPath = join(dbPath, 'backup_${DateTime.now().millisecondsSinceEpoch}.db');
+
+    // Copy database file for backup
+    await File(join(dbPath, 'app.db')).copy(backupPath);
+  }
+
+  static Future<void> restore(String backupPath) async {
+    final dbPath = await getDatabasesPath();
+    await File(backupPath).copy(join(dbPath, 'app.db'));
+  }
+}
+```
+
+### Database Encryption
+```dart
+// Use SQLCipher for encrypted databases
+dependencies:
+  sqlcipher_flutter_libs: ^0.6.0
+
+// Configure encrypted database
+static QueryExecutor _openConnection() {
+  return NativeDatabase.createInBackground(
+    File(await getDatabasesPath()).path + '/app.db',
+    setup: (db) {
+      db.execute("PRAGMA key = 'your-encryption-key'");
+    },
+  );
+}
+```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Database Locked**: Use WAL mode or proper transaction handling
+2. **Memory Leaks**: Always dispose of streams and database connections
+3. **Performance Issues**: Use proper indexing and query optimization
+4. **Migration Failures**: Test migrations thoroughly before deployment
+
+### Debug Commands
+```bash
+# Analyze drift files for issues
+dart run drift_dev analyze
+
+# Generate schema for debugging
+dart run drift_dev schema generate
+
+# Check database integrity
+dart run drift_dev schema verify
+```
+
+## Performance Benchmarks
+
+### Query Performance
+- **Simple Select**: ~1-5ms
+- **Join Queries**: ~5-20ms
+- **Complex Aggregations**: ~10-50ms
+- **Batch Inserts**: ~50-200ms for 1000 records
+
+### Memory Usage
+- **Base Database**: ~2-5MB
+- **Active Streams**: ~0.1-0.5MB per stream
+- **Read Pool**: ~1MB per additional isolate
+
+## Security Best Practices
+
+1. **Input Validation**: Always validate user input before database operations
+2. **SQL Injection Prevention**: Use parameterized queries exclusively
+3. **Access Control**: Implement proper user permissions for database operations
+4. **Encryption**: Use encrypted databases for sensitive data
+5. **Audit Logging**: Log all database operations for security monitoring
+
+## Maintenance & Monitoring
+
+### Database Health Checks
+```dart
+class DatabaseHealthChecker {
+  static Future<DatabaseHealth> checkHealth(AppDatabase db) async {
+    final startTime = DateTime.now();
+
+    try {
+      // Check basic connectivity
+      await db.select(db.users).limit(1).get();
+
+      // Check table integrity
+      final pragmaResult = await db.customSelect('PRAGMA integrity_check').get();
+
+      final duration = DateTime.now().difference(startTime);
+
+      return DatabaseHealth(
+        isHealthy: pragmaResult.isNotEmpty && pragmaResult.first.data['integrity_check'] == 'ok',
+        responseTime: duration,
+        lastChecked: DateTime.now(),
+      );
+    } catch (e) {
+      return DatabaseHealth(
+        isHealthy: false,
+        error: e.toString(),
+        lastChecked: DateTime.now(),
+      );
+    }
+  }
+}
+```
+
+### Performance Monitoring
+```dart
+class DatabaseMetrics {
+  static final Map<String, int> _queryCounts = {};
+  static final Map<String, Duration> _queryDurations = {};
+
+  static void recordQuery(String query, Duration duration) {
+    _queryCounts[query] = (_queryCounts[query] ?? 0) + 1;
+    _queryDurations[query] = duration;
+  }
+
+  static Map<String, dynamic> getMetrics() {
+    return {
+      'query_counts': _queryCounts,
+      'query_durations': _queryDurations,
+      'total_queries': _queryCounts.values.fold(0, (a, b) => a + b),
+    };
+  }
+}
+```
+
+## API Reference
+
+### Core Classes
+- **DriftDatabase**: Base class for all Drift databases
+- **Table**: Base class for database tables
+- **DataClass**: Generated class for table rows
+- **UpdateCompanion**: Class for partial updates
+- **QueryExecutor**: Interface for database operations
+
+### Query Methods
+- **select()**: Create select queries
+- **insert()**: Insert new records
+- **update()**: Update existing records
+- **delete()**: Delete records
+- **watch()**: Create reactive streams
+- **customSelect()**: Execute raw SQL queries
+
+### Expression Methods
+- **equals()**: Equality comparison
+- **isIn()**: IN clause
+- **isBetween()**: BETWEEN clause
+- **like()**: LIKE pattern matching
+- **isNull()**: IS NULL check
+- **count()**: Count aggregation
+- **sum()**: Sum aggregation
+- **avg()**: Average aggregation
+
+## drift_flutter: Flutter-Specific Enhancements
+
+### Overview
+`drift_flutter` is an optional utility package that simplifies Drift integration in Flutter applications. It provides Flutter-specific extensions for easier database setup, platform handling, and advanced features like isolate sharing and web support. While not required, it reduces boilerplate and enhances the Flutter development experience.
+
+### Key Features and Usage
+
+#### Platform-Agnostic Initialization
+```dart
+import 'package:drift_flutter/drift_flutter.dart';
+
+@DriftDatabase(tables: [YourTables])
+class AppDatabase extends _$AppDatabase {
+  // Simplified setup - drift_flutter handles platform differences
+  AppDatabase() : super(driftDatabase(name: 'app_db'));
+}
+```
+
+#### Advanced Options
+```dart
+// Custom database path and isolate sharing
+AppDatabase() : super(
+  driftDatabase(
+    name: 'app_db',
+    native: DriftNativeOptions(
+      databasePath: '/custom/path/app.db',  // Optional custom path
+      shareAcrossIsolates: true,            // For background tasks
+    ),
+  ),
+);
+```
+
+#### Web Support Setup
+1. Download `sqlite3.wasm` from the official SQLite WASM build.
+2. Place `sqlite3.wasm` in your Flutter project's `web/` folder.
+3. Add `drift_worker.js` (from Drift repo) to `web/`.
+4. Update `web/index.html`:
+   ```html
+   <script src="drift_worker.js"></script>
+   ```
+5. Use `driftDatabase` as usual - it handles web initialization automatically.
+
+#### Isolate Sharing
+Useful for apps using `WorkManager` or background processing:
+```dart
+driftDatabase(
+  name: 'app_db',
+  native: DriftNativeOptions(shareAcrossIsolates: true),
+);
+```
+
+### Benefits and Use Cases
+- **Simplified Setup**: Reduces boilerplate for database initialization.
+- **Web-Ready**: Easy web support without manual configuration.
+- **Isolate Support**: Enables shared database access across Flutter isolates.
+- **When to Use**: Ideal for Flutter apps targeting multiple platforms or using advanced features like background processing.
+
+### Installation
+```yaml
+dependencies:
+  drift_flutter: ^0.2.7  # Add alongside drift and sqlite3_flutter_libs
+```
+
+### Best Practices for drift_flutter
+
+#### ✅ What To Do
+1. **Use `driftDatabase` for Simplified Initialization**: Always opt for `driftDatabase(name: 'your_db')` when setting up your database class. It handles platform differences automatically, reducing boilerplate and potential errors.
+2. **Enable Web Support When Targeting Multiple Platforms**: If your app supports web, follow the exact setup steps: Download `sqlite3.wasm`, add `drift_worker.js` to `web/`, and update `web/index.html`.
+3. **Leverage Isolate Sharing for Background Tasks**: Use `shareAcrossIsolates: true` in `DriftNativeOptions` if your app uses `WorkManager` or similar for background processing. This prevents database locks and improves concurrency.
+4. **Combine with Core Drift Features**: Use `drift_flutter` alongside Drift's type-safe queries, reactive streams, and migrations. For example, pair it with `.watch()` for real-time UI updates in your game screens.
+5. **Handle Platform-Specific Paths Thoughtfully**: Use `DriftNativeOptions.databasePath` for custom paths only when necessary (e.g., for app-specific storage). Otherwise, rely on defaults for simplicity.
+6. **Integrate with Flutter State Management**: Combine `drift_flutter` with Riverpod or BLoC for reactive database providers. Ensure streams are properly disposed to avoid memory leaks.
+7. **Test Thoroughly Across Platforms**: Write tests for database operations on Android, iOS, and web. Use `drift_dev` tools for schema verification and performance checks.
+8. **Monitor Performance and Resources**: Use `driftDatabase` with logging enabled (`logStatements: true`) during development to monitor queries. Dispose of database connections and streams in your app's lifecycle.
+9. **Stay Updated**: Keep `drift_flutter` and `drift` versions aligned. Check pub.dev and the Drift GitHub for updates, especially for web or isolate features.
+10. **Use for Production-Ready Apps**: In projects like TicTacToe XO Royale, use `drift_flutter` to simplify your Drift migration, ensuring cross-platform compatibility without manual platform checks.
+
+#### ❌ What NOT To Do
+1. **Don't Include Web-Specific Code for Mobile-Only Apps**: If your app is strictly mobile-only (Android/iOS), avoid adding web-specific setup or code (e.g., `sqlite3.wasm`, `drift_worker.js`, or web-related `drift_flutter` configurations). These are unnecessary and can increase bundle size without benefit.
+2. **Don't Over-Rely on `drift_flutter` for Simple Mobile-Only Apps**: If your app is mobile-only (Android/iOS), you don't need `drift_flutter`—stick to core `drift` with `sqlite3_flutter_libs` for minimal overhead.
+3. **Don't Skip Web Setup Steps**: Avoid enabling web support without adding `sqlite3.wasm` and `drift_worker.js`. This will cause runtime errors on web builds.
+4. **Don't Use Isolate Sharing Unnecessarily**: Only enable `shareAcrossIsolates` if you have background tasks. It adds complexity and isn't needed for simple single-isolate apps.
+5. **Don't Mix Manual and `drift_flutter` Setup**: Avoid combining `driftDatabase` with manual `NativeDatabase` calls in the same project—it can lead to inconsistent behavior.
+6. **Don't Ignore Error Handling**: Never skip try-catch blocks for database operations. `drift_flutter` simplifies setup but doesn't eliminate the need for robust error handling (e.g., for web failures).
+7. **Don't Hardcode Sensitive Paths**: Avoid hardcoding database paths unless absolutely necessary. Use `DriftNativeOptions` sparingly and document why custom paths are used.
+8. **Don't Forget Resource Disposal**: Always dispose of database instances and streams in your app's `dispose()` methods to prevent memory leaks, even with `drift_flutter`.
+9. **Don't Assume Cross-Platform Parity**: Don't treat web and native platforms identically. Test features like isolate sharing on each platform, as behavior can differ.
+10. **Don't Use Outdated Versions**: Avoid mixing incompatible versions of `drift` and `drift_flutter`. Always update both together.
+11. **Don't Over-Engineer for Small Projects**: In simple apps, `drift_flutter` might add unnecessary abstraction. Evaluate if the benefits outweigh the added dependency.
+
+#### 🚫 Forbidden Practices
+1. **Never Use Without Core `drift`**: `drift_flutter` requires `drift` as a dependency. Using it alone will cause import errors and compilation failures.
+2. **Never Enable Isolate Sharing Without Isolates**: Setting `shareAcrossIsolates: true` without actual isolate usage can lead to unnecessary resource overhead and potential deadlocks.
+3. **Never Ignore Web File Requirements**: Omitting `sqlite3.wasm` or `drift_worker.js` for web builds will result in runtime crashes. This is a hard requirement for web SQLite functionality.
+4. **Never Mix Sync and Async Operations**: Avoid synchronous database calls in async contexts. Always use `await` with `drift_flutter`'s methods to prevent blocking the UI thread.
+5. **Never Skip Input Validation**: Don't insert unvalidated data into the database, even with `drift_flutter`. Use parameterized queries and validation to prevent SQL injection or data corruption.
+6. **Never Forget to Handle Platform Permissions**: On native platforms, ensure storage permissions are handled (e.g., via `path_provider`). `drift_flutter` doesn't manage permissions—your app must.
+7. **Never Use Deprecated Features**: Avoid any deprecated APIs in `drift_flutter` (check pub.dev changelogs). For example, don't rely on old initialization methods that may be removed.
+8. **Never Combine with Conflicting Packages**: Don't use `drift_flutter` with other database packages (e.g., `sqflite`) in the same app without proper isolation, as it can cause conflicts.
+9. **Never Perform Heavy Operations on Main Thread**: Even with `drift_flutter`, avoid long-running queries on the UI thread. Use background isolates or proper async handling.
+10. **Never Skip Testing Migrations**: Don't deploy without testing schema migrations. `drift_flutter` doesn't prevent migration issues—use `drift_dev` tools for verification.
+
+## Summary
+
+Drift is a powerful, type-safe, reactive database solution for Flutter and Dart applications. It provides excellent performance, comprehensive testing support, and seamless cross-platform compatibility. With enhancements from `drift_flutter`, Flutter developers can further simplify setup and leverage advanced features like web support and isolate sharing. By following these rules and best practices, you can build robust, maintainable database-driven applications
+
+The key principles are:
+- **Type Safety First**: Use generated code over raw SQL
+- **Reactive by Default**: Leverage streams for data updates
+- **Performance Conscious**: Optimize queries and use proper indexing
+- **Maintainable**: Write clear, testable database code
+- **Cross-Platform**: Ensure consistent behavior across all platforms
+- **Flutter Integration**: Use `drift_flutter` for enhanced Flutter-specific utilities
+
+These rules provide a comprehensive foundation for using Drift effectively in production applications.

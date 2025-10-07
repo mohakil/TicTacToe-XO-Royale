@@ -1,0 +1,110 @@
+---
+alwaysApply: true
+---
+# Flutter Development Rules - Outdated Practices
+
+This document covers outdated practices that must be avoided in Flutter development.
+
+## Outdated Practices to Avoid
+
+These practices are deprecated or considered bad practice in modern Flutter development and should be avoided.
+
+### Deprecated Widgets and APIs
+
+*   **RaisedButton (Deprecated):**
+    *   **Instead:** Use `ElevatedButton` with proper styling.
+    *   **Example:** `ElevatedButton(onPressed: () {}, child: Text('Click me'))`
+*   **FlatButton (Deprecated):**
+    *   **Instead:** Use `TextButton` for text-only buttons.
+    *   **Example:** `TextButton(onPressed: () {}, child: Text('Click me'))`
+*   **OutlineButton (Deprecated):**
+    *   **Instead:** Use `OutlinedButton` for outlined buttons.
+    *   **Example:** `OutlinedButton(onPressed: () {}, child: Text('Click me'))`
+*   **Scaffold.of(context).showSnackBar (Deprecated):**
+    *   **Instead:** Use `ScaffoldMessenger.of(context).showSnackBar()`.
+    *   **Example:** `ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Message')))`
+*   **WillPopScope (Deprecated):**
+    *   **Instead:** Use `PopScope` for handling back button behavior.
+    *   **Example:** `PopScope(canPop: false, onPopInvoked: (didPop) => handleBack())`
+
+### Flutter 3.35.0 Breaking Changes
+
+*   **Scaffold.appBar and Scaffold.bottomNavigationBar (Deprecated):**
+    *   **Instead:** Use `Scaffold.appBarBuilder` and `Scaffold.bottomNavigationBarBuilder` for dynamic creation.
+    *   **Example:** `Scaffold(appBarBuilder: (context) => AppBar(title: Text('Title')))`
+    *   **Example:** `Scaffold(bottomNavigationBarBuilder: (context) => BottomNavigationBar(...))`
+*   **showModalBottomSheet isScrollControlled (Removed):**
+    *   **Instead:** Height now adjusts automatically based on content.
+    *   **Note:** No migration needed, behavior is now automatic.
+*   **CupertinoPageRoute fullscreenDialog (Removed):**
+    *   **Instead:** Use `fullscreenDialog` property of `ModalRoute` instead.
+    *   **Migration:** Move `fullscreenDialog` property to route configuration.
+*   **TextFormField.decoration Type Change:**
+    *   **Instead:** Property is now `InputDecoration?` (nullable).
+    *   **Migration:** Handle nullable decoration property.
+    *   **Example:** `decoration: InputDecoration(...)` → `decoration: InputDecoration(...)?`
+*   **RawKeyboardListener.onKey Callback Change:**
+    *   **Instead:** Callback now includes a `KeyEvent` object parameter.
+    *   **Migration:** Include KeyEvent object in callback.
+    *   **Example:** `onKey: (event) => handleKey(event)` instead of `onKey: () => handleKey()`
+*   **TextSelectionToolbar (Removed):**
+    *   **Instead:** Use `AdaptiveTextSelectionToolbar` for cross-platform text selection.
+    *   **Migration:** Replace `TextSelectionToolbar` with `AdaptiveTextSelectionToolbar`.
+    *   **Example:** `AdaptiveTextSelectionToolbar(actions: [...])`
+
+### State Management Anti-patterns
+
+*   **setState Abuse:**
+    *   **Avoid:** Using `setState` for complex state management across multiple widgets.
+    *   **Instead:** Use proper state management solutions (Provider, Riverpod, Bloc).
+*   **Global Variables for State:**
+    *   **Avoid:** Using global variables or singletons for app state.
+    *   **Instead:** Use dependency injection and proper state containers.
+*   **InheritedWidget Direct Usage:**
+    *   **Avoid:** Using `InheritedWidget` directly for state management.
+    *   **Instead:** Use higher-level abstractions like Provider or Riverpod.
+
+### Build Method Anti-patterns
+
+*   **Expensive Operations in Build:**
+    *   **Avoid:** Performing heavy computations, network calls, or database operations in `build()` methods.
+    *   **Instead:** Cache results or use `FutureBuilder`/`StreamBuilder`.
+*   **Creating Objects in Build:**
+    *   **Avoid:** Creating new objects (controllers, animations) in `build()` methods.
+    *   **Instead:** Create objects in `initState()` or use `StatefulWidget`.
+
+### Memory Management Anti-patterns
+
+*   **Not Disposing Resources:**
+    *   **Avoid:** Forgetting to dispose controllers, streams, and animations.
+    *   **Instead:** Always dispose resources in `dispose()` methods.
+*   **Holding Context References:**
+    *   **Avoid:** Holding long-lived references to `BuildContext`.
+    *   **Instead:** Use `BuildContext` only within widget lifecycle methods.
+
+### Testing Anti-patterns
+
+*   **Testing Implementation Details:**
+    *   **Avoid:** Testing private methods or internal implementation.
+    *   **Instead:** Test public APIs and user-facing behavior.
+*   **Over-mocking:**
+    *   **Avoid:** Mocking everything in unit tests.
+    *   **Instead:** Test real integrations where possible and meaningful.
+
+### Build Configuration Anti-patterns
+
+*   **Debug Mode in Production:**
+    *   **Avoid:** Using debug builds for production releases.
+    *   **Instead:** Always use release builds for production with proper optimization.
+*   **Ignoring Build Warnings:**
+    *   **Avoid:** Ignoring build warnings and deprecation notices.
+    *   **Instead:** Address warnings promptly to prevent future issues.
+
+### Platform-Specific Anti-patterns
+
+*   **Ignoring Platform Conventions:**
+    *   **Avoid:** Using iOS-style UI on Android or vice versa.
+    *   **Instead:** Use platform-specific widgets and follow platform conventions.
+*   **Hard-coded Platform Values:**
+    *   **Avoid:** Using hard-coded platform-specific values (status bar height, safe areas).
+    *   **Instead:** Use `MediaQuery` and platform-specific APIs.

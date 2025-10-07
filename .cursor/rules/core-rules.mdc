@@ -1,0 +1,67 @@
+---
+alwaysApply: true
+---
+# Flutter Development Rules - Foundation & Architecture
+
+This document outlines the foundational rules and guidelines for Flutter development, focusing on core principles and code style.
+
+## General Principles & Foundational Best Practices
+
+*   **Objective:** Generate clean, maintainable, efficient, and testable Flutter/Dart code.
+*   **Readability:** Prioritize code readability and clarity. Code should be self-documenting where possible.
+*   **Modularity:** Promote modular design by breaking down complex problems into smaller, manageable components.
+*   **Consistency:** Adhere strictly to established coding conventions and architectural patterns throughout the codebase.
+*   **Efficiency:** Optimize for performance, especially in UI rendering and data processing, to ensure a smooth user experience.
+*   **Security:** Implement secure coding practices to prevent common vulnerabilities.
+
+## Advanced Principles & Best Practices
+
+*   **Immutability:** Favor immutable widgets and data structures. This simplifies state management, improves performance (especially with `const` constructors), and reduces the likelihood of bugs.
+*   **Separation of Concerns (SoC):** Strictly enforce SoC. UI logic should be separate from business logic, and business logic from data access. This enhances testability, maintainability, and scalability.
+*   **Dependency Inversion Principle (DIP):** Depend on abstractions, not concretions. Use interfaces or abstract classes to define contracts, allowing for easier testing and swapping of implementations.
+*   **Test-Driven Development (TDD):** Adopt TDD where feasible. Writing tests before code helps clarify requirements, improves design, and ensures high test coverage.
+*   **Don't Repeat Yourself (DRY):** Avoid code duplication. Create reusable widgets, functions, and classes for common patterns and logic.
+*   **Keep `build()` Methods Pure:** `build` methods should be declarative and free of side effects. Avoid complex computations, network calls, or state changes directly within `build`.
+*   **Effective Use of Keys:** Understand and use `Key`s effectively, especially `ValueKey` and `ObjectKey`, for managing widget identity in lists or when widgets change position in the tree. This helps Flutter optimize rebuilds.
+*   **Error Boundaries:** Implement error boundaries (e.g., using `ErrorWidget.builder` or custom `ErrorBoundary` widgets) to gracefully handle unexpected errors in the UI and prevent app crashes.
+*   **Code Generation:** Leverage code generation tools (e.g., `freezed`, `json_serializable`, `build_runner`) to reduce boilerplate, improve type safety, and minimize manual errors.
+*   **Asynchronous Programming:** Master `async`/`await` and `Future`s. Use `Isolate`s for heavy, CPU-bound computations to prevent UI jank.
+*   **Null Safety:** Fully embrace Dart's null safety features to eliminate null-related runtime errors and improve code robustness.
+*   **Linter Rules:** Configure and adhere to a strict set of linting rules (e.g., `flutter_lints` or custom `analysis_options.yaml`) to enforce coding standards and catch potential issues early.
+
+## Code Style and Formatting
+
+Consistent code style and formatting are essential for readability, maintainability, and collaborative development. Adhering to these guidelines ensures that all generated code is uniform and easy to understand.
+
+*   **Automatic Formatting:** Always apply `dart format` to all generated code. Ensure trailing commas are used for multi-line arguments to improve readability and prevent unintended diffs.
+*   **Line Length:** Limit lines to a maximum of 120 characters. This improves readability on various screen sizes and prevents horizontal scrolling.
+*   **Naming Conventions (Effective Dart):** Follow Dart's official naming conventions to ensure consistency and clarity across the codebase.
+    *   **Files & Directories:** Use `snake_case` (e.g., `user_profile_screen.dart`, `auth_repository.dart`, `lib/features/auth/`). This convention makes file names easy to read and consistent with typical file system practices.
+    *   **Classes, Enums, Typedefs, Extensions:** Use `PascalCase` (e.g., `UserProfileScreen`, `AuthRepository`, `AuthenticationStatus`). This convention is standard for types in Dart and many other object-oriented languages.
+    *   **Variables, Functions, Parameters:** Use `lowerCamelCase` (e.g., `userName`, `fetchUserData()`, `paddingValue`). This is the standard for members and functions, promoting clear distinction from types.
+    *   **Constants:** Use `lowerCamelCase` with a `k` prefix for global constants (e.g., `kDefaultPadding`, `kAppBarHeight`). This convention helps identify global constants at a glance.
+    *   **Private Identifiers:** Prefix private class members or top-level declarations with an underscore (e.g., `_privateMethod`, `_internalVariable`). This clearly indicates that an identifier is private to its library.
+*   **Comments:** Use comments judiciously to explain complex logic or design decisions, but strive for self-documenting code.
+    *   **Documentation Comments:** Use `///` for public APIs (classes, methods, properties) to generate DartDoc documentation. These comments should explain the purpose, parameters, and return values, aiding in API understanding and usage.
+    *   **Inline Comments:** Use `//` for explaining complex logic, non-obvious decisions, or temporary workarounds. Keep them concise and relevant, focusing on *why* something is done, not *what*.
+    *   **TODOs/FIXMEs:** Use `// TODO: [description]` and `// FIXME: [description]` for temporary notes or issues that require future attention. These should be addressed before production deployment.
+*   **Modern Dart Language Features (Flutter 3.35.1):** Leverage the latest Dart language improvements for cleaner, more expressive code:
+    *   **Pattern Matching Enhancements:** Use improved pattern matching for more concise and readable conditional logic, especially when working with sealed classes or complex data structures.
+    *   **Switch Expression Syntax:** Prefer the new `switch` expression syntax over traditional switch statements for more functional-style programming and better type inference. This provides more concise code and better null safety integration.
+
+### Flutter 3.35.0 Language Features
+
+*   **Form Enhancements:**
+    *   **FormField.onReset Callback:**
+        *   **New Feature:** `FormField` now includes an `onReset` callback for form reset handling.
+        *   **Use Case:** Implement custom form reset logic, clear validation states, or restore default values.
+        *   **Example:** `FormField(onReset: () => clearValidationErrors())`
+        *   **Integration:** Works seamlessly with existing form validation and state management.
+
+*   **Navigation Enhancements:**
+    *   **ModalRoute.fullscreenDialog:**
+        *   **New Feature:** `fullscreenDialog` property now available on `ModalRoute` and `showDialog`.
+        *   **Use Case:** Control dialog presentation style for better user experience.
+        *   **Example:** `showDialog(fullscreenDialog: true, ...)`
+        *   **Migration:** Move `fullscreenDialog` from `CupertinoPageRoute` to route configuration.
+    *   **Improved Type Inference:** Take advantage of enhanced type inference capabilities to reduce explicit type annotations while maintaining code clarity and safety.

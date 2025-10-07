@@ -1,0 +1,71 @@
+---
+alwaysApply: true
+---
+# Flutter Development Rules - Performance Optimization
+
+This document covers performance optimization strategies for Flutter applications.
+
+## Performance Optimization
+
+Performance optimization is critical for delivering smooth, responsive Flutter applications. This section covers strategies for achieving optimal performance, targeting 120fps where possible.
+
+### Performance Target: 120fps
+
+*   **Understanding 120fps:**
+    *   **Frame Budget:** At 120fps, each frame has ~8.33ms to render (vs 16.67ms at 60fps).
+    *   **Device Support:** Not all devices support 120fps; target the highest possible refresh rate supported by the device.
+    *   **Battery Impact:** Higher refresh rates consume more battery; balance performance with battery life.
+*   **Performance Monitoring:**
+    *   Use Flutter DevTools Performance view to monitor frame rates and identify bottlenecks.
+    *   Enable performance overlay during development: `flutter run --profile`.
+    *   Use `Timeline` and `Performance` tabs in DevTools to analyze frame timing.
+
+### Rendering Performance
+
+*   **Minimize Widget Rebuilds:**
+    *   Use `const` constructors for widgets that don't change.
+    *   Use `const` for static widget trees to prevent unnecessary rebuilds.
+    *   Example: `const Text('Static text')` instead of `Text('Static text')`.
+*   **Efficient State Management:**
+    *   Use state management solutions that minimize rebuilds (Provider, Riverpod, Bloc).
+    *   Avoid rebuilding entire widget trees when only a small part changes.
+    *   Use `Selector` or `Consumer` widgets to rebuild only specific parts.
+*   **ListView Performance:**
+    *   Use `ListView.builder` for long lists to build children lazily.
+    *   Use `AutomaticKeepAliveClientMixin` for expensive widgets that should be cached.
+    *   Implement proper item extent when possible to improve scrolling performance.
+    *   Use `cacheExtent` to control how many items are built ahead of time.
+*   **Image Optimization:**
+    *   Use appropriate image formats (WebP for better compression).
+    *   Implement image caching with `cached_network_image` or similar.
+    *   Use `Image.memory` for small, frequently used images.
+    *   Preload critical images during app startup.
+    *   Use `ResizeImage` for large images to reduce memory usage.
+*   **Avoid Expensive Operations in `build`:**
+    *   Don't perform heavy computations in `build` methods.
+    *   Cache expensive calculations or use `compute()` for isolates.
+    *   Use `FutureBuilder` or `StreamBuilder` for async operations.
+*   **Use `RepaintBoundary`:**
+    *   Wrap complex, frequently changing widgets with `RepaintBoundary` to isolate them from the rest of the widget tree.
+    *   This prevents unnecessary repaints of static content.
+
+### Memory Management
+
+*   **Dispose Resources:**
+    *   Always dispose controllers, streams, and other resources in `dispose()` methods.
+    *   Use `AutomaticKeepAliveClientMixin` carefully to avoid memory leaks.
+
+### Flutter 3.35.0 Performance Updates
+
+*   **Sliver Paint Order Control:**
+    *   **New Feature:** Explicit control over paint order (z-order) of slivers for complex UI effects.
+    *   **Use Case:** Create layered sliver effects, overlapping content, and advanced scrolling animations.
+    *   **Performance Impact:** Enables more sophisticated UI patterns without performance degradation.
+    *   **Example:** Control which slivers render on top of others for complex layouts.
+
+*   **Impeller Rendering Engine:**
+    *   **Android Status:** Impeller is now experimental on Android, providing significant performance improvements.
+    *   **iOS Status:** Impeller continues to be the default rendering engine for iOS.
+    *   **Recommendation:** Enable Impeller on Android for better rendering performance and reduced jank.
+    *   **Migration:** No code changes required, enable via build configuration.
+    *   **Performance Benefits:** Reduced frame drops, better memory management, and improved rendering consistency.
