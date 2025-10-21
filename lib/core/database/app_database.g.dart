@@ -30,6 +30,10 @@ class $PlayerProfilesTable extends PlayerProfiles
     'nickname',
     aliasedName,
     false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 50,
+    ),
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
@@ -51,7 +55,8 @@ class $PlayerProfilesTable extends PlayerProfiles
     aliasedName,
     false,
     type: DriftSqlType.int,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
   );
   static const VerificationMeta _hintsMeta = const VerificationMeta('hints');
   @override
@@ -60,7 +65,8 @@ class $PlayerProfilesTable extends PlayerProfiles
     aliasedName,
     false,
     type: DriftSqlType.int,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
   );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
@@ -71,7 +77,8 @@ class $PlayerProfilesTable extends PlayerProfiles
     aliasedName,
     false,
     type: DriftSqlType.dateTime,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.now(),
   );
   static const VerificationMeta _updatedAtMeta = const VerificationMeta(
     'updatedAt',
@@ -82,7 +89,8 @@ class $PlayerProfilesTable extends PlayerProfiles
     aliasedName,
     false,
     type: DriftSqlType.dateTime,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.now(),
   );
   @override
   List<GeneratedColumn> get $columns => [
@@ -131,32 +139,24 @@ class $PlayerProfilesTable extends PlayerProfiles
         _gemsMeta,
         gems.isAcceptableOrUnknown(data['gems']!, _gemsMeta),
       );
-    } else if (isInserting) {
-      context.missing(_gemsMeta);
     }
     if (data.containsKey('hints')) {
       context.handle(
         _hintsMeta,
         hints.isAcceptableOrUnknown(data['hints']!, _hintsMeta),
       );
-    } else if (isInserting) {
-      context.missing(_hintsMeta);
     }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
         createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
       );
-    } else if (isInserting) {
-      context.missing(_createdAtMeta);
     }
     if (data.containsKey('updated_at')) {
       context.handle(
         _updatedAtMeta,
         updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
       );
-    } else if (isInserting) {
-      context.missing(_updatedAtMeta);
     }
     return context;
   }
@@ -372,15 +372,11 @@ class PlayerProfilesCompanion extends UpdateCompanion<PlayerProfile> {
     this.id = const Value.absent(),
     required String nickname,
     this.avatarUrlOrProvider = const Value.absent(),
-    required int gems,
-    required int hints,
-    required DateTime createdAt,
-    required DateTime updatedAt,
-  }) : nickname = Value(nickname),
-       gems = Value(gems),
-       hints = Value(hints),
-       createdAt = Value(createdAt),
-       updatedAt = Value(updatedAt);
+    this.gems = const Value.absent(),
+    this.hints = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  }) : nickname = Value(nickname);
   static Insertable<PlayerProfile> custom({
     Expression<int>? id,
     Expression<String>? nickname,
@@ -496,7 +492,7 @@ class $PlayerStatsTable extends PlayerStats
     type: DriftSqlType.int,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES player_profiles (id)',
+      'REFERENCES player_profiles (id) ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _winsMeta = const VerificationMeta('wins');
@@ -506,7 +502,8 @@ class $PlayerStatsTable extends PlayerStats
     aliasedName,
     false,
     type: DriftSqlType.int,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
   );
   static const VerificationMeta _lossesMeta = const VerificationMeta('losses');
   @override
@@ -515,7 +512,8 @@ class $PlayerStatsTable extends PlayerStats
     aliasedName,
     false,
     type: DriftSqlType.int,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
   );
   static const VerificationMeta _drawsMeta = const VerificationMeta('draws');
   @override
@@ -524,7 +522,8 @@ class $PlayerStatsTable extends PlayerStats
     aliasedName,
     false,
     type: DriftSqlType.int,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
   );
   static const VerificationMeta _streakMeta = const VerificationMeta('streak');
   @override
@@ -533,7 +532,8 @@ class $PlayerStatsTable extends PlayerStats
     aliasedName,
     false,
     type: DriftSqlType.int,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
   );
   static const VerificationMeta _totalGamesMeta = const VerificationMeta(
     'totalGames',
@@ -544,7 +544,8 @@ class $PlayerStatsTable extends PlayerStats
     aliasedName,
     false,
     type: DriftSqlType.int,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
   );
   @override
   List<GeneratedColumn> get $columns => [
@@ -584,40 +585,30 @@ class $PlayerStatsTable extends PlayerStats
         _winsMeta,
         wins.isAcceptableOrUnknown(data['wins']!, _winsMeta),
       );
-    } else if (isInserting) {
-      context.missing(_winsMeta);
     }
     if (data.containsKey('losses')) {
       context.handle(
         _lossesMeta,
         losses.isAcceptableOrUnknown(data['losses']!, _lossesMeta),
       );
-    } else if (isInserting) {
-      context.missing(_lossesMeta);
     }
     if (data.containsKey('draws')) {
       context.handle(
         _drawsMeta,
         draws.isAcceptableOrUnknown(data['draws']!, _drawsMeta),
       );
-    } else if (isInserting) {
-      context.missing(_drawsMeta);
     }
     if (data.containsKey('streak')) {
       context.handle(
         _streakMeta,
         streak.isAcceptableOrUnknown(data['streak']!, _streakMeta),
       );
-    } else if (isInserting) {
-      context.missing(_streakMeta);
     }
     if (data.containsKey('total_games')) {
       context.handle(
         _totalGamesMeta,
         totalGames.isAcceptableOrUnknown(data['total_games']!, _totalGamesMeta),
       );
-    } else if (isInserting) {
-      context.missing(_totalGamesMeta);
     }
     return context;
   }
@@ -817,17 +808,12 @@ class PlayerStatsCompanion extends UpdateCompanion<PlayerStat> {
   PlayerStatsCompanion.insert({
     this.id = const Value.absent(),
     required int profileId,
-    required int wins,
-    required int losses,
-    required int draws,
-    required int streak,
-    required int totalGames,
-  }) : profileId = Value(profileId),
-       wins = Value(wins),
-       losses = Value(losses),
-       draws = Value(draws),
-       streak = Value(streak),
-       totalGames = Value(totalGames);
+    this.wins = const Value.absent(),
+    this.losses = const Value.absent(),
+    this.draws = const Value.absent(),
+    this.streak = const Value.absent(),
+    this.totalGames = const Value.absent(),
+  }) : profileId = Value(profileId);
   static Insertable<PlayerStat> custom({
     Expression<int>? id,
     Expression<int>? profileId,
@@ -940,7 +926,7 @@ class $GameHistoryTable extends GameHistory
     type: DriftSqlType.int,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES player_profiles (id)',
+      'REFERENCES player_profiles (id) ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _opponentMeta = const VerificationMeta(
@@ -951,18 +937,22 @@ class $GameHistoryTable extends GameHistory
     'opponent',
     aliasedName,
     false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 50,
+    ),
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _resultMeta = const VerificationMeta('result');
   @override
-  late final GeneratedColumn<String> result = GeneratedColumn<String>(
-    'result',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
+  late final GeneratedColumnWithTypeConverter<GameResult, int> result =
+      GeneratedColumn<int>(
+        'result',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<GameResult>($GameHistoryTable.$converterresult);
   static const VerificationMeta _boardSizeMeta = const VerificationMeta(
     'boardSize',
   );
@@ -971,6 +961,10 @@ class $GameHistoryTable extends GameHistory
     'board_size',
     aliasedName,
     false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 3,
+      maxTextLength: 5,
+    ),
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
@@ -991,6 +985,10 @@ class $GameHistoryTable extends GameHistory
     'score',
     aliasedName,
     false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 20,
+    ),
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
@@ -1003,7 +1001,8 @@ class $GameHistoryTable extends GameHistory
     aliasedName,
     false,
     type: DriftSqlType.dateTime,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.now(),
   );
   @override
   List<GeneratedColumn> get $columns => [
@@ -1047,14 +1046,6 @@ class $GameHistoryTable extends GameHistory
     } else if (isInserting) {
       context.missing(_opponentMeta);
     }
-    if (data.containsKey('result')) {
-      context.handle(
-        _resultMeta,
-        result.isAcceptableOrUnknown(data['result']!, _resultMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_resultMeta);
-    }
     if (data.containsKey('board_size')) {
       context.handle(
         _boardSizeMeta,
@@ -1087,8 +1078,6 @@ class $GameHistoryTable extends GameHistory
         _playedAtMeta,
         playedAt.isAcceptableOrUnknown(data['played_at']!, _playedAtMeta),
       );
-    } else if (isInserting) {
-      context.missing(_playedAtMeta);
     }
     return context;
   }
@@ -1111,10 +1100,12 @@ class $GameHistoryTable extends GameHistory
         DriftSqlType.string,
         data['${effectivePrefix}opponent'],
       )!,
-      result: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}result'],
-      )!,
+      result: $GameHistoryTable.$converterresult.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}result'],
+        )!,
+      ),
       boardSize: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}board_size'],
@@ -1138,13 +1129,16 @@ class $GameHistoryTable extends GameHistory
   $GameHistoryTable createAlias(String alias) {
     return $GameHistoryTable(attachedDatabase, alias);
   }
+
+  static JsonTypeConverter2<GameResult, int, int> $converterresult =
+      const EnumIndexConverter<GameResult>(GameResult.values);
 }
 
 class GameHistoryData extends DataClass implements Insertable<GameHistoryData> {
   final int id;
   final int profileId;
   final String opponent;
-  final String result;
+  final GameResult result;
   final String boardSize;
   final int durationSeconds;
   final String score;
@@ -1165,7 +1159,11 @@ class GameHistoryData extends DataClass implements Insertable<GameHistoryData> {
     map['id'] = Variable<int>(id);
     map['profile_id'] = Variable<int>(profileId);
     map['opponent'] = Variable<String>(opponent);
-    map['result'] = Variable<String>(result);
+    {
+      map['result'] = Variable<int>(
+        $GameHistoryTable.$converterresult.toSql(result),
+      );
+    }
     map['board_size'] = Variable<String>(boardSize);
     map['duration_seconds'] = Variable<int>(durationSeconds);
     map['score'] = Variable<String>(score);
@@ -1195,7 +1193,9 @@ class GameHistoryData extends DataClass implements Insertable<GameHistoryData> {
       id: serializer.fromJson<int>(json['id']),
       profileId: serializer.fromJson<int>(json['profileId']),
       opponent: serializer.fromJson<String>(json['opponent']),
-      result: serializer.fromJson<String>(json['result']),
+      result: $GameHistoryTable.$converterresult.fromJson(
+        serializer.fromJson<int>(json['result']),
+      ),
       boardSize: serializer.fromJson<String>(json['boardSize']),
       durationSeconds: serializer.fromJson<int>(json['durationSeconds']),
       score: serializer.fromJson<String>(json['score']),
@@ -1209,7 +1209,9 @@ class GameHistoryData extends DataClass implements Insertable<GameHistoryData> {
       'id': serializer.toJson<int>(id),
       'profileId': serializer.toJson<int>(profileId),
       'opponent': serializer.toJson<String>(opponent),
-      'result': serializer.toJson<String>(result),
+      'result': serializer.toJson<int>(
+        $GameHistoryTable.$converterresult.toJson(result),
+      ),
       'boardSize': serializer.toJson<String>(boardSize),
       'durationSeconds': serializer.toJson<int>(durationSeconds),
       'score': serializer.toJson<String>(score),
@@ -1221,7 +1223,7 @@ class GameHistoryData extends DataClass implements Insertable<GameHistoryData> {
     int? id,
     int? profileId,
     String? opponent,
-    String? result,
+    GameResult? result,
     String? boardSize,
     int? durationSeconds,
     String? score,
@@ -1295,7 +1297,7 @@ class GameHistoryCompanion extends UpdateCompanion<GameHistoryData> {
   final Value<int> id;
   final Value<int> profileId;
   final Value<String> opponent;
-  final Value<String> result;
+  final Value<GameResult> result;
   final Value<String> boardSize;
   final Value<int> durationSeconds;
   final Value<String> score;
@@ -1314,23 +1316,22 @@ class GameHistoryCompanion extends UpdateCompanion<GameHistoryData> {
     this.id = const Value.absent(),
     required int profileId,
     required String opponent,
-    required String result,
+    required GameResult result,
     required String boardSize,
     required int durationSeconds,
     required String score,
-    required DateTime playedAt,
+    this.playedAt = const Value.absent(),
   }) : profileId = Value(profileId),
        opponent = Value(opponent),
        result = Value(result),
        boardSize = Value(boardSize),
        durationSeconds = Value(durationSeconds),
-       score = Value(score),
-       playedAt = Value(playedAt);
+       score = Value(score);
   static Insertable<GameHistoryData> custom({
     Expression<int>? id,
     Expression<int>? profileId,
     Expression<String>? opponent,
-    Expression<String>? result,
+    Expression<int>? result,
     Expression<String>? boardSize,
     Expression<int>? durationSeconds,
     Expression<String>? score,
@@ -1352,7 +1353,7 @@ class GameHistoryCompanion extends UpdateCompanion<GameHistoryData> {
     Value<int>? id,
     Value<int>? profileId,
     Value<String>? opponent,
-    Value<String>? result,
+    Value<GameResult>? result,
     Value<String>? boardSize,
     Value<int>? durationSeconds,
     Value<String>? score,
@@ -1383,7 +1384,9 @@ class GameHistoryCompanion extends UpdateCompanion<GameHistoryData> {
       map['opponent'] = Variable<String>(opponent.value);
     }
     if (result.present) {
-      map['result'] = Variable<String>(result.value);
+      map['result'] = Variable<int>(
+        $GameHistoryTable.$converterresult.toSql(result.value),
+      );
     }
     if (boardSize.present) {
       map['board_size'] = Variable<String>(boardSize.value);
@@ -1446,7 +1449,7 @@ class $AchievementsTable extends Achievements
     type: DriftSqlType.int,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES player_profiles (id)',
+      'REFERENCES player_profiles (id) ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _achievementIdMeta = const VerificationMeta(
@@ -1457,6 +1460,10 @@ class $AchievementsTable extends Achievements
     'achievement_id',
     aliasedName,
     false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 50,
+    ),
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
@@ -1469,10 +1476,11 @@ class $AchievementsTable extends Achievements
     aliasedName,
     false,
     type: DriftSqlType.bool,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'CHECK ("is_unlocked" IN (0, 1))',
     ),
+    defaultValue: const Constant(false),
   );
   static const VerificationMeta _progressMeta = const VerificationMeta(
     'progress',
@@ -1483,7 +1491,8 @@ class $AchievementsTable extends Achievements
     aliasedName,
     false,
     type: DriftSqlType.int,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
   );
   static const VerificationMeta _unlockedDateMeta = const VerificationMeta(
     'unlockedDate',
@@ -1544,16 +1553,12 @@ class $AchievementsTable extends Achievements
         _isUnlockedMeta,
         isUnlocked.isAcceptableOrUnknown(data['is_unlocked']!, _isUnlockedMeta),
       );
-    } else if (isInserting) {
-      context.missing(_isUnlockedMeta);
     }
     if (data.containsKey('progress')) {
       context.handle(
         _progressMeta,
         progress.isAcceptableOrUnknown(data['progress']!, _progressMeta),
       );
-    } else if (isInserting) {
-      context.missing(_progressMeta);
     }
     if (data.containsKey('unlocked_date')) {
       context.handle(
@@ -1760,13 +1765,11 @@ class AchievementsCompanion extends UpdateCompanion<Achievement> {
     this.id = const Value.absent(),
     required int profileId,
     required String achievementId,
-    required bool isUnlocked,
-    required int progress,
+    this.isUnlocked = const Value.absent(),
+    this.progress = const Value.absent(),
     this.unlockedDate = const Value.absent(),
   }) : profileId = Value(profileId),
-       achievementId = Value(achievementId),
-       isUnlocked = Value(isUnlocked),
-       progress = Value(progress);
+       achievementId = Value(achievementId);
   static Insertable<Achievement> custom({
     Expression<int>? id,
     Expression<int>? profileId,
@@ -1869,10 +1872,11 @@ class $AppSettingsTable extends AppSettings
     aliasedName,
     false,
     type: DriftSqlType.bool,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'CHECK ("sound_enabled" IN (0, 1))',
     ),
+    defaultValue: const Constant(true),
   );
   static const VerificationMeta _musicEnabledMeta = const VerificationMeta(
     'musicEnabled',
@@ -1883,10 +1887,11 @@ class $AppSettingsTable extends AppSettings
     aliasedName,
     false,
     type: DriftSqlType.bool,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'CHECK ("music_enabled" IN (0, 1))',
     ),
+    defaultValue: const Constant(true),
   );
   static const VerificationMeta _vibrationEnabledMeta = const VerificationMeta(
     'vibrationEnabled',
@@ -1897,10 +1902,11 @@ class $AppSettingsTable extends AppSettings
     aliasedName,
     false,
     type: DriftSqlType.bool,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'CHECK ("vibration_enabled" IN (0, 1))',
     ),
+    defaultValue: const Constant(true),
   );
   static const VerificationMeta _hapticFeedbackEnabledMeta =
       const VerificationMeta('hapticFeedbackEnabled');
@@ -1911,10 +1917,11 @@ class $AppSettingsTable extends AppSettings
         aliasedName,
         false,
         type: DriftSqlType.bool,
-        requiredDuringInsert: true,
+        requiredDuringInsert: false,
         defaultConstraints: GeneratedColumn.constraintIsAlways(
           'CHECK ("haptic_feedback_enabled" IN (0, 1))',
         ),
+        defaultValue: const Constant(true),
       );
   static const VerificationMeta _autoSaveEnabledMeta = const VerificationMeta(
     'autoSaveEnabled',
@@ -1925,10 +1932,11 @@ class $AppSettingsTable extends AppSettings
     aliasedName,
     false,
     type: DriftSqlType.bool,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'CHECK ("auto_save_enabled" IN (0, 1))',
     ),
+    defaultValue: const Constant(true),
   );
   static const VerificationMeta _notificationsEnabledMeta =
       const VerificationMeta('notificationsEnabled');
@@ -1938,10 +1946,11 @@ class $AppSettingsTable extends AppSettings
     aliasedName,
     false,
     type: DriftSqlType.bool,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'CHECK ("notifications_enabled" IN (0, 1))',
     ),
+    defaultValue: const Constant(true),
   );
   @override
   List<GeneratedColumn> get $columns => [
@@ -1976,8 +1985,6 @@ class $AppSettingsTable extends AppSettings
           _soundEnabledMeta,
         ),
       );
-    } else if (isInserting) {
-      context.missing(_soundEnabledMeta);
     }
     if (data.containsKey('music_enabled')) {
       context.handle(
@@ -1987,8 +1994,6 @@ class $AppSettingsTable extends AppSettings
           _musicEnabledMeta,
         ),
       );
-    } else if (isInserting) {
-      context.missing(_musicEnabledMeta);
     }
     if (data.containsKey('vibration_enabled')) {
       context.handle(
@@ -1998,8 +2003,6 @@ class $AppSettingsTable extends AppSettings
           _vibrationEnabledMeta,
         ),
       );
-    } else if (isInserting) {
-      context.missing(_vibrationEnabledMeta);
     }
     if (data.containsKey('haptic_feedback_enabled')) {
       context.handle(
@@ -2009,8 +2012,6 @@ class $AppSettingsTable extends AppSettings
           _hapticFeedbackEnabledMeta,
         ),
       );
-    } else if (isInserting) {
-      context.missing(_hapticFeedbackEnabledMeta);
     }
     if (data.containsKey('auto_save_enabled')) {
       context.handle(
@@ -2020,8 +2021,6 @@ class $AppSettingsTable extends AppSettings
           _autoSaveEnabledMeta,
         ),
       );
-    } else if (isInserting) {
-      context.missing(_autoSaveEnabledMeta);
     }
     if (data.containsKey('notifications_enabled')) {
       context.handle(
@@ -2031,8 +2030,6 @@ class $AppSettingsTable extends AppSettings
           _notificationsEnabledMeta,
         ),
       );
-    } else if (isInserting) {
-      context.missing(_notificationsEnabledMeta);
     }
     return context;
   }
@@ -2252,18 +2249,13 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
   });
   AppSettingsCompanion.insert({
     this.id = const Value.absent(),
-    required bool soundEnabled,
-    required bool musicEnabled,
-    required bool vibrationEnabled,
-    required bool hapticFeedbackEnabled,
-    required bool autoSaveEnabled,
-    required bool notificationsEnabled,
-  }) : soundEnabled = Value(soundEnabled),
-       musicEnabled = Value(musicEnabled),
-       vibrationEnabled = Value(vibrationEnabled),
-       hapticFeedbackEnabled = Value(hapticFeedbackEnabled),
-       autoSaveEnabled = Value(autoSaveEnabled),
-       notificationsEnabled = Value(notificationsEnabled);
+    this.soundEnabled = const Value.absent(),
+    this.musicEnabled = const Value.absent(),
+    this.vibrationEnabled = const Value.absent(),
+    this.hapticFeedbackEnabled = const Value.absent(),
+    this.autoSaveEnabled = const Value.absent(),
+    this.notificationsEnabled = const Value.absent(),
+  });
   static Insertable<AppSetting> custom({
     Expression<int>? id,
     Expression<bool>? soundEnabled,
@@ -2374,12 +2366,13 @@ class $ThemeSettingsTable extends ThemeSettings
     'themeMode',
   );
   @override
-  late final GeneratedColumn<String> themeMode = GeneratedColumn<String>(
+  late final GeneratedColumn<int> themeMode = GeneratedColumn<int>(
     'theme_mode',
     aliasedName,
     false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(2),
   );
   @override
   List<GeneratedColumn> get $columns => [id, themeMode];
@@ -2403,8 +2396,6 @@ class $ThemeSettingsTable extends ThemeSettings
         _themeModeMeta,
         themeMode.isAcceptableOrUnknown(data['theme_mode']!, _themeModeMeta),
       );
-    } else if (isInserting) {
-      context.missing(_themeModeMeta);
     }
     return context;
   }
@@ -2420,7 +2411,7 @@ class $ThemeSettingsTable extends ThemeSettings
         data['${effectivePrefix}id'],
       )!,
       themeMode: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
+        DriftSqlType.int,
         data['${effectivePrefix}theme_mode'],
       )!,
     );
@@ -2434,13 +2425,13 @@ class $ThemeSettingsTable extends ThemeSettings
 
 class ThemeSetting extends DataClass implements Insertable<ThemeSetting> {
   final int id;
-  final String themeMode;
+  final int themeMode;
   const ThemeSetting({required this.id, required this.themeMode});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
-    map['theme_mode'] = Variable<String>(themeMode);
+    map['theme_mode'] = Variable<int>(themeMode);
     return map;
   }
 
@@ -2455,7 +2446,7 @@ class ThemeSetting extends DataClass implements Insertable<ThemeSetting> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return ThemeSetting(
       id: serializer.fromJson<int>(json['id']),
-      themeMode: serializer.fromJson<String>(json['themeMode']),
+      themeMode: serializer.fromJson<int>(json['themeMode']),
     );
   }
   @override
@@ -2463,11 +2454,11 @@ class ThemeSetting extends DataClass implements Insertable<ThemeSetting> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
-      'themeMode': serializer.toJson<String>(themeMode),
+      'themeMode': serializer.toJson<int>(themeMode),
     };
   }
 
-  ThemeSetting copyWith({int? id, String? themeMode}) =>
+  ThemeSetting copyWith({int? id, int? themeMode}) =>
       ThemeSetting(id: id ?? this.id, themeMode: themeMode ?? this.themeMode);
   ThemeSetting copyWithCompanion(ThemeSettingsCompanion data) {
     return ThemeSetting(
@@ -2497,18 +2488,18 @@ class ThemeSetting extends DataClass implements Insertable<ThemeSetting> {
 
 class ThemeSettingsCompanion extends UpdateCompanion<ThemeSetting> {
   final Value<int> id;
-  final Value<String> themeMode;
+  final Value<int> themeMode;
   const ThemeSettingsCompanion({
     this.id = const Value.absent(),
     this.themeMode = const Value.absent(),
   });
   ThemeSettingsCompanion.insert({
     this.id = const Value.absent(),
-    required String themeMode,
-  }) : themeMode = Value(themeMode);
+    this.themeMode = const Value.absent(),
+  });
   static Insertable<ThemeSetting> custom({
     Expression<int>? id,
-    Expression<String>? themeMode,
+    Expression<int>? themeMode,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -2516,7 +2507,7 @@ class ThemeSettingsCompanion extends UpdateCompanion<ThemeSetting> {
     });
   }
 
-  ThemeSettingsCompanion copyWith({Value<int>? id, Value<String>? themeMode}) {
+  ThemeSettingsCompanion copyWith({Value<int>? id, Value<int>? themeMode}) {
     return ThemeSettingsCompanion(
       id: id ?? this.id,
       themeMode: themeMode ?? this.themeMode,
@@ -2530,7 +2521,7 @@ class ThemeSettingsCompanion extends UpdateCompanion<ThemeSetting> {
       map['id'] = Variable<int>(id.value);
     }
     if (themeMode.present) {
-      map['theme_mode'] = Variable<String>(themeMode.value);
+      map['theme_mode'] = Variable<int>(themeMode.value);
     }
     return map;
   }
@@ -2575,7 +2566,7 @@ class $StoreItemsTable extends StoreItems
     type: DriftSqlType.int,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES player_profiles (id)',
+      'REFERENCES player_profiles (id) ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _itemIdMeta = const VerificationMeta('itemId');
@@ -2584,6 +2575,10 @@ class $StoreItemsTable extends StoreItems
     'item_id',
     aliasedName,
     false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 50,
+    ),
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
@@ -2596,7 +2591,8 @@ class $StoreItemsTable extends StoreItems
     aliasedName,
     false,
     type: DriftSqlType.int,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
   );
   static const VerificationMeta _purchasedDateMeta = const VerificationMeta(
     'purchasedDate',
@@ -2608,7 +2604,8 @@ class $StoreItemsTable extends StoreItems
         aliasedName,
         false,
         type: DriftSqlType.dateTime,
-        requiredDuringInsert: true,
+        requiredDuringInsert: false,
+        clientDefault: () => DateTime.now(),
       );
   @override
   List<GeneratedColumn> get $columns => [
@@ -2654,8 +2651,6 @@ class $StoreItemsTable extends StoreItems
         _quantityMeta,
         quantity.isAcceptableOrUnknown(data['quantity']!, _quantityMeta),
       );
-    } else if (isInserting) {
-      context.missing(_quantityMeta);
     }
     if (data.containsKey('purchased_date')) {
       context.handle(
@@ -2665,8 +2660,6 @@ class $StoreItemsTable extends StoreItems
           _purchasedDateMeta,
         ),
       );
-    } else if (isInserting) {
-      context.missing(_purchasedDateMeta);
     }
     return context;
   }
@@ -2833,12 +2826,10 @@ class StoreItemsCompanion extends UpdateCompanion<StoreItem> {
     this.id = const Value.absent(),
     required int profileId,
     required String itemId,
-    required int quantity,
-    required DateTime purchasedDate,
+    this.quantity = const Value.absent(),
+    this.purchasedDate = const Value.absent(),
   }) : profileId = Value(profileId),
-       itemId = Value(itemId),
-       quantity = Value(quantity),
-       purchasedDate = Value(purchasedDate);
+       itemId = Value(itemId);
   static Insertable<StoreItem> custom({
     Expression<int>? id,
     Expression<int>? profileId,
@@ -2915,6 +2906,66 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $AppSettingsTable appSettings = $AppSettingsTable(this);
   late final $ThemeSettingsTable themeSettings = $ThemeSettingsTable(this);
   late final $StoreItemsTable storeItems = $StoreItemsTable(this);
+  late final Index playerProfilesNicknameIdx = Index(
+    'player_profiles_nickname_idx',
+    'CREATE INDEX player_profiles_nickname_idx ON player_profiles (nickname)',
+  );
+  late final Index playerProfilesCreatedAtIdx = Index(
+    'player_profiles_created_at_idx',
+    'CREATE INDEX player_profiles_created_at_idx ON player_profiles (created_at)',
+  );
+  late final Index playerStatsProfileIdIdx = Index(
+    'player_stats_profile_id_idx',
+    'CREATE INDEX player_stats_profile_id_idx ON player_stats (profile_id)',
+  );
+  late final Index playerStatsTotalGamesIdx = Index(
+    'player_stats_total_games_idx',
+    'CREATE INDEX player_stats_total_games_idx ON player_stats (total_games)',
+  );
+  late final Index gameHistoryProfileIdIdx = Index(
+    'game_history_profile_id_idx',
+    'CREATE INDEX game_history_profile_id_idx ON game_history (profile_id)',
+  );
+  late final Index gameHistoryPlayedAtIdx = Index(
+    'game_history_played_at_idx',
+    'CREATE INDEX game_history_played_at_idx ON game_history (played_at)',
+  );
+  late final Index gameHistoryResultIdx = Index(
+    'game_history_result_idx',
+    'CREATE INDEX game_history_result_idx ON game_history (result)',
+  );
+  late final Index gameHistoryOpponentIdx = Index(
+    'game_history_opponent_idx',
+    'CREATE INDEX game_history_opponent_idx ON game_history (opponent)',
+  );
+  late final Index achievementsProfileIdIdx = Index(
+    'achievements_profile_id_idx',
+    'CREATE INDEX achievements_profile_id_idx ON achievements (profile_id)',
+  );
+  late final Index achievementsAchievementIdIdx = Index(
+    'achievements_achievement_id_idx',
+    'CREATE INDEX achievements_achievement_id_idx ON achievements (achievement_id)',
+  );
+  late final Index achievementsIsUnlockedIdx = Index(
+    'achievements_is_unlocked_idx',
+    'CREATE INDEX achievements_is_unlocked_idx ON achievements (is_unlocked)',
+  );
+  late final Index achievementsUnlockedDateIdx = Index(
+    'achievements_unlocked_date_idx',
+    'CREATE INDEX achievements_unlocked_date_idx ON achievements (unlocked_date)',
+  );
+  late final Index storeItemsProfileIdIdx = Index(
+    'store_items_profile_id_idx',
+    'CREATE INDEX store_items_profile_id_idx ON store_items (profile_id)',
+  );
+  late final Index storeItemsItemIdIdx = Index(
+    'store_items_item_id_idx',
+    'CREATE INDEX store_items_item_id_idx ON store_items (item_id)',
+  );
+  late final Index storeItemsPurchasedDateIdx = Index(
+    'store_items_purchased_date_idx',
+    'CREATE INDEX store_items_purchased_date_idx ON store_items (purchased_date)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2927,7 +2978,56 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     appSettings,
     themeSettings,
     storeItems,
+    playerProfilesNicknameIdx,
+    playerProfilesCreatedAtIdx,
+    playerStatsProfileIdIdx,
+    playerStatsTotalGamesIdx,
+    gameHistoryProfileIdIdx,
+    gameHistoryPlayedAtIdx,
+    gameHistoryResultIdx,
+    gameHistoryOpponentIdx,
+    achievementsProfileIdIdx,
+    achievementsAchievementIdIdx,
+    achievementsIsUnlockedIdx,
+    achievementsUnlockedDateIdx,
+    storeItemsProfileIdIdx,
+    storeItemsItemIdIdx,
+    storeItemsPurchasedDateIdx,
   ];
+  @override
+  StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'player_profiles',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('player_stats', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'player_profiles',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('game_history', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'player_profiles',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('achievements', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'player_profiles',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('store_items', kind: UpdateKind.delete)],
+    ),
+  ]);
+  @override
+  DriftDatabaseOptions get options =>
+      const DriftDatabaseOptions(storeDateTimeAsText: true);
 }
 
 typedef $$PlayerProfilesTableCreateCompanionBuilder =
@@ -2935,10 +3035,10 @@ typedef $$PlayerProfilesTableCreateCompanionBuilder =
       Value<int> id,
       required String nickname,
       Value<String?> avatarUrlOrProvider,
-      required int gems,
-      required int hints,
-      required DateTime createdAt,
-      required DateTime updatedAt,
+      Value<int> gems,
+      Value<int> hints,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
     });
 typedef $$PlayerProfilesTableUpdateCompanionBuilder =
     PlayerProfilesCompanion Function({
@@ -3423,10 +3523,10 @@ class $$PlayerProfilesTableTableManager
                 Value<int> id = const Value.absent(),
                 required String nickname,
                 Value<String?> avatarUrlOrProvider = const Value.absent(),
-                required int gems,
-                required int hints,
-                required DateTime createdAt,
-                required DateTime updatedAt,
+                Value<int> gems = const Value.absent(),
+                Value<int> hints = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
               }) => PlayerProfilesCompanion.insert(
                 id: id,
                 nickname: nickname,
@@ -3577,11 +3677,11 @@ typedef $$PlayerStatsTableCreateCompanionBuilder =
     PlayerStatsCompanion Function({
       Value<int> id,
       required int profileId,
-      required int wins,
-      required int losses,
-      required int draws,
-      required int streak,
-      required int totalGames,
+      Value<int> wins,
+      Value<int> losses,
+      Value<int> draws,
+      Value<int> streak,
+      Value<int> totalGames,
     });
 typedef $$PlayerStatsTableUpdateCompanionBuilder =
     PlayerStatsCompanion Function({
@@ -3845,11 +3945,11 @@ class $$PlayerStatsTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 required int profileId,
-                required int wins,
-                required int losses,
-                required int draws,
-                required int streak,
-                required int totalGames,
+                Value<int> wins = const Value.absent(),
+                Value<int> losses = const Value.absent(),
+                Value<int> draws = const Value.absent(),
+                Value<int> streak = const Value.absent(),
+                Value<int> totalGames = const Value.absent(),
               }) => PlayerStatsCompanion.insert(
                 id: id,
                 profileId: profileId,
@@ -3931,18 +4031,18 @@ typedef $$GameHistoryTableCreateCompanionBuilder =
       Value<int> id,
       required int profileId,
       required String opponent,
-      required String result,
+      required GameResult result,
       required String boardSize,
       required int durationSeconds,
       required String score,
-      required DateTime playedAt,
+      Value<DateTime> playedAt,
     });
 typedef $$GameHistoryTableUpdateCompanionBuilder =
     GameHistoryCompanion Function({
       Value<int> id,
       Value<int> profileId,
       Value<String> opponent,
-      Value<String> result,
+      Value<GameResult> result,
       Value<String> boardSize,
       Value<int> durationSeconds,
       Value<String> score,
@@ -3992,10 +4092,11 @@ class $$GameHistoryTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get result => $composableBuilder(
-    column: $table.result,
-    builder: (column) => ColumnFilters(column),
-  );
+  ColumnWithTypeConverterFilters<GameResult, GameResult, int> get result =>
+      $composableBuilder(
+        column: $table.result,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
 
   ColumnFilters<String> get boardSize => $composableBuilder(
     column: $table.boardSize,
@@ -4060,7 +4161,7 @@ class $$GameHistoryTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get result => $composableBuilder(
+  ColumnOrderings<int> get result => $composableBuilder(
     column: $table.result,
     builder: (column) => ColumnOrderings(column),
   );
@@ -4124,7 +4225,7 @@ class $$GameHistoryTableAnnotationComposer
   GeneratedColumn<String> get opponent =>
       $composableBuilder(column: $table.opponent, builder: (column) => column);
 
-  GeneratedColumn<String> get result =>
+  GeneratedColumnWithTypeConverter<GameResult, int> get result =>
       $composableBuilder(column: $table.result, builder: (column) => column);
 
   GeneratedColumn<String> get boardSize =>
@@ -4196,7 +4297,7 @@ class $$GameHistoryTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<int> profileId = const Value.absent(),
                 Value<String> opponent = const Value.absent(),
-                Value<String> result = const Value.absent(),
+                Value<GameResult> result = const Value.absent(),
                 Value<String> boardSize = const Value.absent(),
                 Value<int> durationSeconds = const Value.absent(),
                 Value<String> score = const Value.absent(),
@@ -4216,11 +4317,11 @@ class $$GameHistoryTableTableManager
                 Value<int> id = const Value.absent(),
                 required int profileId,
                 required String opponent,
-                required String result,
+                required GameResult result,
                 required String boardSize,
                 required int durationSeconds,
                 required String score,
-                required DateTime playedAt,
+                Value<DateTime> playedAt = const Value.absent(),
               }) => GameHistoryCompanion.insert(
                 id: id,
                 profileId: profileId,
@@ -4303,8 +4404,8 @@ typedef $$AchievementsTableCreateCompanionBuilder =
       Value<int> id,
       required int profileId,
       required String achievementId,
-      required bool isUnlocked,
-      required int progress,
+      Value<bool> isUnlocked,
+      Value<int> progress,
       Value<DateTime?> unlockedDate,
     });
 typedef $$AchievementsTableUpdateCompanionBuilder =
@@ -4558,8 +4659,8 @@ class $$AchievementsTableTableManager
                 Value<int> id = const Value.absent(),
                 required int profileId,
                 required String achievementId,
-                required bool isUnlocked,
-                required int progress,
+                Value<bool> isUnlocked = const Value.absent(),
+                Value<int> progress = const Value.absent(),
                 Value<DateTime?> unlockedDate = const Value.absent(),
               }) => AchievementsCompanion.insert(
                 id: id,
@@ -4639,12 +4740,12 @@ typedef $$AchievementsTableProcessedTableManager =
 typedef $$AppSettingsTableCreateCompanionBuilder =
     AppSettingsCompanion Function({
       Value<int> id,
-      required bool soundEnabled,
-      required bool musicEnabled,
-      required bool vibrationEnabled,
-      required bool hapticFeedbackEnabled,
-      required bool autoSaveEnabled,
-      required bool notificationsEnabled,
+      Value<bool> soundEnabled,
+      Value<bool> musicEnabled,
+      Value<bool> vibrationEnabled,
+      Value<bool> hapticFeedbackEnabled,
+      Value<bool> autoSaveEnabled,
+      Value<bool> notificationsEnabled,
     });
 typedef $$AppSettingsTableUpdateCompanionBuilder =
     AppSettingsCompanion Function({
@@ -4840,12 +4941,12 @@ class $$AppSettingsTableTableManager
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
-                required bool soundEnabled,
-                required bool musicEnabled,
-                required bool vibrationEnabled,
-                required bool hapticFeedbackEnabled,
-                required bool autoSaveEnabled,
-                required bool notificationsEnabled,
+                Value<bool> soundEnabled = const Value.absent(),
+                Value<bool> musicEnabled = const Value.absent(),
+                Value<bool> vibrationEnabled = const Value.absent(),
+                Value<bool> hapticFeedbackEnabled = const Value.absent(),
+                Value<bool> autoSaveEnabled = const Value.absent(),
+                Value<bool> notificationsEnabled = const Value.absent(),
               }) => AppSettingsCompanion.insert(
                 id: id,
                 soundEnabled: soundEnabled,
@@ -4881,9 +4982,9 @@ typedef $$AppSettingsTableProcessedTableManager =
       PrefetchHooks Function()
     >;
 typedef $$ThemeSettingsTableCreateCompanionBuilder =
-    ThemeSettingsCompanion Function({Value<int> id, required String themeMode});
+    ThemeSettingsCompanion Function({Value<int> id, Value<int> themeMode});
 typedef $$ThemeSettingsTableUpdateCompanionBuilder =
-    ThemeSettingsCompanion Function({Value<int> id, Value<String> themeMode});
+    ThemeSettingsCompanion Function({Value<int> id, Value<int> themeMode});
 
 class $$ThemeSettingsTableFilterComposer
     extends Composer<_$AppDatabase, $ThemeSettingsTable> {
@@ -4899,7 +5000,7 @@ class $$ThemeSettingsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get themeMode => $composableBuilder(
+  ColumnFilters<int> get themeMode => $composableBuilder(
     column: $table.themeMode,
     builder: (column) => ColumnFilters(column),
   );
@@ -4919,7 +5020,7 @@ class $$ThemeSettingsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get themeMode => $composableBuilder(
+  ColumnOrderings<int> get themeMode => $composableBuilder(
     column: $table.themeMode,
     builder: (column) => ColumnOrderings(column),
   );
@@ -4937,7 +5038,7 @@ class $$ThemeSettingsTableAnnotationComposer
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<String> get themeMode =>
+  GeneratedColumn<int> get themeMode =>
       $composableBuilder(column: $table.themeMode, builder: (column) => column);
 }
 
@@ -4973,12 +5074,12 @@ class $$ThemeSettingsTableTableManager
           updateCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
-                Value<String> themeMode = const Value.absent(),
+                Value<int> themeMode = const Value.absent(),
               }) => ThemeSettingsCompanion(id: id, themeMode: themeMode),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
-                required String themeMode,
+                Value<int> themeMode = const Value.absent(),
               }) => ThemeSettingsCompanion.insert(id: id, themeMode: themeMode),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -5010,8 +5111,8 @@ typedef $$StoreItemsTableCreateCompanionBuilder =
       Value<int> id,
       required int profileId,
       required String itemId,
-      required int quantity,
-      required DateTime purchasedDate,
+      Value<int> quantity,
+      Value<DateTime> purchasedDate,
     });
 typedef $$StoreItemsTableUpdateCompanionBuilder =
     StoreItemsCompanion Function({
@@ -5244,8 +5345,8 @@ class $$StoreItemsTableTableManager
                 Value<int> id = const Value.absent(),
                 required int profileId,
                 required String itemId,
-                required int quantity,
-                required DateTime purchasedDate,
+                Value<int> quantity = const Value.absent(),
+                Value<DateTime> purchasedDate = const Value.absent(),
               }) => StoreItemsCompanion.insert(
                 id: id,
                 profileId: profileId,

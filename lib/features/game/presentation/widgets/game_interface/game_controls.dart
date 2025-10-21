@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tictactoe_xo_royale/core/extensions/responsive_extensions.dart';
-// No longer needed - using standard Material Icons
+import 'package:tictactoe_xo_royale/shared/widgets/buttons/enhanced_button.dart';
 
 /// Optimized game control bar widget with performance improvements
 ///
@@ -56,7 +56,7 @@ class GameControls extends StatelessWidget {
           children: [
             // Hint button
             Expanded(
-              child: _HintButton(hintCount: hintCount, onHint: onHint),
+              child: _MigratedHintButton(hintCount: hintCount, onHint: onHint),
             ),
 
             SizedBox(
@@ -67,7 +67,7 @@ class GameControls extends StatelessWidget {
             ),
 
             // New Game button
-            Expanded(child: _NewGameButton(onNewGame: onNewGame)),
+            Expanded(child: _MigratedNewGameButton(onNewGame: onNewGame)),
           ],
         ),
       ),
@@ -75,105 +75,48 @@ class GameControls extends StatelessWidget {
   }
 }
 
-/// Optimized hint button widget with RepaintBoundary
-class _HintButton extends StatelessWidget {
+/// Migrated hint button using shared EnhancedButton
+class _MigratedHintButton extends StatelessWidget {
   final int hintCount;
   final VoidCallback onHint;
 
-  const _HintButton({required this.hintCount, required this.onHint});
+  const _MigratedHintButton({required this.hintCount, required this.onHint});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final hasHints = hintCount > 0;
 
     return RepaintBoundary(
-      child: ElevatedButton.icon(
+      child: EnhancedButton(
+        text: 'Hint',
         onPressed: hasHints ? onHint : null,
-        icon: Stack(
-          children: [
-            const Icon(Icons.lightbulb),
-            if (hasHints)
-              Positioned(
-                right: 0,
-                top: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.error,
-                    shape: BoxShape.circle,
-                  ),
-                  constraints: const BoxConstraints(
-                    minWidth: 16,
-                    minHeight: 16,
-                  ),
-                  child: Text(
-                    hintCount.toString(),
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: theme.colorScheme.onError,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-          ],
-        ),
-        label: const Text('Hint'),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: theme.colorScheme.secondaryContainer,
-          foregroundColor: theme.colorScheme.onSecondaryContainer,
-          elevation: 0,
-          padding: EdgeInsets.symmetric(
-            vertical: context.getResponsiveSpacing(
-              phoneSpacing: 12.0,
-              tabletSpacing: 16.0,
-            ),
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: context.getResponsiveBorderRadius(
-              phoneRadius: 12.0,
-              tabletRadius: 12.0,
-            ),
-          ),
-        ),
+        variant: ButtonVariant.secondary,
+        size: ButtonSize.medium,
+        icon: Icons.lightbulb,
+        tooltip: hasHints
+            ? 'Use hint ($hintCount remaining)'
+            : 'No hints available',
       ),
     );
   }
 }
 
-/// Optimized new game button widget with RepaintBoundary
-class _NewGameButton extends StatelessWidget {
+/// Migrated new game button using shared EnhancedButton
+class _MigratedNewGameButton extends StatelessWidget {
   final VoidCallback onNewGame;
 
-  const _NewGameButton({required this.onNewGame});
+  const _MigratedNewGameButton({required this.onNewGame});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return RepaintBoundary(
-      child: ElevatedButton.icon(
+      child: EnhancedButton(
+        text: 'New Game',
         onPressed: onNewGame,
-        icon: const Icon(Icons.restart_alt),
-        label: const Text('New Game'),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: theme.colorScheme.primary,
-          foregroundColor: theme.colorScheme.onPrimary,
-          elevation: 0,
-          padding: EdgeInsets.symmetric(
-            vertical: context.getResponsiveSpacing(
-              phoneSpacing: 12.0,
-              tabletSpacing: 16.0,
-            ),
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: context.getResponsiveBorderRadius(
-              phoneRadius: 12.0,
-              tabletRadius: 12.0,
-            ),
-          ),
-        ),
+        variant: ButtonVariant.primary,
+        size: ButtonSize.medium,
+        icon: Icons.restart_alt,
+        tooltip: 'Start a new game',
       ),
     );
   }

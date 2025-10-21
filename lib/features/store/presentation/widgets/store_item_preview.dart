@@ -4,6 +4,9 @@ import 'package:tictactoe_xo_royale/core/extensions/responsive_extensions.dart';
 import 'package:tictactoe_xo_royale/core/models/store_item.dart';
 import 'package:tictactoe_xo_royale/core/providers/profile_provider.dart';
 import 'package:tictactoe_xo_royale/core/providers/store_provider.dart';
+import 'package:tictactoe_xo_royale/shared/widgets/cards/enhanced_card.dart';
+import 'package:tictactoe_xo_royale/shared/widgets/buttons/enhanced_button.dart';
+import 'package:tictactoe_xo_royale/shared/widgets/icons/icon_text.dart';
 
 class StoreItemPreview extends ConsumerWidget {
   final StoreItem item;
@@ -16,27 +19,19 @@ class StoreItemPreview extends ConsumerWidget {
     final userGems = ref.watch(profileGemsProvider);
     final canAfford = item.priceGems != null && userGems >= item.priceGems!;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainer,
-        borderRadius: context.getResponsiveBorderRadius(
-          phoneRadius: 14.0,
-          tabletRadius: 16.0,
-        ),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.1),
-            blurRadius: context.getResponsiveCardElevation(
-              phoneElevation: 6.0,
-              tabletElevation: 8.0,
-            ),
-            spreadRadius: 1,
-          ),
-        ],
-      ),
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return EnhancedCard(
+      variant: CardVariant.elevated,
+      size: CardSize.medium,
+      backgroundColor: isUnlocked
+          ? colorScheme.surfaceContainerHighest
+          : colorScheme.surfaceContainer,
+      borderColor: isUnlocked
+          ? colorScheme.primary.withValues(alpha: 0.2)
+          : colorScheme.outline.withValues(alpha: 0.1),
+      elevation: isUnlocked ? 4.0 : 1.0,
       child: Stack(
         children: [
           // Main Content
@@ -50,17 +45,13 @@ class StoreItemPreview extends ConsumerWidget {
               children: [
                 // Preview Image/Icon
                 Expanded(
+                  flex: 3,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surfaceContainer,
+                      color: !isUnlocked ? colorScheme.surfaceContainer : null,
                       borderRadius: context.getResponsiveBorderRadius(
-                        phoneRadius: 10.0,
-                        tabletRadius: 12.0,
-                      ),
-                      border: Border.all(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.outline.withValues(alpha: 0.2),
+                        phoneRadius: 16.0,
+                        tabletRadius: 20.0,
                       ),
                     ),
                     child: Center(
@@ -83,21 +74,24 @@ class StoreItemPreview extends ConsumerWidget {
                 Text(
                   item.name,
                   style: context.getResponsiveTextStyle(
-                    Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
+                    theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: isUnlocked
+                              ? colorScheme.onSurface
+                              : colorScheme.onSurfaceVariant,
                         ) ??
                         const TextStyle(),
-                    phoneSize: 14.0,
-                    tabletSize: 16.0,
+                    phoneSize: 15.0,
+                    tabletSize: 17.0,
                   ),
-                  maxLines: 2,
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
 
                 SizedBox(
                   height: context.getResponsiveSpacing(
-                    phoneSpacing: 2.0,
-                    tabletSpacing: 4.0,
+                    phoneSpacing: 4.0,
+                    tabletSpacing: 6.0,
                   ),
                 ),
 
@@ -105,12 +99,15 @@ class StoreItemPreview extends ConsumerWidget {
                 Text(
                   item.desc,
                   style: context.getResponsiveTextStyle(
-                    Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant.withValues(
+                            alpha: 0.8,
+                          ),
+                          height: 1.3,
                         ) ??
                         const TextStyle(),
-                    phoneSize: 12.0,
-                    tabletSize: 14.0,
+                    phoneSize: 11.0,
+                    tabletSize: 13.0,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -129,102 +126,164 @@ class StoreItemPreview extends ConsumerWidget {
                     // Price Chip - Flexible to prevent overflow
                     Flexible(
                       child: item.priceGems != null
-                          ? Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.tertiary.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.tertiary.withValues(alpha: 0.3),
+                          ? IntrinsicWidth(
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: context.getResponsiveSpacing(
+                                    phoneSpacing: 8.0,
+                                    tabletSpacing: 12.0,
+                                  ),
+                                  vertical: context.getResponsiveSpacing(
+                                    phoneSpacing: 4.0,
+                                    tabletSpacing: 6.0,
+                                  ),
                                 ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    Icons.diamond,
-                                    size: 16,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.tertiary,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      colorScheme.tertiary.withValues(
+                                        alpha: 0.15,
+                                      ),
+                                      colorScheme.tertiary.withValues(
+                                        alpha: 0.05,
+                                      ),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
                                   ),
-                                  const SizedBox(width: 4),
-                                  Flexible(
-                                    child: Text(
-                                      item.priceGems.toString(),
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall
-                                          ?.copyWith(
-                                            fontWeight: FontWeight.w600,
-                                            color: Theme.of(
-                                              context,
-                                            ).colorScheme.tertiary,
-                                          ),
-                                      overflow: TextOverflow.ellipsis,
+                                  borderRadius: context
+                                      .getResponsiveBorderRadius(
+                                        phoneRadius: 12.0,
+                                        tabletRadius: 16.0,
+                                      ),
+                                  border: Border.all(
+                                    color: colorScheme.tertiary.withValues(
+                                      alpha: 0.3,
                                     ),
+                                    width: 1,
                                   ),
-                                ],
+                                ),
+                                child: IconText(
+                                  icon: Icons.diamond,
+                                  text: item.priceGems.toString(),
+                                  iconColor: colorScheme.tertiary,
+                                  textStyle: context.getResponsiveTextStyle(
+                                    theme.textTheme.bodySmall?.copyWith(
+                                          fontWeight: FontWeight.w700,
+                                          color: colorScheme.tertiary,
+                                        ) ??
+                                        const TextStyle(),
+                                    phoneSize: 11.0,
+                                    tabletSize: 13.0,
+                                  ),
+                                  size: IconTextSize.small,
+                                  direction: Axis.horizontal,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  useResponsiveSizing:
+                                      false, // Using custom sizing
+                                ),
                               ),
                             )
                           : item.priceReal != null
                           ? Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
+                              padding: EdgeInsets.symmetric(
+                                horizontal: context.getResponsiveSpacing(
+                                  phoneSpacing: 8.0,
+                                  tabletSpacing: 12.0,
+                                ),
+                                vertical: context.getResponsiveSpacing(
+                                  phoneSpacing: 4.0,
+                                  tabletSpacing: 6.0,
+                                ),
                               ),
                               decoration: BoxDecoration(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.secondary.withValues(alpha: 0.9),
-                                borderRadius: BorderRadius.circular(8),
+                                gradient: LinearGradient(
+                                  colors: [
+                                    colorScheme.secondary,
+                                    colorScheme.secondary.withValues(
+                                      alpha: 0.8,
+                                    ),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                borderRadius: context.getResponsiveBorderRadius(
+                                  phoneRadius: 12.0,
+                                  tabletRadius: 16.0,
+                                ),
                               ),
                               child: Text(
                                 'PREMIUM',
-                                style: Theme.of(context).textTheme.bodySmall
-                                    ?.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white,
-                                      fontSize: 10,
-                                    ),
+                                style: context.getResponsiveTextStyle(
+                                  theme.textTheme.bodySmall?.copyWith(
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.white,
+                                        letterSpacing: 0.5,
+                                      ) ??
+                                      const TextStyle(),
+                                  phoneSize: 10.0,
+                                  tabletSize: 12.0,
+                                ),
                               ),
                             )
                           : const SizedBox.shrink(),
                     ),
 
-                    const SizedBox(width: 8),
+                    SizedBox(
+                      width: context.getResponsiveSpacing(
+                        phoneSpacing: 8.0,
+                        tabletSpacing: 12.0,
+                      ),
+                    ),
 
                     // CTA Button - Flexible to prevent overflow
                     Flexible(
                       child: isUnlocked
                           ? Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
+                              padding: EdgeInsets.symmetric(
+                                horizontal: context.getResponsiveSpacing(
+                                  phoneSpacing: 8.0,
+                                  tabletSpacing: 12.0,
+                                ),
+                                vertical: context.getResponsiveSpacing(
+                                  phoneSpacing: 4.0,
+                                  tabletSpacing: 6.0,
+                                ),
                               ),
                               decoration: BoxDecoration(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.tertiary.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(8),
+                                gradient: LinearGradient(
+                                  colors: [
+                                    colorScheme.primary.withValues(alpha: 0.1),
+                                    colorScheme.primary.withValues(alpha: 0.05),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                borderRadius: context.getResponsiveBorderRadius(
+                                  phoneRadius: 12.0,
+                                  tabletRadius: 16.0,
+                                ),
+                                border: Border.all(
+                                  color: colorScheme.primary.withValues(
+                                    alpha: 0.3,
+                                  ),
+                                  width: 1,
+                                ),
                               ),
                               child: Text(
                                 'SELECTED',
-                                style: Theme.of(context).textTheme.bodySmall
-                                    ?.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.tertiary,
-                                    ),
+                                style: context.getResponsiveTextStyle(
+                                  theme.textTheme.bodySmall?.copyWith(
+                                        fontWeight: FontWeight.w700,
+                                        color: colorScheme.primary,
+                                      ) ??
+                                      const TextStyle(),
+                                  phoneSize: 10.0,
+                                  tabletSize: 12.0,
+                                ),
                                 overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.center,
                               ),
                             )
                           : _buildActionButton(context, ref, canAfford),
@@ -238,18 +297,46 @@ class StoreItemPreview extends ConsumerWidget {
           // Lock Overlay
           if (!isUnlocked)
             Positioned(
-              top: 8,
-              right: 8,
+              top: context.getResponsiveSpacing(
+                phoneSpacing: 8.0,
+                tabletSpacing: 12.0,
+              ),
+              right: context.getResponsiveSpacing(
+                phoneSpacing: 8.0,
+                tabletSpacing: 12.0,
+              ),
               child: Container(
-                padding: const EdgeInsets.all(4),
+                padding: EdgeInsets.all(
+                  context.getResponsiveSpacing(
+                    phoneSpacing: 6.0,
+                    tabletSpacing: 8.0,
+                  ),
+                ),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceDim,
-                  borderRadius: BorderRadius.circular(8),
+                  color: colorScheme.surfaceDim.withValues(alpha: 0.9),
+                  borderRadius: context.getResponsiveBorderRadius(
+                    phoneRadius: 12.0,
+                    tabletRadius: 16.0,
+                  ),
+                  border: Border.all(
+                    color: colorScheme.outline.withValues(alpha: 0.2),
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: colorScheme.shadow.withValues(alpha: 0.2),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
                 child: Icon(
                   Icons.lock,
-                  size: 16,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  size: context.getResponsiveIconSize(
+                    phoneSize: 16.0,
+                    tabletSize: 20.0,
+                  ),
+                  color: colorScheme.onSurfaceVariant,
                 ),
               ),
             ),
@@ -257,22 +344,57 @@ class StoreItemPreview extends ConsumerWidget {
           // Premium Badge
           if (item.premium)
             Positioned(
-              top: 8,
-              left: 8,
+              top: context.getResponsiveSpacing(
+                phoneSpacing: 8.0,
+                tabletSpacing: 12.0,
+              ),
+              left: context.getResponsiveSpacing(
+                phoneSpacing: 8.0,
+                tabletSpacing: 12.0,
+              ),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.getResponsiveSpacing(
+                    phoneSpacing: 8.0,
+                    tabletSpacing: 12.0,
+                  ),
+                  vertical: context.getResponsiveSpacing(
+                    phoneSpacing: 4.0,
+                    tabletSpacing: 6.0,
+                  ),
+                ),
                 decoration: BoxDecoration(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.secondary.withValues(alpha: 0.9),
-                  borderRadius: BorderRadius.circular(8),
+                  gradient: LinearGradient(
+                    colors: [
+                      colorScheme.secondary,
+                      colorScheme.secondary.withValues(alpha: 0.8),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: context.getResponsiveBorderRadius(
+                    phoneRadius: 12.0,
+                    tabletRadius: 16.0,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: colorScheme.secondary.withValues(alpha: 0.3),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
                 child: Text(
                   'PREMIUM',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 10,
+                  style: context.getResponsiveTextStyle(
+                    theme.textTheme.bodySmall?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.5,
+                        ) ??
+                        const TextStyle(),
+                    phoneSize: 9.0,
+                    tabletSize: 11.0,
                   ),
                 ),
               ),
@@ -334,25 +456,23 @@ class StoreItemPreview extends ConsumerWidget {
     ],
   );
 
-  Widget _buildGemPreview(BuildContext context) => Column(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [
-      Icon(
-        Icons.diamond,
-        size: 32,
-        color: Theme.of(context).colorScheme.tertiary,
-      ),
-      const SizedBox(height: 4),
-      Text(
-        item.priceReal != null
-            ? '\\${item.priceReal!.toStringAsFixed(2)}'
-            : '${item.priceGems} Gems',
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+  Widget _buildGemPreview(BuildContext context) => IconText(
+    icon: Icons.diamond,
+    text: item.priceReal != null
+        ? '\\${item.priceReal!.toStringAsFixed(2)}'
+        : '${item.priceGems} Gems',
+    iconColor: Theme.of(context).colorScheme.tertiary,
+    textStyle:
+        Theme.of(context).textTheme.bodySmall?.copyWith(
           fontWeight: FontWeight.w600,
           color: Theme.of(context).colorScheme.onSurfaceVariant,
-        ),
-      ),
-    ],
+        ) ??
+        const TextStyle(),
+    size: IconTextSize.medium,
+    direction: Axis.vertical,
+    crossAxisAlignment: CrossAxisAlignment.center,
+    mainAxisAlignment: MainAxisAlignment.center,
+    useResponsiveSizing: false, // Using fixed sizing for this preview
   );
 
   Widget _buildActionButton(
@@ -361,40 +481,20 @@ class StoreItemPreview extends ConsumerWidget {
     bool canAfford,
   ) {
     if (item.priceGems != null) {
-      return ElevatedButton(
+      return EnhancedButton(
+        text: 'UNLOCK',
         onPressed: canAfford ? () => _purchaseWithGems(context, ref) : null,
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          backgroundColor: canAfford
-              ? Theme.of(context).colorScheme.tertiary
-              : Theme.of(context).colorScheme.surfaceDim,
-          foregroundColor: canAfford
-              ? Theme.of(context).colorScheme.onTertiary
-              : Theme.of(context).colorScheme.onSurfaceVariant,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
-        child: Text(
-          'UNLOCK',
-          style: Theme.of(
-            context,
-          ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
-        ),
+        variant: ButtonVariant.primary,
+        size: ButtonSize.small,
+        isDisabled: !canAfford,
       );
     } else if (item.priceReal != null) {
-      return ElevatedButton(
+      return EnhancedButton(
+        text: 'BUY',
         onPressed: null, // Disabled for premium items as per PRD
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          backgroundColor: Theme.of(context).colorScheme.surfaceDim,
-          foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
-        child: Text(
-          'BUY',
-          style: Theme.of(
-            context,
-          ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
-        ),
+        variant: ButtonVariant.secondary,
+        size: ButtonSize.small,
+        isDisabled: true,
       );
     }
 

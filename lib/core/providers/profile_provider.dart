@@ -104,6 +104,12 @@ class ProfileNotifier extends _$ProfileNotifier {
   late GameHistoryDao _gameHistoryDao;
   late AchievementDao _achievementDao;
 
+  /// Convert string profile ID to integer ID consistently
+  int _convertProfileId(String id) {
+    if (id == 'default_user') return 1;
+    return int.tryParse(id) ?? 1;
+  }
+
   @override
   ProfileState build() {
     ref.onDispose(() {
@@ -115,10 +121,10 @@ class ProfileNotifier extends _$ProfileNotifier {
     _gameHistoryDao = ref.watch(gameHistoryDaoProvider);
     _achievementDao = ref.watch(achievementDaoProvider);
 
+    // Initialize profile ID converter (already defined as method above)
+
     // Initialize game history stream
-    _gameHistoryStream = _gameHistoryDao
-        .watchRecentGames('default_user', limit: 20)
-        .map((games) => games.map(_convertDatabaseGameToAppGame).toList());
+    _initializeGameHistoryStream();
 
     _loadProfile();
     return ProfileState.initial();
@@ -143,14 +149,8 @@ class ProfileNotifier extends _$ProfileNotifier {
           profileWithStats,
         );
 
-        // Check if achievements exist and initialize if needed
-        final existingAchievements = await _achievementDao
-            .getAchievementsByProfile('default_user');
-        if (existingAchievements.isEmpty) {
-          await _achievementDao.initializeAchievementsForProfile(
-            'default_user',
-          );
-        }
+        // Ensure achievements are properly initialized for the profile
+        await _ensureAchievementsInitialized('default_user');
 
         if (_mounted) {
           state = ProfileState.success(playerProfile);
@@ -209,6 +209,25 @@ class ProfileNotifier extends _$ProfileNotifier {
     );
   }
 
+  // Ensure achievements are properly initialized for a profile
+  Future<void> _ensureAchievementsInitialized(String profileId) async {
+    try {
+      // Check if achievements exist for this profile
+      final existingAchievements = await _achievementDao
+          .getAchievementsByProfile(profileId);
+
+      // If no achievements exist, initialize them
+      if (existingAchievements.isEmpty) {
+        await _achievementDao.initializeAchievementsForProfile(profileId);
+      }
+    } catch (error) {
+      // Log the error but don't fail the profile loading
+      debugPrint(
+        'Warning: Failed to ensure achievements are initialized: $error',
+      );
+    }
+  }
+
   // Create default profile in database
   Future<void> _createDefaultProfile(PlayerProfile defaultProfile) async {
     try {
@@ -217,15 +236,15 @@ class ProfileNotifier extends _$ProfileNotifier {
         db.PlayerProfilesCompanion.insert(
           nickname: defaultProfile.nickname,
           avatarUrlOrProvider: Value(defaultProfile.avatarUrlOrProvider),
-          gems: defaultProfile.gems,
-          hints: defaultProfile.hints,
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
+          gems: Value(defaultProfile.gems),
+          hints: Value(defaultProfile.hints),
+          createdAt: Value(DateTime.now()),
+          updatedAt: Value(DateTime.now()),
         ),
       );
 
       // Initialize achievements for the new profile
-      await _achievementDao.initializeAchievementsForProfile('default_user');
+      await _ensureAchievementsInitialized('default_user');
     } on DriftWrappedException catch (e) {
       if (_mounted) {
         state = state.copyWith(
@@ -249,7 +268,7 @@ class ProfileNotifier extends _$ProfileNotifier {
       // Use ProfileDao.updateProfileAndStats for atomic updates
       await _profileDao.updateProfileAndStats(
         db.PlayerProfile(
-          id: int.parse(profile.id),
+          id: _convertProfileId(profile.id),
           nickname: profile.nickname,
           avatarUrlOrProvider: profile.avatarUrlOrProvider,
           gems: profile.gems,
@@ -302,7 +321,7 @@ class ProfileNotifier extends _$ProfileNotifier {
       try {
         // Update profile in database directly for better performance
         final dbProfile = db.PlayerProfile(
-          id: int.parse(currentProfile.id),
+          id: _convertProfileId(currentProfile.id),
           nickname: newNickname,
           avatarUrlOrProvider: currentProfile.avatarUrlOrProvider,
           gems: currentProfile.gems,
@@ -351,7 +370,7 @@ class ProfileNotifier extends _$ProfileNotifier {
       try {
         // Update profile in database directly for better performance
         final dbProfile = db.PlayerProfile(
-          id: int.parse(currentProfile.id),
+          id: _convertProfileId(currentProfile.id),
           nickname: currentProfile.nickname,
           avatarUrlOrProvider: avatarUrlOrProvider,
           gems: currentProfile.gems,
@@ -401,7 +420,7 @@ class ProfileNotifier extends _$ProfileNotifier {
         // Update gems in database directly
         final newGems = currentProfile.gems + amount;
         final dbProfile = db.PlayerProfile(
-          id: int.parse(currentProfile.id),
+          id: _convertProfileId(currentProfile.id),
           nickname: currentProfile.nickname,
           avatarUrlOrProvider: currentProfile.avatarUrlOrProvider,
           gems: newGems,
@@ -451,7 +470,7 @@ class ProfileNotifier extends _$ProfileNotifier {
         // Update gems in database directly
         final newGems = currentProfile.gems - amount;
         final dbProfile = db.PlayerProfile(
-          id: int.parse(currentProfile.id),
+          id: _convertProfileId(currentProfile.id),
           nickname: currentProfile.nickname,
           avatarUrlOrProvider: currentProfile.avatarUrlOrProvider,
           gems: newGems,
@@ -505,7 +524,7 @@ class ProfileNotifier extends _$ProfileNotifier {
         // Update hints in database directly
         final newHints = currentProfile.hints + amount;
         final dbProfile = db.PlayerProfile(
-          id: int.parse(currentProfile.id),
+          id: _convertProfileId(currentProfile.id),
           nickname: currentProfile.nickname,
           avatarUrlOrProvider: currentProfile.avatarUrlOrProvider,
           gems: currentProfile.gems,
@@ -555,7 +574,7 @@ class ProfileNotifier extends _$ProfileNotifier {
         // Update hints in database directly
         final newHints = currentProfile.hints - 1;
         final dbProfile = db.PlayerProfile(
-          id: int.parse(currentProfile.id),
+          id: _convertProfileId(currentProfile.id),
           nickname: currentProfile.nickname,
           avatarUrlOrProvider: currentProfile.avatarUrlOrProvider,
           gems: currentProfile.gems,
@@ -633,7 +652,7 @@ class ProfileNotifier extends _$ProfileNotifier {
 
         await _profileDao.updateProfileAndStats(
           db.PlayerProfile(
-            id: int.parse(currentProfile.id),
+            id: _convertProfileId(currentProfile.id),
             nickname: currentProfile.nickname,
             avatarUrlOrProvider: currentProfile.avatarUrlOrProvider,
             gems: currentProfile.gems,
@@ -749,7 +768,7 @@ class ProfileNotifier extends _$ProfileNotifier {
   PlayerStats? get currentStats => state.profile?.stats;
 
   // Game history management using database with reactive streams
-  late final Stream<List<GameHistoryItem>> _gameHistoryStream;
+  Stream<List<GameHistoryItem>>? _gameHistoryStream;
 
   // Add game to history in database
   Future<void> addGameToHistory(GameHistoryItem game) async {
@@ -761,30 +780,34 @@ class ProfileNotifier extends _$ProfileNotifier {
           ? 1
           : int.tryParse(profileIdString) ?? 1;
 
+      // Convert GameResult from model to database enum
+      db.GameResult dbResult;
+      switch (game.result) {
+        case GameResult.win:
+          dbResult = db.GameResult.win;
+          break;
+        case GameResult.loss:
+          dbResult = db.GameResult.loss;
+          break;
+        case GameResult.draw:
+          dbResult = db.GameResult.draw;
+          break;
+      }
+
       final dbGame = db.GameHistoryCompanion.insert(
         profileId: profileId,
         opponent: game.opponent,
-        result: _convertGameResultToString(game.result),
+        result: dbResult,
         boardSize: game.boardSize,
         durationSeconds: game.duration.inSeconds,
         score: game.score,
-        playedAt: game.date,
+        playedAt: Value(game.date),
       );
 
       await _gameHistoryDao.insertGame(dbGame);
 
-      // Update profile stats if it's a win/loss/draw
-      if (game.result != GameResult.win &&
-          game.result != GameResult.loss &&
-          game.result != GameResult.draw) {
-        return; // Don't update stats for other results
-      }
-
-      // Update profile stats
-      await updateGameStats(
-        isWin: game.result == GameResult.win,
-        isDraw: game.result == GameResult.draw,
-      );
+      // Stats are already updated in the game screen's _updateProfileStats method
+      // No need to update again here to avoid double-counting
     } on DriftWrappedException catch (e) {
       if (_mounted) {
         state = state.copyWith(
@@ -798,8 +821,16 @@ class ProfileNotifier extends _$ProfileNotifier {
     }
   }
 
+  // Initialize game history stream
+  void _initializeGameHistoryStream() {
+    _gameHistoryStream = _gameHistoryDao
+        .watchRecentGames('default_user', limit: 20)
+        .map((games) => games.map(_convertDatabaseGameToAppGame).toList());
+  }
+
   // Get game history stream for reactive updates
-  Stream<List<GameHistoryItem>> get gameHistoryStream => _gameHistoryStream;
+  Stream<List<GameHistoryItem>> get gameHistoryStream =>
+      _gameHistoryStream ?? Stream.empty();
 
   // Get game history (most recent first) - synchronous for compatibility
   Future<List<GameHistoryItem>> get gameHistory async {
@@ -827,35 +858,27 @@ class ProfileNotifier extends _$ProfileNotifier {
     }
   }
 
-  // Helper methods for game history conversion
-  String _convertGameResultToString(GameResult result) {
-    switch (result) {
-      case GameResult.win:
-        return 'win';
-      case GameResult.loss:
-        return 'loss';
-      case GameResult.draw:
-        return 'draw';
-    }
-  }
-
-  GameResult _convertStringToGameResult(String result) {
-    switch (result) {
-      case 'win':
-        return GameResult.win;
-      case 'loss':
-        return GameResult.loss;
-      case 'draw':
-        return GameResult.draw;
-      default:
-        return GameResult.draw; // fallback
-    }
-  }
-
   GameHistoryItem _convertDatabaseGameToAppGame(dynamic dbGame) {
+    // Convert GameResult from database to model enum
+    GameResult result;
+    switch (dbGame.result) {
+      case db.GameResult.win:
+        result = GameResult.win;
+        break;
+      case db.GameResult.loss:
+        result = GameResult.loss;
+        break;
+      case db.GameResult.draw:
+        result = GameResult.draw;
+        break;
+      default:
+        result = GameResult.draw; // fallback
+        break;
+    }
+
     return GameHistoryItem(
       opponent: dbGame.opponent,
-      result: _convertStringToGameResult(dbGame.result),
+      result: result,
       boardSize: dbGame.boardSize,
       date: dbGame.playedAt,
       duration: Duration(seconds: dbGame.durationSeconds),

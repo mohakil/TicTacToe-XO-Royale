@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tictactoe_xo_royale/core/extensions/responsive_extensions.dart';
+import 'package:tictactoe_xo_royale/shared/widgets/icons/icon_text.dart';
 // No longer needed - using standard Material Icons
 
 /// Optimized game settings overlay widget with performance improvements
@@ -110,28 +111,20 @@ class _SettingsHeader extends StatelessWidget {
     return RepaintBoundary(
       child: Row(
         children: [
-          Icon(
-            Icons.settings,
-            size: context.getResponsiveIconSize(
-              phoneSize: 24.0,
-              tabletSize: 28.0,
-            ),
-            color: theme.colorScheme.onSurface,
-          ),
-          SizedBox(
-            width: context.getResponsiveSpacing(
-              phoneSpacing: 8.0,
-              tabletSpacing: 12.0,
-            ),
-          ),
-          Text(
-            'Game Settings',
-            style: context.getResponsiveTextStyle(
+          IconText(
+            icon: Icons.settings,
+            text: 'Game Settings',
+            iconColor: theme.colorScheme.onSurface,
+            textStyle: context.getResponsiveTextStyle(
               theme.textTheme.headlineSmall!.copyWith(
                 fontWeight: FontWeight.w700,
                 color: theme.colorScheme.onSurface,
               ),
             ),
+            size: IconTextSize.large,
+            direction: Axis.horizontal,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
           ),
           const Spacer(),
           IconButton(
@@ -276,13 +269,20 @@ class _SettingToggle extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(
-              icon,
-              size: context.getResponsiveIconSize(
-                phoneSize: 20.0,
-                tabletSize: 24.0,
+            IconText(
+              icon: icon,
+              text: title,
+              iconColor: theme.colorScheme.onSurfaceVariant,
+              textStyle: context.getResponsiveTextStyle(
+                theme.textTheme.titleMedium!.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: theme.colorScheme.onSurface,
+                ),
               ),
-              color: theme.colorScheme.onSurfaceVariant,
+              size: IconTextSize.medium,
+              direction: Axis.vertical,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
             ),
 
             SizedBox(
@@ -293,27 +293,13 @@ class _SettingToggle extends StatelessWidget {
             ),
 
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: context.getResponsiveTextStyle(
-                      theme.textTheme.titleMedium!.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: theme.colorScheme.onSurface,
-                      ),
-                    ),
+              child: Text(
+                subtitle,
+                style: context.getResponsiveTextStyle(
+                  theme.textTheme.bodySmall!.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
-                  Text(
-                    subtitle,
-                    style: context.getResponsiveTextStyle(
-                      theme.textTheme.bodySmall!.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
 

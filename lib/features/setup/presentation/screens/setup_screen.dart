@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tictactoe_xo_royale/core/extensions/responsive_extensions.dart';
+import 'package:tictactoe_xo_royale/core/providers/profile_provider.dart';
 import 'package:tictactoe_xo_royale/core/services/navigation_service.dart';
 import 'package:tictactoe_xo_royale/features/setup/presentation/widgets/board_size_selector.dart';
 import 'package:tictactoe_xo_royale/features/setup/presentation/widgets/selection_chips.dart';
@@ -8,6 +9,8 @@ import 'package:tictactoe_xo_royale/features/setup/presentation/widgets/player_n
 import 'package:tictactoe_xo_royale/features/setup/presentation/widgets/win_condition_selector.dart';
 import 'package:tictactoe_xo_royale/features/setup/providers/setup_provider.dart';
 import 'package:tictactoe_xo_royale/core/models/game_enums.dart';
+import 'package:tictactoe_xo_royale/app/routing/app_routes.dart';
+import 'package:tictactoe_xo_royale/shared/widgets/navigation/app_bar.dart';
 
 class SetupScreen extends ConsumerStatefulWidget {
   const SetupScreen({
@@ -53,9 +56,15 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
         setupNotifier.setMode(mode);
       }
 
-      // Set other parameters if provided
+      // Set player1 name - prioritize widget parameter, then profile nickname
       if (widget.player1 != null) {
         setupNotifier.setPlayer1Name(widget.player1!);
+      } else {
+        // Initialize player1 name from profile nickname if not provided via parameter
+        final profileNickname = ref.read(profileNicknameProvider);
+        if (profileNickname.isNotEmpty && profileNickname != 'Player') {
+          setupNotifier.setPlayer1Name(profileNickname);
+        }
       }
 
       if (widget.player2 != null) {
@@ -136,6 +145,23 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
+    // Listen to profile nickname changes and sync to player1 name
+    ref.listen<String>(profileNicknameProvider, (previous, next) {
+      // Only update if nickname is not empty and has actually changed
+      if (next.isNotEmpty && next != 'Player' && previous != next) {
+        // Only update player1 name if it hasn't been manually customized
+        // (i.e., if it still matches the previous profile nickname or is default)
+        final currentPlayer1Name = ref.read(
+          setupProvider.select((state) => state.player1Name),
+        );
+        if (currentPlayer1Name == previous ||
+            currentPlayer1Name == 'Player 1' ||
+            currentPlayer1Name.isEmpty) {
+          setupNotifier.setPlayer1Name(next);
+        }
+      }
+    });
+
     // Use select for frequently accessed setup properties to minimize rebuilds
     final player1Name = ref.watch(
       setupProvider.select((state) => state.player1Name),
@@ -172,21 +198,9 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
       },
       child: Scaffold(
         backgroundColor: colorScheme.surface,
-        appBar: AppBar(
-          backgroundColor: colorScheme.surface,
-          elevation: 0,
-          leading: IconButton(
-            onPressed: () => NavigationService.goHome(context),
-            icon: Icon(Icons.arrow_back, color: colorScheme.onSurface),
-            tooltip: 'Back to Home',
-          ),
-          title: Text(
-            'Game Setup',
-            style: theme.textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: colorScheme.onSurface,
-            ),
-          ),
+        appBar: SharedAppBar(
+          title: 'Game Setup',
+          showBackButton: true,
           centerTitle: true,
         ),
         body: SafeArea(
@@ -231,8 +245,11 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                   label: 'Player 2',
                   value: player2Name, // Use consistent player 2 name
                   onChanged: setupNotifier.setPlayer2Name,
-                  enabled: true, // Always enabled for both modes
-                  hintText: 'Enter player name',
+                  enabled:
+                      mode == GameMode.local, // Only editable in local mode
+                  hintText: mode == GameMode.robot
+                      ? 'Auto-generated based on difficulty'
+                      : 'Enter player name',
                 ),
 
                 SizedBox(
@@ -343,19 +360,26 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                   child: FilledButton(
                     onPressed:
                         isValid // Use optimized value
-                        ? () {
+                        ? () async {
                             // Navigate to game screen with setup data using navigation service
-                            NavigationService.goGame(
+                            final gameParams = GameSetupParams(
+                              boardSize: boardSize.value,
+                              winCondition: winCondition.value,
+                              gameMode: mode.toString().split('.').last,
+                              difficulty: mode == GameMode.local
+                                  ? null
+                                  : difficulty.value.toString().split('.').last,
+                              player1: player1Name,
+                              player2: player2Name,
+                              firstMove: firstMove.value
+                                  .toString()
+                                  .split('.')
+                                  .last,
+                            );
+
+                            await NavigationService.goGame(
                               context,
-                              params: {
-                                'boardSize': boardSize.value.toString(),
-                                'winCondition': winCondition.value.toString(),
-                                'gameMode': mode.value,
-                                'difficulty': difficulty.value,
-                                'player1': player1Name,
-                                'player2': player2Name,
-                                'firstMove': firstMove.value,
-                              },
+                              params: gameParams,
                             );
                           }
                         : null,

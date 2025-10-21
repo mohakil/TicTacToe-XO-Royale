@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tictactoe_xo_royale/core/extensions/responsive_extensions.dart';
-import 'package:tictactoe_xo_royale/core/providers/services_provider.dart';
 import 'package:tictactoe_xo_royale/core/providers/store_provider.dart';
 import 'package:tictactoe_xo_royale/features/store/presentation/widgets/store_grid.dart';
 import 'package:tictactoe_xo_royale/features/store/presentation/widgets/store_tabs.dart';
 import 'package:tictactoe_xo_royale/features/store/presentation/widgets/watch_ad_button.dart';
+import 'package:tictactoe_xo_royale/shared/widgets/buttons/enhanced_button.dart';
 
 class StoreScreen extends ConsumerStatefulWidget {
   const StoreScreen({super.key});
@@ -15,41 +15,13 @@ class StoreScreen extends ConsumerStatefulWidget {
   ConsumerState<StoreScreen> createState() => _StoreScreenState();
 }
 
-class _StoreScreenState extends ConsumerState<StoreScreen>
-    with TickerProviderStateMixin {
-  late TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-
-    // Controller listener for tab changes (user swipe/click)
-    _tabController.addListener(() {
-      if (!_tabController.indexIsChanging) {
-        ref.read(storeProvider.notifier).selectTab(_tabController.index);
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
+class _StoreScreenState extends ConsumerState<StoreScreen> {
   @override
   Widget build(BuildContext context) {
     final isLoading = ref.watch(storeIsLoadingProvider);
     final error = ref.watch(storeErrorProvider);
-    final brightness = Theme.of(context).brightness;
-
-    // Listen for provider changes and sync controller
-    ref.listen(storeTabIndexProvider, (previous, next) {
-      if (next != _tabController.index) {
-        _tabController.animateTo(next);
-      }
-    });
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return PopScope(
       canPop: false,
@@ -59,256 +31,254 @@ class _StoreScreenState extends ConsumerState<StoreScreen>
         }
       },
       child: Scaffold(
-        extendBodyBehindAppBar: false,
-        appBar: AppBar(
-          backgroundColor: brightness == Brightness.light
-              ? Theme.of(context).colorScheme.surface
-              : Colors.transparent,
-          elevation: 0,
-          title: Text(
-            'Store',
-            style: context.getResponsiveTextStyle(
-              Theme.of(context).textTheme.headlineSmall ?? const TextStyle(),
-              phoneSize: 20.0,
-              tabletSize: 24.0,
-            ),
-          ),
-          bottom: TabBar(
-            controller: _tabController,
-            indicator: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                  color: Theme.of(context).colorScheme.primary,
-                  width: 2.0,
-                ),
-              ),
-            ),
-            labelStyle: Theme.of(context).textTheme.labelLarge,
-            tabs: const [
-              Tab(text: 'Gems'),
-              Tab(text: 'Cosmetics'),
-            ],
-            onTap: (index) {
-              final currentTab = ref.read(storeTabIndexProvider);
-              if (index != currentTab) {
-                ref.read(hapticServiceProvider).lightImpact();
-              }
-            },
-          ),
-        ),
-        body: Stack(
-          children: [
-            if (isLoading)
-              const Center(child: CircularProgressIndicator())
-            else if (error != null)
-              Center(
-                child: Card(
-                  margin: context.getResponsivePadding(
-                    phonePadding: 8.0,
-                    tabletPadding: 16.0,
-                  ),
-                  elevation: context.getResponsiveCardElevation(
-                    phoneElevation: 1.0,
-                    tabletElevation: 2.0,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: context.getResponsiveBorderRadius(
-                      phoneRadius: 14.0,
-                      tabletRadius: 16.0,
-                    ),
-                  ),
-                  child: Padding(
+        backgroundColor: colorScheme.surface,
+        body: SafeArea(
+          child: RefreshIndicator(
+            onRefresh: () =>
+                ref.read(storeProvider.notifier).refreshStoreData(),
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Compact Header
+                  Padding(
                     padding: context.getResponsivePadding(
-                      phonePadding: 16.0,
+                      phonePadding: 20.0,
                       tabletPadding: 24.0,
                     ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    child: Row(
                       children: [
-                        Semantics(
-                          label: 'Error loading store items',
+                        // Store Title
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Store',
+                                style: context.getResponsiveTextStyle(
+                                  theme.textTheme.headlineMedium?.copyWith(
+                                        fontWeight: FontWeight.w700,
+                                        color: colorScheme.onSurface,
+                                      ) ??
+                                      const TextStyle(),
+                                  phoneSize: 28.0,
+                                  tabletSize: 32.0,
+                                ),
+                              ),
+                              SizedBox(
+                                height: context.getResponsiveSpacing(
+                                  phoneSpacing: 4.0,
+                                  tabletSpacing: 6.0,
+                                ),
+                              ),
+                              Text(
+                                'Premium themes & customizations',
+                                style: context.getResponsiveTextStyle(
+                                  theme.textTheme.bodyMedium?.copyWith(
+                                        color: colorScheme.onSurfaceVariant,
+                                      ) ??
+                                      const TextStyle(),
+                                  phoneSize: 14.0,
+                                  tabletSize: 16.0,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Store Icon
+                        Container(
+                          padding: EdgeInsets.all(
+                            context.getResponsiveSpacing(
+                              phoneSpacing: 12.0,
+                              tabletSpacing: 16.0,
+                            ),
+                          ),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                colorScheme.primary.withValues(alpha: 0.1),
+                                colorScheme.secondary.withValues(alpha: 0.1),
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: context.getResponsiveBorderRadius(
+                              phoneRadius: 16.0,
+                              tabletRadius: 20.0,
+                            ),
+                          ),
                           child: Icon(
-                            Icons.error_outline,
+                            Icons.storefront,
                             size: context.getResponsiveIconSize(
-                              phoneSize: 56.0,
-                              tabletSize: 64.0,
+                              phoneSize: 24.0,
+                              tabletSize: 28.0,
                             ),
-                            color: Theme.of(context).colorScheme.error,
+                            color: colorScheme.primary,
                           ),
-                        ),
-                        SizedBox(
-                          height: context.getResponsiveSpacing(
-                            phoneSpacing: 16.0,
-                            tabletSpacing: 20.0,
-                          ),
-                        ),
-                        Text(
-                          'Something went wrong',
-                          style: context.getResponsiveTextStyle(
-                            Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                  color: Theme.of(context).colorScheme.error,
-                                ) ??
-                                const TextStyle(),
-                            phoneSize: 18.0,
-                            tabletSize: 20.0,
-                          ),
-                        ),
-                        SizedBox(
-                          height: context.getResponsiveSpacing(
-                            phoneSpacing: 8.0,
-                            tabletSpacing: 12.0,
-                          ),
-                        ),
-                        Text(
-                          error,
-                          style: context.getResponsiveTextStyle(
-                            Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurfaceVariant,
-                                ) ??
-                                const TextStyle(),
-                            phoneSize: 14.0,
-                            tabletSize: 16.0,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(
-                          height: context.getResponsiveSpacing(
-                            phoneSpacing: 20.0,
-                            tabletSpacing: 24.0,
-                          ),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            OutlinedButton(
-                              onPressed: () => context.go('/home'),
-                              style: OutlinedButton.styleFrom(
-                                padding: context.getResponsivePadding(
-                                  phonePadding: 12.0,
-                                  tabletPadding: 16.0,
-                                ),
-                                minimumSize: Size(
-                                  context.scale(80.0),
-                                  context.getResponsiveButtonHeight(
-                                    phoneHeight: 36.0,
-                                    tabletHeight: 40.0,
-                                  ),
-                                ),
-                              ),
-                              child: Text(
-                                'Dismiss',
-                                style: context.getResponsiveTextStyle(
-                                  Theme.of(context).textTheme.labelLarge ??
-                                      const TextStyle(),
-                                  phoneSize: 14.0,
-                                  tabletSize: 16.0,
-                                ),
-                              ),
-                            ),
-                            FilledButton(
-                              onPressed: () => ref
-                                  .read(storeProvider.notifier)
-                                  .refreshStoreData(),
-                              style: FilledButton.styleFrom(
-                                padding: context.getResponsivePadding(
-                                  phonePadding: 12.0,
-                                  tabletPadding: 16.0,
-                                ),
-                                minimumSize: Size(
-                                  context.scale(80.0),
-                                  context.getResponsiveButtonHeight(
-                                    phoneHeight: 36.0,
-                                    tabletHeight: 40.0,
-                                  ),
-                                ),
-                              ),
-                              child: Text(
-                                'Retry',
-                                style: context.getResponsiveTextStyle(
-                                  Theme.of(context).textTheme.labelLarge ??
-                                      const TextStyle(),
-                                  phoneSize: 14.0,
-                                  tabletSize: 16.0,
-                                ),
-                              ),
-                            ),
-                          ],
                         ),
                       ],
                     ),
                   ),
-                ),
-              )
-            else
-              SafeArea(
-                child: RefreshIndicator(
-                  onRefresh: () =>
-                      ref.read(storeProvider.notifier).refreshStoreData(),
-                  child: RepaintBoundary(
-                    child: TabBarView(
-                      controller: _tabController,
-                      children: [
-                        // Gems Tab
-                        Column(
+
+                  // Loading State
+                  if (isLoading)
+                    const Padding(
+                      padding: EdgeInsets.all(64.0),
+                      child: Center(
+                        child: Column(
                           children: [
-                            Padding(
-                              padding: context.getResponsivePadding(
-                                phonePadding: 16.0,
-                                tabletPadding: 20.0,
+                            CircularProgressIndicator(),
+                            SizedBox(height: 16),
+                            Text('Loading store items...'),
+                          ],
+                        ),
+                      ),
+                    )
+                  else if (error != null)
+                    Padding(
+                      padding: context.getResponsivePadding(
+                        phonePadding: 20.0,
+                        tabletPadding: 24.0,
+                      ),
+                      child: Card(
+                        elevation: context.getResponsiveCardElevation(
+                          phoneElevation: 2.0,
+                          tabletElevation: 4.0,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: context.getResponsiveBorderRadius(
+                            phoneRadius: 16.0,
+                            tabletRadius: 20.0,
+                          ),
+                        ),
+                        child: Padding(
+                          padding: context.getResponsivePadding(
+                            phonePadding: 24.0,
+                            tabletPadding: 32.0,
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.error_outline,
+                                size: context.getResponsiveIconSize(
+                                  phoneSize: 56.0,
+                                  tabletSize: 64.0,
+                                ),
+                                color: colorScheme.error,
                               ),
-                              child: const WatchAdButton(),
-                            ),
-                            Expanded(
-                              child: CustomScrollView(
-                                slivers: [
-                                  SliverPadding(
-                                    padding: context.getResponsivePadding(
-                                      phonePadding: 12.0,
-                                      tabletPadding: 16.0,
-                                    ),
-                                    sliver: StoreGrid(useSliver: true),
+                              SizedBox(
+                                height: context.getResponsiveSpacing(
+                                  phoneSpacing: 16.0,
+                                  tabletSpacing: 20.0,
+                                ),
+                              ),
+                              Text(
+                                'Something went wrong',
+                                style: context.getResponsiveTextStyle(
+                                  theme.textTheme.headlineSmall?.copyWith(
+                                        color: colorScheme.error,
+                                      ) ??
+                                      const TextStyle(),
+                                  phoneSize: 18.0,
+                                  tabletSize: 20.0,
+                                ),
+                              ),
+                              SizedBox(
+                                height: context.getResponsiveSpacing(
+                                  phoneSpacing: 8.0,
+                                  tabletSpacing: 12.0,
+                                ),
+                              ),
+                              Text(
+                                error,
+                                style: context.getResponsiveTextStyle(
+                                  theme.textTheme.bodyMedium?.copyWith(
+                                        color: colorScheme.onSurfaceVariant,
+                                      ) ??
+                                      const TextStyle(),
+                                  phoneSize: 14.0,
+                                  tabletSize: 16.0,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              SizedBox(
+                                height: context.getResponsiveSpacing(
+                                  phoneSpacing: 24.0,
+                                  tabletSpacing: 32.0,
+                                ),
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  EnhancedButton(
+                                    text: 'Go Back',
+                                    onPressed: () => context.go('/home'),
+                                    variant: ButtonVariant.outline,
+                                    size: ButtonSize.medium,
+                                  ),
+                                  EnhancedButton(
+                                    text: 'Retry',
+                                    onPressed: () => ref
+                                        .read(storeProvider.notifier)
+                                        .refreshStoreData(),
+                                    variant: ButtonVariant.primary,
+                                    size: ButtonSize.medium,
                                   ),
                                 ],
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                        // Cosmetics Tab
-                        Column(
-                          children: [
-                            Padding(
-                              padding: context.getResponsivePadding(
-                                phonePadding: 16.0,
-                                tabletPadding: 20.0,
-                              ),
-                              child: const StoreTabs(),
-                            ),
-                            Expanded(
-                              child: CustomScrollView(
-                                slivers: [
-                                  SliverPadding(
-                                    padding: context.getResponsivePadding(
-                                      phonePadding: 12.0,
-                                      tabletPadding: 16.0,
-                                    ),
-                                    sliver: StoreGrid(useSliver: true),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                      ),
+                    )
+                  else
+                    // Unified Store Content
+                    _buildUnifiedStoreContent(context),
+                ],
               ),
-          ],
+            ),
+          ),
         ),
       ),
+    );
+  }
+
+  Widget _buildUnifiedStoreContent(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Gems Section - Compact
+        Padding(
+          padding: context.getResponsivePadding(
+            phonePadding: 20.0,
+            tabletPadding: 24.0,
+          ),
+          child: const WatchAdButton(),
+        ),
+
+        SizedBox(
+          height: context.getResponsiveSpacing(
+            phoneSpacing: 24.0,
+            tabletSpacing: 32.0,
+          ),
+        ),
+
+        // Category Pills - Single Line
+        const StoreTabs(),
+
+        SizedBox(
+          height: context.getResponsiveSpacing(
+            phoneSpacing: 20.0,
+            tabletSpacing: 24.0,
+          ),
+        ),
+
+        // Store Grid
+        const StoreGrid(),
+      ],
     );
   }
 }

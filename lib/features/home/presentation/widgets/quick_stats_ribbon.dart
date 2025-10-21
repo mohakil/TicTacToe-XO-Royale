@@ -1,26 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tictactoe_xo_royale/core/extensions/responsive_extensions.dart';
+import 'package:tictactoe_xo_royale/shared/widgets/icons/icon_text.dart';
+import 'package:tictactoe_xo_royale/features/home/providers/home_provider.dart';
 
 /// Quick stats ribbon displaying game statistics
 /// Shows last result, streak, gems count, and hint count
-class QuickStatsRibbon extends StatelessWidget {
-  const QuickStatsRibbon({
-    super.key,
-    this.lastResult = 'Win',
-    this.streak = 3,
-    this.gemsCount = 150,
-    this.hintCount = 5,
-  });
-
-  final String lastResult;
-  final int streak;
-  final int gemsCount;
-  final int hintCount;
+class QuickStatsRibbon extends ConsumerWidget {
+  const QuickStatsRibbon({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+
+    // Watch real data from providers
+    final homeStats = ref.watch(homeStatsProvider);
 
     return Container(
       width: double.infinity,
@@ -40,35 +35,182 @@ class QuickStatsRibbon extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           Expanded(
-            child: _StatItem(
-              icon: Icons.emoji_events,
-              label: 'Last Result',
-              value: lastResult,
-              color: _getResultColor(lastResult, colorScheme),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconText(
+                  icon: Icons.emoji_events,
+                  text: homeStats.lastResult,
+                  iconColor: _getResultColor(homeStats.lastResult, colorScheme),
+                  textStyle: context.getResponsiveTextStyle(
+                    theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: _getResultColor(
+                            homeStats.lastResult,
+                            colorScheme,
+                          ),
+                          fontFamily: 'JetBrains Mono',
+                        ) ??
+                        const TextStyle(),
+                    phoneSize: 16.0,
+                    tabletSize: 18.0,
+                  ),
+                  size: IconTextSize.medium,
+                  direction: Axis.vertical,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                ),
+                SizedBox(
+                  height: context.getResponsiveSpacing(
+                    phoneSpacing: 2.0,
+                    tabletSpacing: 4.0,
+                  ),
+                ),
+                Text(
+                  'Last Result',
+                  style: context.getResponsiveTextStyle(
+                    theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ) ??
+                        const TextStyle(),
+                    phoneSize: 10.0,
+                    tabletSize: 12.0,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
           ),
           Expanded(
-            child: _StatItem(
-              icon: Icons.local_fire_department,
-              label: 'Streak',
-              value: '$streak',
-              color: colorScheme.tertiary,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconText(
+                  icon: Icons.local_fire_department,
+                  text: '${homeStats.streak}',
+                  iconColor: colorScheme.secondary,
+                  textStyle: context.getResponsiveTextStyle(
+                    theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: colorScheme.secondary,
+                          fontFamily: 'JetBrains Mono',
+                        ) ??
+                        const TextStyle(),
+                    phoneSize: 16.0,
+                    tabletSize: 18.0,
+                  ),
+                  size: IconTextSize.medium,
+                  direction: Axis.vertical,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                ),
+                SizedBox(
+                  height: context.getResponsiveSpacing(
+                    phoneSpacing: 2.0,
+                    tabletSpacing: 4.0,
+                  ),
+                ),
+                Text(
+                  'Streak',
+                  style: context.getResponsiveTextStyle(
+                    theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ) ??
+                        const TextStyle(),
+                    phoneSize: 10.0,
+                    tabletSize: 12.0,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
           ),
           Expanded(
-            child: _StatItem(
-              icon: Icons.diamond,
-              label: 'Gems',
-              value: '$gemsCount',
-              color: colorScheme.tertiary,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconText(
+                  icon: Icons.diamond,
+                  text: '${homeStats.gemsCount}',
+                  iconColor: colorScheme.tertiary,
+                  textStyle: context.getResponsiveTextStyle(
+                    theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: colorScheme.tertiary,
+                          fontFamily: 'JetBrains Mono',
+                        ) ??
+                        const TextStyle(),
+                    phoneSize: 16.0,
+                    tabletSize: 18.0,
+                  ),
+                  size: IconTextSize.medium,
+                  direction: Axis.vertical,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                ),
+                SizedBox(
+                  height: context.getResponsiveSpacing(
+                    phoneSpacing: 2.0,
+                    tabletSpacing: 4.0,
+                  ),
+                ),
+                Text(
+                  'Gems',
+                  style: context.getResponsiveTextStyle(
+                    theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ) ??
+                        const TextStyle(),
+                    phoneSize: 10.0,
+                    tabletSize: 12.0,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
           ),
           Expanded(
-            child: _StatItem(
-              icon: Icons.lightbulb,
-              label: 'Hints',
-              value: '$hintCount',
-              color: colorScheme.tertiary,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconText(
+                  icon: Icons.lightbulb,
+                  text: '${homeStats.hintCount}',
+                  iconColor: colorScheme.secondary,
+                  textStyle: context.getResponsiveTextStyle(
+                    theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: colorScheme.secondary,
+                          fontFamily: 'JetBrains Mono',
+                        ) ??
+                        const TextStyle(),
+                    phoneSize: 16.0,
+                    tabletSize: 18.0,
+                  ),
+                  size: IconTextSize.medium,
+                  direction: Axis.vertical,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                ),
+                SizedBox(
+                  height: context.getResponsiveSpacing(
+                    phoneSpacing: 2.0,
+                    tabletSpacing: 4.0,
+                  ),
+                ),
+                Text(
+                  'Hints',
+                  style: context.getResponsiveTextStyle(
+                    theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ) ??
+                        const TextStyle(),
+                    phoneSize: 10.0,
+                    tabletSize: 12.0,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
           ),
         ],
@@ -87,82 +229,5 @@ class QuickStatsRibbon extends StatelessWidget {
       default:
         return colorScheme.onSurfaceVariant;
     }
-  }
-}
-
-/// Individual stat item within the ribbon
-class _StatItem extends StatelessWidget {
-  const _StatItem({
-    required this.icon,
-    required this.label,
-    required this.value,
-    required this.color,
-  });
-
-  final IconData icon;
-  final String label;
-  final String value;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(
-          icon,
-          color: color,
-          size: context.getResponsiveIconSize(
-            phoneSize: 20.0,
-            tabletSize: 24.0,
-          ),
-        ),
-        SizedBox(
-          height: context.getResponsiveSpacing(
-            phoneSpacing: 2.0,
-            tabletSpacing: 4.0,
-          ),
-        ),
-        Flexible(
-          child: Text(
-            value,
-            style: context.getResponsiveTextStyle(
-              theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: color,
-                    fontFamily: 'JetBrains Mono',
-                  ) ??
-                  const TextStyle(),
-              phoneSize: 16.0,
-              tabletSize: 18.0,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        SizedBox(
-          height: context.getResponsiveSpacing(
-            phoneSpacing: 1.0,
-            tabletSpacing: 2.0,
-          ),
-        ),
-        Text(
-          label,
-          style: context.getResponsiveTextStyle(
-            theme.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ) ??
-                const TextStyle(),
-            phoneSize: 10.0,
-            tabletSize: 12.0,
-          ),
-          textAlign: TextAlign.center,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-        ),
-      ],
-    );
   }
 }

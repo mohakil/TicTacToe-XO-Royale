@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:drift_flutter/drift_flutter.dart';
 
 part 'test_database.g.dart';
 
@@ -12,7 +13,7 @@ class TestTable extends Table {
 // Test database class for initial setup verification
 @DriftDatabase(tables: [TestTable])
 class TestDatabase extends _$TestDatabase {
-  TestDatabase(super.executor);
+  TestDatabase() : super(driftDatabase(name: 'test_db'));
 
   @override
   int get schemaVersion => 1;

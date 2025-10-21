@@ -97,7 +97,8 @@ class SetupNotifier extends _$SetupNotifier {
       final localSnapshot = state.player2Name.trim().isEmpty
           ? GameSetup.defaultLocalPlayerName
           : state.player2Name;
-      final robotName = _normalizeRobotName(state.robotPlayerName);
+      // Set robot name based on current difficulty
+      final robotName = _getRobotNameForDifficulty(state.difficulty);
 
       state = state.copyWith(
         mode: GameMode.robot,
@@ -128,12 +129,9 @@ class SetupNotifier extends _$SetupNotifier {
   void setPlayer2Name(String name) {
     final trimmedName = name.trim();
 
+    // In robot mode, player2 name is auto-generated and not editable
     if (state.mode == GameMode.robot) {
-      final robotName = _normalizeRobotName(trimmedName);
-      state = state.copyWith(
-        player2Name: robotName,
-        robotPlayerName: robotName,
-      );
+      // Ignore manual changes in robot mode
       return;
     }
 
@@ -149,6 +147,15 @@ class SetupNotifier extends _$SetupNotifier {
 
   void setDifficulty(Difficulty difficulty) {
     state = state.copyWith(difficulty: difficulty);
+
+    // Update robot name when difficulty changes in robot mode
+    if (state.mode == GameMode.robot) {
+      final robotName = _getRobotNameForDifficulty(difficulty);
+      state = state.copyWith(
+        player2Name: robotName,
+        robotPlayerName: robotName,
+      );
+    }
   }
 
   void setBoardSize(BoardSize boardSize) {
@@ -191,7 +198,7 @@ class SetupNotifier extends _$SetupNotifier {
   /// Get robot configuration if in robot mode
   RobotConfig? get robotConfig {
     if (state.mode == GameMode.robot) {
-      final robotName = _normalizeRobotName(state.robotPlayerName);
+      final robotName = _getRobotNameForDifficulty(state.difficulty);
       return RobotConfig.custom(
         difficulty: state.difficulty,
         playerName: robotName,
@@ -200,14 +207,26 @@ class SetupNotifier extends _$SetupNotifier {
     return null;
   }
 
+  /// Get robot name based on difficulty
+  String _getRobotNameForDifficulty(Difficulty difficulty) {
+    switch (difficulty) {
+      case Difficulty.easy:
+        return 'Robot Easy';
+      case Difficulty.medium:
+        return 'Robot Medium';
+      case Difficulty.hard:
+        return 'Robot Hard';
+    }
+  }
+
   /// Get the display name for player 2 - always use the actual player name
   String get player2DisplayName {
     return state.player2Name;
   }
 
-  /// Check if player 2 name is editable - always true for both modes
+  /// Check if player 2 name is editable - only in local mode
   bool get isPlayer2NameEditable {
-    return true;
+    return state.mode == GameMode.local;
   }
 
   /// Reset to default values
@@ -234,7 +253,7 @@ final setupIsValidProvider = Provider<bool>((ref) {
 final setupRobotConfigProvider = Provider<RobotConfig?>((ref) {
   final state = ref.watch(setupProvider);
   if (state.mode == GameMode.robot) {
-    final robotName = _normalizeRobotName(state.robotPlayerName);
+    final robotName = _getRobotNameForDifficulty(state.difficulty);
     return RobotConfig.custom(
       difficulty: state.difficulty,
       playerName: robotName,
@@ -251,8 +270,14 @@ extension SetupProviderExtension on WidgetRef {
   RobotConfig? get setupRobotConfig => watch(setupRobotConfigProvider);
 }
 
-String _normalizeRobotName(String name) {
-  final trimmed = name.trim();
-  if (trimmed.isEmpty) return RobotConfig.defaultPlayerName;
-  return trimmed;
+/// Helper function to get robot name based on difficulty
+String _getRobotNameForDifficulty(Difficulty difficulty) {
+  switch (difficulty) {
+    case Difficulty.easy:
+      return 'Robot Easy';
+    case Difficulty.medium:
+      return 'Robot Medium';
+    case Difficulty.hard:
+      return 'Robot Hard';
+  }
 }

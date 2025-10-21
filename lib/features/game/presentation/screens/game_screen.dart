@@ -14,6 +14,7 @@ import 'package:tictactoe_xo_royale/features/game/presentation/widgets/game_boar
 import 'package:tictactoe_xo_royale/features/game/presentation/widgets/game_interface/game_header.dart';
 import 'package:tictactoe_xo_royale/features/game/presentation/widgets/overlays/exit_confirmation_overlay.dart';
 import 'package:tictactoe_xo_royale/features/game/presentation/widgets/overlays/game_settings_overlay.dart';
+import 'package:tictactoe_xo_royale/features/game/presentation/widgets/overlays/game_countdown_overlay.dart';
 import 'package:tictactoe_xo_royale/features/game/presentation/widgets/game_interface/game_status.dart';
 import 'package:tictactoe_xo_royale/features/achievements/services/achievement_data_service.dart';
 
@@ -73,6 +74,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   bool _showHint = false;
   bool _showResult = false;
   bool _isWinAnimationPlaying = false;
+  bool _showCountdown = true; // Show countdown on game start
   int _hintCount = 3;
   Position? _hintPosition;
 
@@ -83,10 +85,19 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   @override
   void initState() {
     super.initState();
-    // Initialize game configuration
+    // Initialize game configuration after countdown
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _initializeGameConfig();
+      // Don't initialize game immediately, wait for countdown
+      // Game will initialize when countdown completes
     });
+  }
+
+  void _onCountdownComplete() {
+    setState(() {
+      _showCountdown = false;
+    });
+    // Initialize game after countdown
+    _initializeGameConfig();
   }
 
   void _initializeGameConfig() {
@@ -590,6 +601,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
             ),
 
             // Overlays
+            if (_showCountdown)
+              GameCountdownOverlay(onComplete: _onCountdownComplete),
+
             if (_showExitDialog)
               ExitConfirmationOverlay(
                 onContinue: () => setState(() => _showExitDialog = false),

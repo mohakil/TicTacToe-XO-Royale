@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:tictactoe_xo_royale/core/extensions/responsive_extensions.dart';
+import 'package:tictactoe_xo_royale/shared/widgets/icons/icon_text.dart';
 
 /// An about section widget for displaying app information
 class AboutSection extends ConsumerStatefulWidget {
@@ -44,32 +45,19 @@ class _AboutSectionState extends ConsumerState<AboutSection> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Icon(
-                    Icons.info_outline,
-                    color: colorScheme.primary,
-                    size: context.getResponsiveIconSize(
-                      phoneSize: 24.0,
-                      tabletSize: 28.0,
-                    ),
-                  ),
-                  SizedBox(
-                    width: context.getResponsiveSpacing(
-                      phoneSpacing: 10.0,
-                      tabletSpacing: 12.0,
-                    ),
-                  ),
-                  Text(
-                    'About',
-                    style: context.getResponsiveTextStyle(
-                      Theme.of(context).textTheme.titleLarge ??
-                          const TextStyle(),
-                      phoneSize: 20.0,
-                      tabletSize: 22.0,
-                    ),
-                  ),
-                ],
+              IconText(
+                icon: Icons.info_outline,
+                text: 'About',
+                iconColor: colorScheme.primary,
+                textStyle: context.getResponsiveTextStyle(
+                  Theme.of(context).textTheme.titleLarge ?? const TextStyle(),
+                  phoneSize: 20.0,
+                  tabletSize: 22.0,
+                ),
+                size: IconTextSize.large,
+                direction: Axis.horizontal,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
               ),
               SizedBox(
                 height: context.getResponsiveSpacing(
@@ -289,35 +277,23 @@ class _AuthorInfo extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Icon(
-              Icons.person,
-              color: colorScheme.primary,
-              size: context.getResponsiveIconSize(
-                phoneSize: 16.0,
-                tabletSize: 18.0,
-              ),
-            ),
-            SizedBox(
-              width: context.getResponsiveSpacing(
-                phoneSpacing: 6.0,
-                tabletSpacing: 8.0,
-              ),
-            ),
-            Text(
-              author,
-              style: context.getResponsiveTextStyle(
-                Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: colorScheme.onSurface,
-                    ) ??
-                    const TextStyle(),
-                phoneSize: 16.0,
-                tabletSize: 18.0,
-              ),
-            ),
-          ],
+        IconText(
+          icon: Icons.person,
+          text: author,
+          iconColor: colorScheme.primary,
+          textStyle: context.getResponsiveTextStyle(
+            Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: colorScheme.onSurface,
+                ) ??
+                const TextStyle(),
+            phoneSize: 16.0,
+            tabletSize: 18.0,
+          ),
+          size: IconTextSize.small,
+          direction: Axis.horizontal,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
         ),
         SizedBox(
           height: context.getResponsiveSpacing(
@@ -325,34 +301,22 @@ class _AuthorInfo extends StatelessWidget {
             tabletSpacing: 6.0,
           ),
         ),
-        Row(
-          children: [
-            Icon(
-              Icons.email,
-              color: colorScheme.outline,
-              size: context.getResponsiveIconSize(
-                phoneSize: 14.0,
-                tabletSize: 16.0,
-              ),
-            ),
-            SizedBox(
-              width: context.getResponsiveSpacing(
-                phoneSpacing: 6.0,
-                tabletSpacing: 8.0,
-              ),
-            ),
-            Text(
-              email,
-              style: context.getResponsiveTextStyle(
-                Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ) ??
-                    const TextStyle(),
-                phoneSize: 14.0,
-                tabletSize: 16.0,
-              ),
-            ),
-          ],
+        IconText(
+          icon: Icons.email,
+          text: email,
+          iconColor: colorScheme.outline,
+          textStyle: context.getResponsiveTextStyle(
+            Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ) ??
+                const TextStyle(),
+            phoneSize: 14.0,
+            tabletSize: 16.0,
+          ),
+          size: IconTextSize.small,
+          direction: Axis.horizontal,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
         ),
         SizedBox(
           height: context.getResponsiveSpacing(
@@ -360,34 +324,22 @@ class _AuthorInfo extends StatelessWidget {
             tabletSpacing: 4.0,
           ),
         ),
-        Row(
-          children: [
-            Icon(
-              Icons.send,
-              color: colorScheme.outline,
-              size: context.getResponsiveIconSize(
-                phoneSize: 14.0,
-                tabletSize: 16.0,
-              ),
-            ),
-            SizedBox(
-              width: context.getResponsiveSpacing(
-                phoneSpacing: 6.0,
-                tabletSpacing: 8.0,
-              ),
-            ),
-            Text(
-              telegram,
-              style: context.getResponsiveTextStyle(
-                Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ) ??
-                    const TextStyle(),
-                phoneSize: 14.0,
-                tabletSize: 16.0,
-              ),
-            ),
-          ],
+        IconText(
+          icon: Icons.send,
+          text: telegram,
+          iconColor: colorScheme.outline,
+          textStyle: context.getResponsiveTextStyle(
+            Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ) ??
+                const TextStyle(),
+            phoneSize: 14.0,
+            tabletSize: 16.0,
+          ),
+          size: IconTextSize.small,
+          direction: Axis.horizontal,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
         ),
       ],
     );

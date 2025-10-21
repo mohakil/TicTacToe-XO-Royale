@@ -44,7 +44,7 @@ final class HomeNotifierProvider
   }
 }
 
-String _$homeNotifierHash() => r'110cf0895479517a2ee07d568078dedcb491de5b';
+String _$homeNotifierHash() => r'eb277cb563a42d3fe25e935ae69ce19ae71d6882';
 
 /// Home screen state notifier
 

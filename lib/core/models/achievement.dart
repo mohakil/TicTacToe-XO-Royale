@@ -61,8 +61,16 @@ class Achievement {
   bool get isCompleted => progress >= maxProgress;
 
   /// Get completion percentage (0.0 to 1.0)
-  double get completionPercentage =>
-      maxProgress > 0 ? (progress / maxProgress).clamp(0.0, 1.0) : 0.0;
+  double get completionPercentage {
+    if (maxProgress <= 0) return 0.0;
+
+    // If unlocked, always return 1.0 (100%)
+    if (isUnlocked) return 1.0;
+
+    // For locked achievements, ensure progress doesn't exceed 99%
+    final percentage = (progress / maxProgress);
+    return percentage.clamp(0.0, 0.99);
+  }
 
   /// Get rarity color for UI
   Color getRarityColor() {

@@ -11,7 +11,7 @@ import 'store_dao.dart';
 
 // Provider for the main AppDatabase instance
 final appDatabaseProvider = Provider<AppDatabase>((ref) {
-  throw UnimplementedError('Database provider must be overridden');
+  return AppDatabase();
 });
 
 // Provider for ProfileDao
@@ -49,3 +49,16 @@ final storeDaoProvider = Provider<StoreDao>((ref) {
   final database = ref.watch(appDatabaseProvider);
   return StoreDao(database);
 });
+
+// ===== UTILITY PROVIDERS =====
+
+// Provider for converting string profile IDs to integer IDs consistently
+final profileIdConverterProvider = Provider<int Function(String)>((ref) {
+  return (String profileId) {
+    if (profileId == 'default_user') return 1;
+    return int.tryParse(profileId) ?? 1;
+  };
+});
+
+// Provider for the default profile ID (used throughout the app)
+final defaultProfileIdProvider = Provider<int>((ref) => 1);

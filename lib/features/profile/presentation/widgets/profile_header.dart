@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tictactoe_xo_royale/core/extensions/responsive_extensions.dart';
 import 'package:tictactoe_xo_royale/core/providers/profile_provider.dart';
+import 'package:tictactoe_xo_royale/shared/widgets/icons/icon_avatar.dart';
+import 'package:tictactoe_xo_royale/shared/widgets/icons/icon_text.dart';
 
 class ProfileHeader extends ConsumerStatefulWidget {
   const ProfileHeader({super.key});
@@ -99,72 +101,51 @@ class _ProfileHeaderState extends ConsumerState<ProfileHeader> {
           Center(
             child: Stack(
               children: [
-                Container(
-                  width: context.getResponsiveIconSize(
+                IconAvatar(
+                  icon: Icons.person,
+                  size: isVerySmallScreen
+                      ? AvatarSize.large
+                      : AvatarSize.extraLarge,
+                  customSize: context.getResponsiveIconSize(
                     phoneSize:
                         (isVerySmallScreen ? 90.0 : 100.0) * densityMultiplier,
                     tabletSize:
                         (isLargeTablet ? 130.0 : 120.0) * densityMultiplier,
                   ),
-                  height: context.getResponsiveIconSize(
-                    phoneSize:
-                        (isVerySmallScreen ? 90.0 : 100.0) * densityMultiplier,
-                    tabletSize:
-                        (isLargeTablet ? 130.0 : 120.0) * densityMultiplier,
+                  backgroundColor: avatar != null
+                      ? null
+                      : Theme.of(context).colorScheme.surfaceContainer,
+                  borderColor: Theme.of(context).colorScheme.primary,
+                  borderWidth: context.getResponsiveCardElevation(
+                    phoneElevation: 3.0,
+                    tabletElevation: 4.0,
                   ),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Theme.of(context).colorScheme.primary,
-                      width: context.getResponsiveCardElevation(
-                        phoneElevation: 3.0,
-                        tabletElevation: 4.0,
-                      ),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.primary.withValues(alpha: 0.3),
-                        blurRadius: context.getResponsiveCardElevation(
-                          phoneElevation: 16.0,
-                          tabletElevation: 20.0,
-                        ),
-                        spreadRadius: 2,
-                      ),
-                    ],
-                  ),
-                  child: CircleAvatar(
-                    radius: context.getResponsiveIconSize(
-                      phoneSize:
-                          (isVerySmallScreen ? 40.0 : 45.0) * densityMultiplier,
-                      tabletSize:
-                          (isLargeTablet ? 61.0 : 56.0) * densityMultiplier,
-                    ),
-                    backgroundColor: Theme.of(
-                      context,
-                    ).colorScheme.surfaceContainer,
-                    backgroundImage: avatar != null
-                        ? NetworkImage(avatar)
-                        : null,
-                    child: avatar == null
-                        ? Icon(
-                            Icons.person,
-                            size: context.getResponsiveIconSize(
-                              phoneSize:
-                                  (isVerySmallScreen ? 45.0 : 50.0) *
-                                  densityMultiplier,
-                              tabletSize:
-                                  (isLargeTablet ? 65.0 : 60.0) *
-                                  densityMultiplier,
-                            ),
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSurfaceVariant,
-                          )
-                        : null,
-                  ),
+                  useResponsiveSizing: false, // Using custom sizing
                 ),
+                if (avatar != null)
+                  Container(
+                    width: context.getResponsiveIconSize(
+                      phoneSize:
+                          (isVerySmallScreen ? 90.0 : 100.0) *
+                          densityMultiplier,
+                      tabletSize:
+                          (isLargeTablet ? 130.0 : 120.0) * densityMultiplier,
+                    ),
+                    height: context.getResponsiveIconSize(
+                      phoneSize:
+                          (isVerySmallScreen ? 90.0 : 100.0) *
+                          densityMultiplier,
+                      tabletSize:
+                          (isLargeTablet ? 130.0 : 120.0) * densityMultiplier,
+                    ),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                        image: NetworkImage(avatar),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
                 Positioned(
                   bottom: 0,
                   right: 0,
@@ -371,17 +352,95 @@ class _ProfileHeaderState extends ConsumerState<ProfileHeader> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _StatCard(
-                icon: Icons.diamond,
-                value: gems.toString(),
-                label: 'Gems',
-                color: Theme.of(context).colorScheme.tertiary,
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconText(
+                    icon: Icons.diamond,
+                    text: gems.toString(),
+                    iconColor: Theme.of(context).colorScheme.tertiary,
+                    textStyle: context.getResponsiveTextStyle(
+                      Theme.of(context).textTheme.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: Theme.of(context).colorScheme.tertiary,
+                          ) ??
+                          const TextStyle(),
+                      phoneSize: 18.0,
+                      tabletSize: 20.0,
+                    ),
+                    size: IconTextSize.medium,
+                    direction: Axis.vertical,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                  ),
+                  SizedBox(
+                    height: context.getResponsiveSpacing(
+                      phoneSpacing: 4.0,
+                      tabletSpacing: 6.0,
+                    ),
+                  ),
+                  Text(
+                    'Gems',
+                    style: context.getResponsiveTextStyle(
+                      Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
+                          ) ??
+                          const TextStyle(),
+                      phoneSize: 12.0,
+                      tabletSize: 14.0,
+                    ),
+                  ),
+                ],
               ),
-              _StatCard(
-                icon: Icons.lightbulb,
-                value: hints.toString(),
-                label: 'Hints',
-                color: Theme.of(context).colorScheme.secondary,
+              SizedBox(
+                width: context.getResponsiveSpacing(
+                  phoneSpacing: 20.0,
+                  tabletSpacing: 24.0,
+                ),
+              ),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconText(
+                    icon: Icons.lightbulb,
+                    text: hints.toString(),
+                    iconColor: Theme.of(context).colorScheme.secondary,
+                    textStyle: context.getResponsiveTextStyle(
+                      Theme.of(context).textTheme.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: Theme.of(context).colorScheme.secondary,
+                          ) ??
+                          const TextStyle(),
+                      phoneSize: 18.0,
+                      tabletSize: 20.0,
+                    ),
+                    size: IconTextSize.medium,
+                    direction: Axis.vertical,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                  ),
+                  SizedBox(
+                    height: context.getResponsiveSpacing(
+                      phoneSpacing: 4.0,
+                      tabletSpacing: 6.0,
+                    ),
+                  ),
+                  Text(
+                    'Hints',
+                    style: context.getResponsiveTextStyle(
+                      Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
+                          ) ??
+                          const TextStyle(),
+                      phoneSize: 12.0,
+                      tabletSize: 14.0,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -471,81 +530,6 @@ class _ProfileHeaderState extends ConsumerState<ProfileHeader> {
               ],
             ),
           ],
-        ],
-      ),
-    );
-  }
-}
-
-class _StatCard extends StatelessWidget {
-  final IconData icon;
-  final String value;
-  final String label;
-  final Color color;
-
-  const _StatCard({
-    required this.icon,
-    required this.value,
-    required this.label,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    // Use responsive system instead of parameter
-    final padding = context.getResponsiveSpacing(
-      phoneSpacing: 12.0,
-      tabletSpacing: 16.0,
-    );
-    final iconSize = context.getResponsiveIconSize(
-      phoneSize: 28.0,
-      tabletSize: 32.0,
-    );
-
-    return Container(
-      padding: EdgeInsets.all(padding),
-      constraints: BoxConstraints(
-        minWidth: context.scale(80.0),
-        maxWidth: context.scale(120.0),
-      ),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainer,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withValues(alpha: 0.2)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: color, size: iconSize),
-          SizedBox(
-            height: context.getResponsiveSpacing(
-              phoneSpacing: 6.0,
-              tabletSpacing: 8.0,
-            ),
-          ),
-          Text(
-            value,
-            style: context.getResponsiveTextStyle(
-              Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: color,
-                  ) ??
-                  const TextStyle(),
-              phoneSize: 18.0,
-              tabletSize: 20.0,
-            ),
-          ),
-          Text(
-            label,
-            style: context.getResponsiveTextStyle(
-              Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ) ??
-                  const TextStyle(),
-              phoneSize: 12.0,
-              tabletSize: 14.0,
-            ),
-          ),
         ],
       ),
     );

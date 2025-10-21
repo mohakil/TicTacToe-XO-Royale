@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:tictactoe_xo_royale/core/extensions/responsive_extensions.dart';
 import 'package:tictactoe_xo_royale/core/models/achievement.dart';
+import 'package:tictactoe_xo_royale/shared/widgets/cards/enhanced_card.dart';
+import 'package:tictactoe_xo_royale/shared/widgets/feedback/progress_animation.dart';
 
 class AchievementCard extends StatelessWidget {
   final Achievement achievement;
@@ -12,39 +14,36 @@ class AchievementCard extends StatelessWidget {
     final rarityColor = achievement.getRarityColor();
     final isUnlocked = achievement.isUnlocked;
 
-    // Use responsive system instead of parameter
-    final padding = context.getResponsiveSpacing(
-      phoneSpacing: 12.0,
-      tabletSpacing: 16.0,
-    );
-
-    return Container(
-      decoration: BoxDecoration(
-        color: isUnlocked
-            ? Theme.of(context).colorScheme.surface
-            : Theme.of(context).colorScheme.surfaceDim,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isUnlocked
-              ? rarityColor.withValues(alpha: 0.3)
-              : Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
-          width: isUnlocked ? 2 : 1,
-        ),
-        boxShadow: isUnlocked
-            ? [
-                BoxShadow(
-                  color: rarityColor.withValues(alpha: 0.1),
-                  blurRadius: 8,
-                  spreadRadius: 1,
-                ),
-              ]
-            : null,
-      ),
+    return EnhancedCard(
+      variant: CardVariant.elevated,
+      size: CardSize.medium,
+      backgroundColor: isUnlocked
+          ? Theme.of(context).colorScheme.surface
+          : Theme.of(context).colorScheme.surfaceDim,
+      borderColor: isUnlocked
+          ? rarityColor.withValues(alpha: 0.3)
+          : Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+      elevation: isUnlocked ? 2.0 : 0.0,
+      gradient: isUnlocked
+          ? null
+          : LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Theme.of(context).colorScheme.surfaceDim,
+                Theme.of(context).colorScheme.surfaceDim.withValues(alpha: 0.9),
+              ],
+            ),
       child: Stack(
         children: [
           // Main Content
           Padding(
-            padding: EdgeInsets.all(padding),
+            padding: EdgeInsets.all(
+              context.getResponsiveSpacing(
+                phoneSpacing: 12.0,
+                tabletSpacing: 16.0,
+              ),
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min, // Prevent overflow
@@ -109,6 +108,69 @@ class AchievementCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
+
+                // Progress Bar (show for achievements with progress, including unlocked ones)
+                if (achievement.maxProgress > 1) ...[
+                  SizedBox(
+                    height: context.getResponsiveSpacing(
+                      phoneSpacing: 4.0,
+                      tabletSpacing: 6.0,
+                    ),
+                  ),
+                  // Progress Text with validation
+                  Builder(
+                    builder: (context) {
+                      // Ensure progress consistency
+                      final displayProgress = isUnlocked
+                          ? achievement
+                                .maxProgress // Always show max for unlocked
+                          : achievement.progress.clamp(
+                              0,
+                              achievement.maxProgress - 1,
+                            );
+
+                      return Text(
+                        '$displayProgress/${achievement.maxProgress}',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: isUnlocked
+                              ? rarityColor
+                              : Theme.of(context).colorScheme.onSurfaceVariant
+                                    .withValues(alpha: 0.7),
+                          fontWeight: FontWeight.w500,
+                          fontSize: context.isPhone ? 9.0 : 10.0,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      );
+                    },
+                  ),
+                  SizedBox(
+                    height: context.getResponsiveSpacing(
+                      phoneSpacing: 2.0,
+                      tabletSpacing: 3.0,
+                    ),
+                  ),
+                  // Progress Bar - Using shared ProgressAnimation with validated progress
+                  ProgressAnimation(
+                    progress: isUnlocked
+                        ? 1.0 // Always show 100% for unlocked achievements
+                        : (achievement.progress.clamp(
+                                    0,
+                                    achievement.maxProgress - 1,
+                                  ) /
+                                  achievement.maxProgress)
+                              .clamp(0.0, 0.99),
+                    variant: ProgressAnimationVariant.linear,
+                    color: isUnlocked
+                        ? rarityColor
+                        : Theme.of(context).colorScheme.primary,
+                    backgroundColor: Theme.of(
+                      context,
+                    ).colorScheme.surfaceContainerHighest,
+                    strokeWidth: context.scale(3.0),
+                  ),
+                ],
 
                 if (isUnlocked && achievement.unlockedDate != null) ...[
                   SizedBox(

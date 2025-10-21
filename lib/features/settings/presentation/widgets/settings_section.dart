@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tictactoe_xo_royale/core/extensions/responsive_extensions.dart';
+import 'package:tictactoe_xo_royale/shared/widgets/cards/enhanced_card.dart';
 
 /// A settings section widget for grouping related settings
 class SettingsSection extends StatelessWidget {
@@ -16,8 +17,6 @@ class SettingsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Semantics(
       label: '$title settings section',
       child: Column(
@@ -34,27 +33,29 @@ class SettingsSection extends StatelessWidget {
                 Text(
                   title,
                   style: context.getResponsiveTextStyle(
-                    Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: colorScheme.primary,
+                    Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.w600,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ) ??
                         const TextStyle(),
-                    phoneSize: 16.0,
-                    tabletSize: 18.0,
+                    phoneSize: 18.0,
+                    tabletSize: 20.0,
                   ),
                 ),
                 if (subtitle != null) ...[
                   SizedBox(
                     height: context.getResponsiveSpacing(
-                      phoneSpacing: 2.0,
-                      tabletSpacing: 4.0,
+                      phoneSpacing: 4.0,
+                      tabletSpacing: 6.0,
                     ),
                   ),
                   Text(
                     subtitle!,
                     style: context.getResponsiveTextStyle(
-                      Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
+                      Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
                           ) ??
                           const TextStyle(),
                       phoneSize: 12.0,
@@ -65,7 +66,9 @@ class SettingsSection extends StatelessWidget {
               ],
             ),
           ),
-          Card(
+          EnhancedCard(
+            variant: CardVariant.filled,
+            size: CardSize.medium,
             margin: context.getResponsivePadding(
               phonePadding: 12.0,
               tabletPadding: 16.0,

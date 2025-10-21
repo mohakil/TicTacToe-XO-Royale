@@ -4,6 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:drift/drift.dart';
 import 'package:tictactoe_xo_royale/app/theme/app_theme.dart';
 import 'package:tictactoe_xo_royale/core/database/database_providers.dart';
+import 'package:tictactoe_xo_royale/core/database/app_database.dart';
 import 'package:tictactoe_xo_royale/core/database/theme_dao.dart';
 
 part 'theme_provider.g.dart';
@@ -59,25 +60,24 @@ class ThemeModeNotifier extends _$ThemeModeNotifier {
   bool _mounted = true;
 
   // Helper methods for theme mode conversion
-  String _convertThemeModeToString(ThemeMode themeMode) {
-    switch (themeMode) {
+  AppThemeMode _convertFlutterThemeModeToApp(ThemeMode flutterMode) {
+    switch (flutterMode) {
       case ThemeMode.light:
-        return 'light';
+        return AppThemeMode.light;
       case ThemeMode.dark:
-        return 'dark';
+        return AppThemeMode.dark;
       case ThemeMode.system:
-        return 'system';
+        return AppThemeMode.system;
     }
   }
 
-  ThemeMode _convertStringToThemeMode(String themeModeString) {
-    switch (themeModeString) {
-      case 'light':
+  ThemeMode _convertAppThemeModeToFlutter(AppThemeMode appMode) {
+    switch (appMode) {
+      case AppThemeMode.light:
         return ThemeMode.light;
-      case 'dark':
+      case AppThemeMode.dark:
         return ThemeMode.dark;
-      case 'system':
-      default:
+      case AppThemeMode.system:
         return ThemeMode.system;
     }
   }
@@ -101,10 +101,10 @@ class ThemeModeNotifier extends _$ThemeModeNotifier {
     if (!_mounted) return;
     try {
       // Try to load existing theme mode from database
-      final themeModeString = await _themeDao.getThemeMode();
+      final appThemeMode = await _themeDao.getThemeMode();
 
-      // Convert string to ThemeMode enum
-      final themeMode = _convertStringToThemeMode(themeModeString);
+      // Convert AppThemeMode to Flutter ThemeMode enum
+      final themeMode = _convertAppThemeModeToFlutter(appThemeMode);
       if (_mounted) {
         state = themeMode;
       }
@@ -123,9 +123,9 @@ class ThemeModeNotifier extends _$ThemeModeNotifier {
   Future<void> _saveThemeMode(ThemeMode themeMode) async {
     if (!_mounted) return;
     try {
-      // Convert ThemeMode to string and save
-      final themeModeString = _convertThemeModeToString(themeMode);
-      await _themeDao.setThemeMode(themeModeString);
+      // Convert Flutter ThemeMode to AppThemeMode and save
+      final appThemeMode = _convertFlutterThemeModeToApp(themeMode);
+      await _themeDao.setThemeMode(appThemeMode);
     } on DriftWrappedException catch (e) {
       debugPrint('Database error while saving theme mode: ${e.message}');
       throw Exception('Database error while saving theme mode: ${e.message}');

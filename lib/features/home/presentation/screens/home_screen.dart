@@ -8,7 +8,8 @@ import 'package:tictactoe_xo_royale/features/home/presentation/widgets/ambient_p
 import 'package:tictactoe_xo_royale/features/home/presentation/widgets/game_mode_cards.dart';
 import 'package:tictactoe_xo_royale/features/home/presentation/widgets/quick_stats_ribbon.dart';
 import 'package:tictactoe_xo_royale/features/home/presentation/widgets/typewriter_text.dart';
-import 'package:tictactoe_xo_royale/features/home/providers/home_provider.dart';
+import 'package:tictactoe_xo_royale/app/routing/app_routes.dart';
+import 'package:tictactoe_xo_royale/shared/widgets/feedback/confirmation_dialog.dart';
 
 /// Home screen with hero section, CTA cards, stats ribbon, and ambient effects
 /// Implements the design specified in the PRD with responsive layout and accessibility
@@ -29,15 +30,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   late Animation<double> _contentFadeAnimation;
   late Animation<Offset> _contentSlideAnimation;
 
+  bool _animationsInitialized = false;
+  bool _disposed = false;
+
   @override
   void initState() {
     super.initState();
+    _initializeAnimations();
+  }
 
-    // Hero animation controller - get from pool
-    _heroAnimationController = AnimationPool.getController(
+  void _initializeAnimations() {
+    if (_disposed || _animationsInitialized) return;
+
+    // Get fresh controllers to ensure clean state for rapid navigation
+    _heroAnimationController = AnimationPool.getFreshController(
       vsync: this,
       poolName: 'home',
-      duration: const Duration(milliseconds: 1200),
+      duration: const Duration(
+        milliseconds: 600,
+      ), // Reduced for better performance
     );
 
     _heroFadeAnimation = Tween<double>(begin: 0, end: 1).animate(
@@ -55,11 +66,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           ),
         );
 
-    // Content animation controller - get from pool
-    _contentAnimationController = AnimationPool.getController(
+    // Content animation controller - get fresh controller
+    _contentAnimationController = AnimationPool.getFreshController(
       vsync: this,
       poolName: 'home',
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(
+        milliseconds: 400,
+      ), // Reduced for better performance
     );
 
     _contentFadeAnimation = Tween<double>(begin: 0, end: 1).animate(
@@ -77,35 +90,111 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           ),
         );
 
-    // Start animations with staggered timing
-    _heroAnimationController.forward();
-    Future.delayed(const Duration(milliseconds: 400), () {
-      _contentAnimationController.forward();
+    _animationsInitialized = true;
+
+    // Start animations with staggered timing - use addPostFrameCallback for safety
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && !_disposed) {
+        _startAnimations();
+      }
     });
+  }
+
+  void _startAnimations() {
+    if (!mounted || _disposed) return;
+
+    // Reset animations to ensure they start from the beginning
+    _heroAnimationController.reset();
+    _contentAnimationController.reset();
+
+    // Start hero animation
+    _heroAnimationController.forward();
+
+    // Start content animation with delay - use Future with error handling
+    Future.delayed(const Duration(milliseconds: 400), () {
+      if (mounted && !_disposed) {
+        _contentAnimationController.forward();
+      }
+    });
+  }
+
+  void _resetAnimations() {
+    if (_disposed) return;
+
+    if (_animationsInitialized) {
+      try {
+        _heroAnimationController.reset();
+        _contentAnimationController.reset();
+      } catch (e) {
+        // Controllers might be disposed, ignore
+      }
+    }
+    _animationsInitialized = false;
   }
 
   @override
   void dispose() {
+    _disposed = true;
+
     // Return controllers to the pool instead of disposing them directly
-    AnimationPool.returnController(_heroAnimationController, 'home');
-    AnimationPool.returnController(_contentAnimationController, 'home');
+    try {
+      if (_heroAnimationController.isAnimating) {
+        _heroAnimationController.stop();
+      }
+      AnimationPool.returnController(_heroAnimationController, 'home');
+    } catch (e) {
+      // Controller might be already disposed
+    }
+
+    try {
+      if (_contentAnimationController.isAnimating) {
+        _contentAnimationController.stop();
+      }
+      AnimationPool.returnController(_contentAnimationController, 'home');
+    } catch (e) {
+      // Controller might be already disposed
+    }
+
     super.dispose();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Restart animations when returning to home screen
+    if (mounted && !_disposed && NavigationService.isOnHome(context)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && !_disposed) {
+          _resetAnimations();
+          _initializeAnimations();
+        }
+      });
+    }
+  }
+
   void _onLocalModeSelected() {
-    // Navigate to setup screen with local mode pre-selected
-    NavigationService.goSetup(context, params: {'gameMode': 'local'});
+    // Navigate to setup screen with local mode pre-selected using type-safe parameters
+    final params = GameSetupParams(
+      gameMode: 'local',
+      boardSize: AppRoutes.defaultBoardSize,
+      winCondition: AppRoutes.defaultWinCondition,
+    );
+    NavigationService.goSetup(context, params: params);
   }
 
   void _onRobotModeSelected() {
-    // Navigate to setup screen with robot mode pre-selected
-    NavigationService.goSetup(context, params: {'gameMode': 'robot'});
+    // Navigate to setup screen with robot mode pre-selected using type-safe parameters
+    final params = GameSetupParams(
+      gameMode: 'robot',
+      boardSize: AppRoutes.defaultBoardSize,
+      winCondition: AppRoutes.defaultWinCondition,
+      difficulty: AppRoutes.defaultDifficulty,
+    );
+    NavigationService.goSetup(context, params: params);
   }
 
   /// Shows a robust exit confirmation dialog
   Future<bool?> _showExitDialog(BuildContext context) async {
-    final colorScheme = Theme.of(context).colorScheme;
-
     try {
       return await showDialog<bool>(
         context: context,
@@ -113,98 +202,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         builder: (BuildContext context) {
           return PopScope(
             canPop: false, // Prevent back button from closing dialog
-            child: AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: context.getResponsiveBorderRadius(
-                  phoneRadius: 14.0,
-                  tabletRadius: 16.0,
-                ),
-              ),
-              title: Row(
-                children: [
-                  Icon(
-                    Icons.exit_to_app,
-                    color: colorScheme.error,
-                    size: context.getResponsiveIconSize(
-                      phoneSize: 24.0,
-                      tabletSize: 28.0,
-                    ),
-                  ),
-                  SizedBox(
-                    width: context.getResponsiveSpacing(
-                      phoneSpacing: 8.0,
-                      tabletSpacing: 12.0,
-                    ),
-                  ),
-                  Text(
-                    'Exit App',
-                    style: context.getResponsiveTextStyle(
-                      Theme.of(context).textTheme.headlineSmall ??
-                          const TextStyle(),
-                      phoneSize: 18.0,
-                      tabletSize: 20.0,
-                    ),
-                  ),
-                ],
-              ),
-              content: Text(
-                'Are you sure you want to exit the game?',
-                style: context.getResponsiveTextStyle(
-                  Theme.of(context).textTheme.bodyMedium ?? const TextStyle(),
-                  phoneSize: 14.0,
-                  tabletSize: 16.0,
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  style: TextButton.styleFrom(
-                    foregroundColor: colorScheme.onSurfaceVariant,
-                    padding: context.getResponsivePadding(
-                      phonePadding: 16.0,
-                      tabletPadding: 20.0,
-                    ),
-                  ),
-                  child: Text(
-                    'Cancel',
-                    style: context.getResponsiveTextStyle(
-                      Theme.of(context).textTheme.labelLarge ??
-                          const TextStyle(),
-                      phoneSize: 14.0,
-                      tabletSize: 16.0,
-                    ),
-                  ),
-                ),
-                FilledButton(
-                  onPressed: () => Navigator.of(context).pop(true),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: colorScheme.error,
-                    foregroundColor: colorScheme.onError,
-                    padding: context.getResponsivePadding(
-                      phonePadding: 16.0,
-                      tabletPadding: 20.0,
-                    ),
-                    minimumSize: Size(
-                      context.scale(80.0),
-                      context.getResponsiveButtonHeight(
-                        phoneHeight: 36.0,
-                        tabletHeight: 40.0,
-                      ),
-                    ),
-                  ),
-                  child: Text(
-                    'Exit',
-                    style: context.getResponsiveTextStyle(
-                      Theme.of(context).textTheme.labelLarge?.copyWith(
-                            color: colorScheme.onError,
-                          ) ??
-                          TextStyle(color: colorScheme.onError),
-                      phoneSize: 14.0,
-                      tabletSize: 16.0,
-                    ),
-                  ),
-                ),
-              ],
+            child: ConfirmationDialog(
+              title: 'Exit App',
+              content: 'Are you sure you want to exit the game?',
+              icon: Icons.exit_to_app,
+              confirmText: 'Exit',
+              cancelText: 'Cancel',
+              confirmTextColor: Colors.black,
+              autoPop: false, // Let the calling code handle navigation
+              onConfirm: () => Navigator.of(context).pop(true),
+              onCancel: () => Navigator.of(context).pop(false),
+              barrierDismissible: false,
             ),
           );
         },
@@ -375,39 +383,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                       ),
                                     ),
 
-                                    // Quick stats ribbon - optimized with select for granular rebuilds
-                                    Consumer(
-                                      builder: (context, ref, child) {
-                                        // Use select for granular rebuilds - only rebuild when specific values change
-                                        final lastResult = ref.watch(
-                                          homeProvider.select(
-                                            (state) => state.lastResult,
-                                          ),
-                                        );
-                                        final streak = ref.watch(
-                                          homeProvider.select(
-                                            (state) => state.streak,
-                                          ),
-                                        );
-                                        final gemsCount = ref.watch(
-                                          homeProvider.select(
-                                            (state) => state.gemsCount,
-                                          ),
-                                        );
-                                        final hintCount = ref.watch(
-                                          homeProvider.select(
-                                            (state) => state.hintCount,
-                                          ),
-                                        );
-
-                                        return QuickStatsRibbon(
-                                          lastResult: lastResult,
-                                          streak: streak,
-                                          gemsCount: gemsCount,
-                                          hintCount: hintCount,
-                                        );
-                                      },
-                                    ),
+                                    // Quick stats ribbon - now uses real data from providers
+                                    const QuickStatsRibbon(),
                                   ],
                                 ),
                               ),

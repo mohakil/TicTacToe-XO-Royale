@@ -42,7 +42,7 @@ final class AchievementsNotifierProvider
 }
 
 String _$achievementsNotifierHash() =>
-    r'284066c94fdd29a65b344e7f86cc850364c6b7f7';
+    r'f338dece6e0e86eb0fc983eaae6b41e64de21629';
 
 abstract class _$AchievementsNotifier extends $Notifier<AchievementsState> {
   AchievementsState build();

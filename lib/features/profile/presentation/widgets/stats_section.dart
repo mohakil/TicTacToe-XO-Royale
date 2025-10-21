@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tictactoe_xo_royale/core/extensions/responsive_extensions.dart';
 import 'package:tictactoe_xo_royale/core/providers/profile_provider.dart';
+import 'package:tictactoe_xo_royale/shared/widgets/icons/icon_text.dart';
 
 class StatsSection extends ConsumerWidget {
   const StatsSection({super.key});
@@ -35,29 +36,17 @@ class StatsSection extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Icon(
-                Icons.analytics,
-                color: Theme.of(context).colorScheme.primary,
-                size: context.getResponsiveIconSize(
-                  phoneSize: 26.0,
-                  tabletSize: 28.0,
-                ),
-              ),
-              SizedBox(
-                width: context.getResponsiveSpacing(
-                  phoneSpacing: 10.0,
-                  tabletSpacing: 12.0,
-                ),
-              ),
-              Text(
-                'Game Statistics',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
-              ),
-            ],
+          IconText(
+            icon: Icons.analytics,
+            text: 'Game Statistics',
+            iconColor: Theme.of(context).colorScheme.primary,
+            textStyle: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+            size: IconTextSize.large,
+            direction: Axis.horizontal,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
           ),
           SizedBox(
             height: context.getResponsiveSpacing(
@@ -70,12 +59,48 @@ class StatsSection extends ConsumerWidget {
           Row(
             children: [
               Expanded(
-                child: _StatTile(
-                  icon: Icons.emoji_events,
-                  value: stats.wins.toString(),
-                  label: 'Wins',
-                  color: Theme.of(context).colorScheme.tertiary,
-                  isPrimary: true,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconText(
+                      icon: Icons.emoji_events,
+                      text: stats.wins.toString(),
+                      iconColor: Theme.of(context).colorScheme.tertiary,
+                      textStyle: context.getResponsiveTextStyle(
+                        Theme.of(context).textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              color: Theme.of(context).colorScheme.tertiary,
+                            ) ??
+                            const TextStyle(),
+                        phoneSize: 18.0,
+                        tabletSize: 20.0,
+                      ),
+                      size: IconTextSize.medium,
+                      direction: Axis.vertical,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                    ),
+                    SizedBox(
+                      height: context.getResponsiveSpacing(
+                        phoneSpacing: 4.0,
+                        tabletSpacing: 6.0,
+                      ),
+                    ),
+                    Text(
+                      'Wins',
+                      style: context.getResponsiveTextStyle(
+                        Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant,
+                            ) ??
+                            const TextStyle(),
+                        phoneSize: 12.0,
+                        tabletSize: 14.0,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
               ),
               SizedBox(
@@ -85,11 +110,48 @@ class StatsSection extends ConsumerWidget {
                 ),
               ),
               Expanded(
-                child: _StatTile(
-                  icon: Icons.close,
-                  value: stats.losses.toString(),
-                  label: 'Losses',
-                  color: Theme.of(context).colorScheme.error,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconText(
+                      icon: Icons.close,
+                      text: stats.losses.toString(),
+                      iconColor: Theme.of(context).colorScheme.error,
+                      textStyle: context.getResponsiveTextStyle(
+                        Theme.of(context).textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              color: Theme.of(context).colorScheme.error,
+                            ) ??
+                            const TextStyle(),
+                        phoneSize: 18.0,
+                        tabletSize: 20.0,
+                      ),
+                      size: IconTextSize.medium,
+                      direction: Axis.vertical,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                    ),
+                    SizedBox(
+                      height: context.getResponsiveSpacing(
+                        phoneSpacing: 4.0,
+                        tabletSpacing: 6.0,
+                      ),
+                    ),
+                    Text(
+                      'Losses',
+                      style: context.getResponsiveTextStyle(
+                        Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant,
+                            ) ??
+                            const TextStyle(),
+                        phoneSize: 12.0,
+                        tabletSize: 14.0,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
               ),
               SizedBox(
@@ -99,11 +161,50 @@ class StatsSection extends ConsumerWidget {
                 ),
               ),
               Expanded(
-                child: _StatTile(
-                  icon: Icons.remove,
-                  value: stats.draws.toString(),
-                  label: 'Draws',
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconText(
+                      icon: Icons.remove,
+                      text: stats.draws.toString(),
+                      iconColor: Theme.of(context).colorScheme.onSurfaceVariant,
+                      textStyle: context.getResponsiveTextStyle(
+                        Theme.of(context).textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant,
+                            ) ??
+                            const TextStyle(),
+                        phoneSize: 18.0,
+                        tabletSize: 20.0,
+                      ),
+                      size: IconTextSize.medium,
+                      direction: Axis.vertical,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                    ),
+                    SizedBox(
+                      height: context.getResponsiveSpacing(
+                        phoneSpacing: 4.0,
+                        tabletSpacing: 6.0,
+                      ),
+                    ),
+                    Text(
+                      'Draws',
+                      style: context.getResponsiveTextStyle(
+                        Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant,
+                            ) ??
+                            const TextStyle(),
+                        phoneSize: 12.0,
+                        tabletSize: 14.0,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -119,11 +220,49 @@ class StatsSection extends ConsumerWidget {
           Row(
             children: [
               Expanded(
-                child: _SecondaryStatTile(
-                  icon: Icons.games,
-                  value: totalGames.toString(),
-                  label: 'Total Games',
-                  color: Theme.of(context).colorScheme.primary,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconText(
+                      icon: Icons.games,
+                      text: totalGames.toString(),
+                      iconColor: Theme.of(context).colorScheme.primary,
+                      textStyle: context.getResponsiveTextStyle(
+                        Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: Theme.of(context).colorScheme.primary,
+                            ) ??
+                            const TextStyle(),
+                        phoneSize: 14.0,
+                        tabletSize: 16.0,
+                      ),
+                      size: IconTextSize.small,
+                      direction: Axis.vertical,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                    ),
+                    SizedBox(
+                      height: context.getResponsiveSpacing(
+                        phoneSpacing: 2.0,
+                        tabletSpacing: 3.0,
+                      ),
+                    ),
+                    Text(
+                      'Total Games',
+                      style: context.getResponsiveTextStyle(
+                        Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant,
+                              fontWeight: FontWeight.w500,
+                            ) ??
+                            const TextStyle(),
+                        phoneSize: 10.0,
+                        tabletSize: 12.0,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
               ),
               SizedBox(
@@ -133,11 +272,49 @@ class StatsSection extends ConsumerWidget {
                 ),
               ),
               Expanded(
-                child: _SecondaryStatTile(
-                  icon: Icons.local_fire_department,
-                  value: stats.streak.toString(),
-                  label: 'Current Streak',
-                  color: Theme.of(context).colorScheme.secondary,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconText(
+                      icon: Icons.local_fire_department,
+                      text: stats.streak.toString(),
+                      iconColor: Theme.of(context).colorScheme.secondary,
+                      textStyle: context.getResponsiveTextStyle(
+                        Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: Theme.of(context).colorScheme.secondary,
+                            ) ??
+                            const TextStyle(),
+                        phoneSize: 14.0,
+                        tabletSize: 16.0,
+                      ),
+                      size: IconTextSize.small,
+                      direction: Axis.vertical,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                    ),
+                    SizedBox(
+                      height: context.getResponsiveSpacing(
+                        phoneSpacing: 2.0,
+                        tabletSpacing: 3.0,
+                      ),
+                    ),
+                    Text(
+                      'Current Streak',
+                      style: context.getResponsiveTextStyle(
+                        Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant,
+                              fontWeight: FontWeight.w500,
+                            ) ??
+                            const TextStyle(),
+                        phoneSize: 10.0,
+                        tabletSize: 12.0,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -194,162 +371,4 @@ class StatsSection extends ConsumerWidget {
   }
 }
 
-class _StatTile extends StatelessWidget {
-  final IconData icon;
-  final String value;
-  final String label;
-  final Color color;
-  final bool isPrimary;
-
-  const _StatTile({
-    required this.icon,
-    required this.value,
-    required this.label,
-    required this.color,
-    this.isPrimary = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    // Use responsive system instead of parameter
-    final padding = context.getResponsiveSpacing(
-      phoneSpacing: 12.0,
-      tabletSpacing: 16.0,
-    );
-    final iconSize = context.getResponsiveIconSize(
-      phoneSize: 28.0,
-      tabletSize: 32.0,
-    );
-
-    return Container(
-      padding: EdgeInsets.all(padding),
-      decoration: BoxDecoration(
-        color: isPrimary
-            ? color.withValues(alpha: 0.1)
-            : Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isPrimary
-              ? color.withValues(alpha: 0.3)
-              : Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
-          width: isPrimary ? 2 : 1,
-        ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: color, size: iconSize),
-          SizedBox(
-            height: context.getResponsiveSpacing(
-              phoneSpacing: 6.0,
-              tabletSpacing: 8.0,
-            ),
-          ),
-          Text(
-            value,
-            style: context.getResponsiveTextStyle(
-              Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: color,
-                  ) ??
-                  const TextStyle(),
-              phoneSize: 18.0,
-              tabletSize: 20.0,
-            ),
-          ),
-          Text(
-            label,
-            style: context.getResponsiveTextStyle(
-              Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    fontWeight: FontWeight.w500,
-                  ) ??
-                  const TextStyle(),
-              phoneSize: 12.0,
-              tabletSize: 14.0,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SecondaryStatTile extends StatelessWidget {
-  final IconData icon;
-  final String value;
-  final String label;
-  final Color color;
-
-  const _SecondaryStatTile({
-    required this.icon,
-    required this.value,
-    required this.label,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    // Use responsive system instead of parameter
-    final padding = context.getResponsiveSpacing(
-      phoneSpacing: 12.0,
-      tabletSpacing: 16.0,
-    );
-    final iconSize = context.getResponsiveIconSize(
-      phoneSize: 20.0,
-      tabletSize: 24.0,
-    );
-    final spacing = context.getResponsiveSpacing(
-      phoneSpacing: 8.0,
-      tabletSpacing: 12.0,
-    );
-
-    return Container(
-      padding: EdgeInsets.all(padding),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
-        ),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: color, size: iconSize),
-          SizedBox(width: spacing),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  value,
-                  style: context.getResponsiveTextStyle(
-                    Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: color,
-                        ) ??
-                        const TextStyle(),
-                    phoneSize: 16.0,
-                    tabletSize: 18.0,
-                  ),
-                ),
-                Text(
-                  label,
-                  style: context.getResponsiveTextStyle(
-                    Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ) ??
-                        const TextStyle(),
-                    phoneSize: 11.0,
-                    tabletSize: 12.0,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
+// Removed _StatTile and _SecondaryStatTile classes - replaced with IconText

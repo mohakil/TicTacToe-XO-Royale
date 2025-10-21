@@ -9,12 +9,18 @@ part 'store_dao.g.dart';
 class StoreDao extends DatabaseAccessor<AppDatabase> with _$StoreDaoMixin {
   StoreDao(super.db);
 
+  /// Convert string profile ID to integer ID consistently
+  int _convertProfileId(String id) {
+    if (id == 'default_user') return 1;
+    return int.tryParse(id) ?? 1;
+  }
+
   // ===== STORE ITEM OPERATIONS =====
 
   /// Get all store items for a profile
   Future<List<StoreItem>> getStoreItems(String profileId) {
     // For now, we'll use a simple approach - assume 'default_user' corresponds to ID 1
-    final intId = profileId == 'default_user' ? 1 : int.parse(profileId);
+    final intId = _convertProfileId(profileId);
 
     return (select(storeItems)
           ..where((s) => s.profileId.equals(intId))
@@ -25,7 +31,7 @@ class StoreDao extends DatabaseAccessor<AppDatabase> with _$StoreDaoMixin {
   /// Watch store items for a profile reactively
   Stream<List<StoreItem>> watchStoreItems(String profileId) {
     // For now, we'll use a simple approach - assume 'default_user' corresponds to ID 1
-    final intId = profileId == 'default_user' ? 1 : int.parse(profileId);
+    final intId = _convertProfileId(profileId);
 
     return (select(storeItems)
           ..where((s) => s.profileId.equals(intId))
@@ -36,7 +42,7 @@ class StoreDao extends DatabaseAccessor<AppDatabase> with _$StoreDaoMixin {
   /// Get a specific store item for a profile
   Future<StoreItem?> getStoreItem(String profileId, String itemId) {
     // For now, we'll use a simple approach - assume 'default_user' corresponds to ID 1
-    final intId = profileId == 'default_user' ? 1 : int.parse(profileId);
+    final intId = _convertProfileId(profileId);
 
     return (select(storeItems)
           ..where((s) => s.profileId.equals(intId) & s.itemId.equals(itemId)))
@@ -50,7 +56,7 @@ class StoreDao extends DatabaseAccessor<AppDatabase> with _$StoreDaoMixin {
     int quantity = 1,
   }) {
     // For now, we'll use a simple approach - assume 'default_user' corresponds to ID 1
-    final intId = profileId == 'default_user' ? 1 : int.parse(profileId);
+    final intId = _convertProfileId(profileId);
 
     return into(storeItems).insert(
       StoreItemsCompanion(
@@ -69,7 +75,7 @@ class StoreDao extends DatabaseAccessor<AppDatabase> with _$StoreDaoMixin {
     int quantity,
   ) {
     // For now, we'll use a simple approach - assume 'default_user' corresponds to ID 1
-    final intId = profileId == 'default_user' ? 1 : int.parse(profileId);
+    final intId = _convertProfileId(profileId);
 
     return (update(storeItems)
           ..where((s) => s.profileId.equals(intId) & s.itemId.equals(itemId)))
@@ -120,7 +126,7 @@ class StoreDao extends DatabaseAccessor<AppDatabase> with _$StoreDaoMixin {
   /// Delete a specific store item
   Future<int> deleteStoreItem(String profileId, String itemId) {
     // For now, we'll use a simple approach - assume 'default_user' corresponds to ID 1
-    final intId = profileId == 'default_user' ? 1 : int.parse(profileId);
+    final intId = _convertProfileId(profileId);
 
     return (delete(
       storeItems,
@@ -130,7 +136,7 @@ class StoreDao extends DatabaseAccessor<AppDatabase> with _$StoreDaoMixin {
   /// Delete all store items for a profile
   Future<int> deleteAllItemsForProfile(String profileId) {
     // For now, we'll use a simple approach - assume 'default_user' corresponds to ID 1
-    final intId = profileId == 'default_user' ? 1 : int.parse(profileId);
+    final intId = _convertProfileId(profileId);
 
     return (delete(storeItems)..where((s) => s.profileId.equals(intId))).go();
   }

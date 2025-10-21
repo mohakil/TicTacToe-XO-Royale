@@ -32,12 +32,19 @@ class _TypewriterTextState extends State<TypewriterText>
 
   int _currentLength = 0;
   bool _showCaret = true;
+  bool _disposed = false;
 
   @override
   void initState() {
     super.initState();
+    _initializeAnimations();
+  }
 
-    _typewriterController = AnimationPool.getController(
+  void _initializeAnimations() {
+    if (_disposed) return;
+
+    // Get fresh controllers to ensure clean state for rapid navigation
+    _typewriterController = AnimationPool.getFreshController(
       vsync: this,
       poolName: 'ui',
       duration: Duration(
@@ -45,7 +52,7 @@ class _TypewriterTextState extends State<TypewriterText>
       ),
     );
 
-    _caretController = AnimationPool.getController(
+    _caretController = AnimationPool.getFreshController(
       vsync: this,
       poolName: 'ui',
       duration: widget.caretBlinkDuration,
@@ -62,15 +69,30 @@ class _TypewriterTextState extends State<TypewriterText>
     _typewriterController.addListener(_typewriterListener);
     _caretController.addListener(_caretListener);
 
-    // Start the typewriter animation
-    _typewriterController.forward();
+    // Start animations safely
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && !_disposed) {
+        _startAnimations();
+      }
+    });
+  }
 
-    // Start the caret blinking
-    _caretController.repeat();
+  void _startAnimations() {
+    if (!mounted || _disposed) return;
+
+    try {
+      // Start the typewriter animation
+      _typewriterController.forward();
+
+      // Start the caret blinking
+      _caretController.repeat();
+    } catch (e) {
+      // Controllers might be disposed, ignore
+    }
   }
 
   void _typewriterListener() {
-    if (mounted) {
+    if (mounted && !_disposed) {
       setState(() {
         _currentLength = _typewriterAnimation.value;
       });
@@ -78,7 +100,7 @@ class _TypewriterTextState extends State<TypewriterText>
   }
 
   void _caretListener() {
-    if (mounted) {
+    if (mounted && !_disposed) {
       setState(() {
         _showCaret = _caretAnimation.value > 0.5;
       });
@@ -87,14 +109,56 @@ class _TypewriterTextState extends State<TypewriterText>
 
   @override
   void dispose() {
-    // Remove listeners before returning controllers to pool
-    _typewriterController.removeListener(_typewriterListener);
-    _caretController.removeListener(_caretListener);
+    _disposed = true;
 
-    // Return controllers to the pool instead of disposing them directly
-    AnimationPool.returnController(_typewriterController, 'ui');
-    AnimationPool.returnController(_caretController, 'ui');
+    // Remove listeners before returning controllers to pool
+    try {
+      _typewriterController.removeListener(_typewriterListener);
+      _caretController.removeListener(_caretListener);
+
+      // Stop animations before returning to pool
+      if (_typewriterController.isAnimating) {
+        _typewriterController.stop();
+      }
+      if (_caretController.isAnimating) {
+        _caretController.stop();
+      }
+
+      // Return controllers to the pool instead of disposing them directly
+      AnimationPool.returnController(_typewriterController, 'ui');
+      AnimationPool.returnController(_caretController, 'ui');
+    } catch (e) {
+      // Controllers might be already disposed, ignore
+    }
+
     super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(TypewriterText oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Restart animation if text changes
+    if (widget.text != oldWidget.text && mounted && !_disposed) {
+      _resetAndRestart();
+    }
+  }
+
+  void _resetAndRestart() {
+    if (_disposed) return;
+
+    try {
+      _typewriterController.reset();
+      _caretController.reset();
+      _currentLength = 0;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && !_disposed) {
+          _startAnimations();
+        }
+      });
+    } catch (e) {
+      // Controllers might be disposed, ignore
+    }
   }
 
   @override

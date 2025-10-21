@@ -7,7 +7,7 @@ import 'package:tictactoe_xo_royale/core/services/game_logic.dart';
 /// This class handles all robot-related settings without over-engineering
 @immutable
 class RobotConfig {
-  static const String defaultPlayerName = 'CPU';
+  static const String defaultPlayerName = 'Robot';
 
   final Difficulty difficulty;
   final String playerName;

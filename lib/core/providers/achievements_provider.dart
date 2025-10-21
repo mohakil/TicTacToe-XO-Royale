@@ -36,7 +36,7 @@ class AchievementsState {
 
   // Initial state
   factory AchievementsState.initial() => AchievementsState(
-    achievements: AchievementDataService.getAllAchievements(),
+    achievements: [], // ✅ FIXED: Start with empty list to prevent duplicates
     isLoading: false,
     error: null,
   );
@@ -47,7 +47,7 @@ class AchievementsState {
 
   // Error state
   factory AchievementsState.error(String errorMessage) => AchievementsState(
-    achievements: AchievementDataService.getAllAchievements(),
+    achievements: [], // ✅ FIXED: Start with empty list to prevent duplicates
     isLoading: false,
     error: errorMessage,
   );
@@ -71,13 +71,15 @@ class AchievementsNotifier extends _$AchievementsNotifier {
     // Initialize DAO from ref
     _achievementDao = ref.watch(achievementDaoProvider);
 
+    // Initialize profile ID converter (already defined as method above)
+
     // Load achievements asynchronously - don't await, let it complete in background
-    _loadAchievements();
+    _loadAchievementsAsync();
     return AchievementsState.initial();
   }
 
-  // Load achievements from database
-  Future<void> _loadAchievements({bool isRefresh = false}) async {
+  // Load achievements from database asynchronously
+  Future<void> _loadAchievementsAsync({bool isRefresh = false}) async {
     try {
       // Only show loading on initial load, not during refresh
       if (_isInitialLoad) {
@@ -89,36 +91,61 @@ class AchievementsNotifier extends _$AchievementsNotifier {
         'default_user',
       );
 
-      // Initialize achievements if none exist
+      // Initialize achievements if none exist (with error handling)
       if (dbAchievements.isEmpty) {
-        await _achievementDao.initializeAchievementsForProfile('default_user');
-        // Reload after initialization
-        final initializedAchievements = await _achievementDao
-            .getAchievementsByProfile('default_user');
-        dbAchievements.clear();
-        dbAchievements.addAll(initializedAchievements);
+        try {
+          await _achievementDao.initializeAchievementsForProfile(
+            'default_user',
+          );
+          // Reload after initialization
+          final initializedAchievements = await _achievementDao
+              .getAchievementsByProfile('default_user');
+          dbAchievements.clear();
+          dbAchievements.addAll(initializedAchievements);
+        } catch (initError) {
+          // If initialization fails, log but continue with empty achievements
+          debugPrint('Warning: Failed to initialize achievements: $initError');
+        }
       }
 
-      // Convert database models to app models
-      final achievementsList = dbAchievements.map((dbAchievement) {
-        // Find the corresponding achievement from the data service
-        final baseAchievement = AchievementDataService.getAllAchievements()
-            .firstWhere(
-              (achievement) => achievement.id == dbAchievement.achievementId,
-            );
+      // Convert database models to app models with progress validation
+      final achievementsList = <Achievement>[];
+      final allBaseAchievements = AchievementDataService.getAllAchievements();
 
-        return Achievement(
-          id: dbAchievement.achievementId,
-          title: baseAchievement.title,
-          description: baseAchievement.description,
-          icon: baseAchievement.icon,
-          rarity: baseAchievement.rarity,
-          maxProgress: baseAchievement.maxProgress,
-          isUnlocked: dbAchievement.isUnlocked,
-          progress: dbAchievement.progress,
-          unlockedDate: dbAchievement.unlockedDate,
-        );
-      }).toList();
+      for (final dbAchievement in dbAchievements) {
+        try {
+          // Find the corresponding achievement from the data service
+          final baseAchievement = allBaseAchievements.firstWhere(
+            (achievement) => achievement.id == dbAchievement.achievementId,
+          );
+
+          // Validate and fix progress consistency
+          final progress = _validateProgress(
+            dbAchievement.progress,
+            baseAchievement.maxProgress,
+            dbAchievement.isUnlocked,
+          );
+
+          achievementsList.add(
+            Achievement(
+              id: dbAchievement.achievementId,
+              title: baseAchievement.title,
+              description: baseAchievement.description,
+              icon: baseAchievement.icon,
+              rarity: baseAchievement.rarity,
+              maxProgress: baseAchievement.maxProgress,
+              isUnlocked: dbAchievement.isUnlocked,
+              progress: progress,
+              unlockedDate: dbAchievement.unlockedDate,
+            ),
+          );
+        } catch (e) {
+          debugPrint(
+            'Warning: Failed to process achievement ${dbAchievement.achievementId}: $e',
+          );
+          // Skip this achievement but continue processing others
+        }
+      }
 
       if (_mounted) {
         state = state.copyWith(
@@ -126,6 +153,9 @@ class AchievementsNotifier extends _$AchievementsNotifier {
           isLoading: false,
         );
         _isInitialLoad = false; // Mark initial load as complete
+
+        // Validate data integrity after loading
+        _validateAchievementDataIntegrity();
       }
     } on DriftWrappedException catch (e) {
       if (_mounted) {
@@ -140,14 +170,80 @@ class AchievementsNotifier extends _$AchievementsNotifier {
     }
   }
 
+  // Validate and fix progress consistency
+  int _validateProgress(int currentProgress, int maxProgress, bool isUnlocked) {
+    // Ensure progress is within valid bounds
+    var validatedProgress = currentProgress.clamp(0, maxProgress);
+
+    // If achievement is unlocked but progress is insufficient, fix it
+    if (isUnlocked && validatedProgress < maxProgress) {
+      validatedProgress = maxProgress;
+    }
+
+    // If progress meets or exceeds max but achievement isn't unlocked, fix it
+    if (!isUnlocked && validatedProgress >= maxProgress) {
+      validatedProgress =
+          maxProgress - 1; // Keep it just below max to allow proper unlocking
+    }
+
+    return validatedProgress;
+  }
+
+  // Validate achievement data integrity and fix inconsistencies
+  Future<void> _validateAchievementDataIntegrity() async {
+    try {
+      final achievements = state.achievements;
+      bool needsUpdate = false;
+
+      for (final achievement in achievements) {
+        // Check for inconsistencies
+        if (achievement.isUnlocked &&
+            achievement.progress < achievement.maxProgress) {
+          // Achievement is unlocked but progress is insufficient
+          needsUpdate = true;
+          await _achievementDao.updateProgress(
+            'default_user',
+            achievement.id,
+            achievement.maxProgress,
+          );
+        } else if (!achievement.isUnlocked &&
+            achievement.progress >= achievement.maxProgress) {
+          // Achievement has sufficient progress but isn't unlocked
+          needsUpdate = true;
+          await _achievementDao.unlockAchievement(
+            'default_user',
+            achievement.id,
+          );
+        }
+      }
+
+      if (needsUpdate) {
+        // Reload data after fixing inconsistencies
+        await _loadAchievementsAsync();
+      }
+    } catch (e) {
+      debugPrint('Warning: Failed to validate achievement data integrity: $e');
+    }
+  }
+
   // Unlock an achievement by ID
   Future<void> unlockAchievement(String achievementId) async {
     try {
       // Use DAO to unlock achievement in database
       await _achievementDao.unlockAchievement('default_user', achievementId);
 
+      // Also update progress to max when unlocking
+      final achievement = getAchievement(achievementId);
+      if (achievement != null) {
+        await _achievementDao.updateProgress(
+          'default_user',
+          achievementId,
+          achievement.maxProgress,
+        );
+      }
+
       // Reload achievements to get updated state
-      _loadAchievements();
+      await _loadAchievementsAsync();
     } on DriftWrappedException catch (e) {
       if (_mounted) {
         state = AchievementsState.error(
@@ -167,15 +263,27 @@ class AchievementsNotifier extends _$AchievementsNotifier {
     int progress,
   ) async {
     try {
+      final achievement = getAchievement(achievementId);
+      if (achievement == null) return;
+
+      // Validate progress bounds
+      final validatedProgress = progress.clamp(0, achievement.maxProgress);
+
       // Use DAO to update achievement progress in database
       await _achievementDao.updateProgress(
         'default_user',
         achievementId,
-        progress,
+        validatedProgress,
       );
 
+      // Check if achievement should be unlocked
+      if (validatedProgress >= achievement.maxProgress &&
+          !achievement.isUnlocked) {
+        await _achievementDao.unlockAchievement('default_user', achievementId);
+      }
+
       // Reload achievements to get updated state
-      _loadAchievements();
+      await _loadAchievementsAsync();
     } on DriftWrappedException catch (e) {
       if (_mounted) {
         state = AchievementsState.error(
@@ -223,7 +331,7 @@ class AchievementsNotifier extends _$AchievementsNotifier {
 
   // Refresh achievements
   Future<void> refreshAchievements() async {
-    await _loadAchievements(isRefresh: true);
+    await _loadAchievementsAsync(isRefresh: true);
   }
 
   // Clear error
@@ -233,9 +341,22 @@ class AchievementsNotifier extends _$AchievementsNotifier {
 }
 
 // Individual achievement data providers for granular rebuilds
-final achievementsListProvider = Provider.autoDispose<List<Achievement>>(
-  (ref) => ref.watch(achievementsProvider).achievements,
-);
+final achievementsListProvider = Provider.autoDispose<List<Achievement>>((ref) {
+  final achievements = ref.watch(achievementsProvider).achievements;
+
+  // Ensure no duplicates by achievement ID
+  final seenIds = <String>{};
+  final deduplicatedAchievements = <Achievement>[];
+
+  for (final achievement in achievements) {
+    if (!seenIds.contains(achievement.id)) {
+      seenIds.add(achievement.id);
+      deduplicatedAchievements.add(achievement);
+    }
+  }
+
+  return deduplicatedAchievements;
+});
 
 final unlockedAchievementsProvider = Provider.autoDispose<List<Achievement>>(
   (ref) =>
@@ -247,13 +368,15 @@ final lockedAchievementsProvider = Provider.autoDispose<List<Achievement>>(
       ref.watch(achievementsListProvider).where((a) => !a.isUnlocked).toList(),
 );
 
-final unlockedAchievementsCountProvider = Provider.autoDispose<int>(
-  (ref) => ref.watch(achievementsProvider.notifier).unlockedAchievementsCount,
-);
+final unlockedAchievementsCountProvider = Provider.autoDispose<int>((ref) {
+  final achievements = ref.watch(achievementsListProvider);
+  return achievements.where((a) => a.isUnlocked).length;
+});
 
-final totalAchievementsCountProvider = Provider.autoDispose<int>(
-  (ref) => ref.watch(achievementsProvider.notifier).totalAchievementsCount,
-);
+final totalAchievementsCountProvider = Provider.autoDispose<int>((ref) {
+  final achievements = ref.watch(achievementsListProvider);
+  return achievements.length;
+});
 
 final achievementsProgressProvider = Provider.autoDispose<double>((ref) {
   final achievements = ref.watch(achievementsListProvider);

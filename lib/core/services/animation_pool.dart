@@ -75,15 +75,30 @@ class AnimationPool {
     // Only return to pool if pool not full
     if (pool.length < maxSize) {
       try {
+        // Stop any ongoing animations before resetting
+        if (controller.isAnimating) {
+          controller.stop();
+        }
         controller.reset();
         pool.add(controller);
       } catch (e) {
         // Controller is disposed, dispose it properly
-        controller.dispose();
+        try {
+          controller.dispose();
+        } catch (e) {
+          // Already disposed, ignore
+        }
       }
     } else {
       // Dispose if pool is full
-      controller.dispose();
+      try {
+        if (controller.isAnimating) {
+          controller.stop();
+        }
+        controller.dispose();
+      } catch (e) {
+        // Already disposed, ignore
+      }
     }
   }
 
@@ -152,6 +167,53 @@ class AnimationPool {
       pool.clear();
     }
     _pools.clear();
+  }
+
+  /// Force reset a specific pool by clearing all controllers
+  ///
+  /// This is useful for handling rapid navigation scenarios where
+  /// controllers might be in an inconsistent state.
+  ///
+  /// Parameters:
+  /// - [poolName]: The name of the pool to force reset
+  static void forceResetPool(String poolName) {
+    final pool = _pools[poolName];
+    if (pool != null) {
+      for (final controller in pool) {
+        try {
+          if (controller.isAnimating) {
+            controller.stop();
+          }
+          controller.dispose();
+        } catch (e) {
+          // Controller already disposed, ignore
+        }
+      }
+      pool.clear();
+    }
+  }
+
+  /// Get a fresh controller from the pool, ensuring it's properly reset
+  ///
+  /// This method is more aggressive about ensuring a clean controller state,
+  /// useful for handling rapid navigation scenarios.
+  ///
+  /// Parameters:
+  /// - [vsync]: The TickerProvider for the animation
+  /// - [poolName]: The name of the pool to get the controller from
+  /// - [duration]: The duration for the animation (can be changed later)
+  ///
+  /// Returns: A fresh AnimationController ready to use
+  static AnimationController getFreshController({
+    required TickerProvider vsync,
+    required String poolName,
+    Duration duration = const Duration(milliseconds: 300),
+  }) {
+    // Force reset the pool to ensure clean state
+    forceResetPool(poolName);
+
+    // Get a new controller
+    return getController(vsync: vsync, poolName: poolName, duration: duration);
   }
 
   /// Set the maximum pool size for a specific pool

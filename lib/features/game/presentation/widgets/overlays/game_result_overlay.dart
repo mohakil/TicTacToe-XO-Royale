@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:tictactoe_xo_royale/core/extensions/responsive_extensions.dart';
-// No longer needed - using standard Material Icons
 
 /// Optimized game result overlay widget with performance improvements
 class GameResultOverlay extends StatelessWidget {

@@ -8,9 +8,9 @@ import 'package:tictactoe_xo_royale/core/services/animation_pool.dart';
 class AmbientParticles extends StatefulWidget {
   const AmbientParticles({
     super.key,
-    this.particleCount = 8,
-    this.opacity = 0.05,
-    this.movementSpeed = 0.2,
+    this.particleCount = 5, // Reduced from 8 for better performance
+    this.opacity = 0.03, // Reduced opacity for better performance
+    this.movementSpeed = 0.15, // Slightly reduced speed
   });
 
   final int particleCount;
@@ -39,7 +39,9 @@ class _AmbientParticlesState extends State<AmbientParticles>
       (index) => AnimationPool.getController(
         vsync: this,
         poolName: 'home',
-        duration: Duration(milliseconds: (8000 + index * 500).toInt()),
+        duration: Duration(
+          milliseconds: (6000 + index * 400).toInt(),
+        ), // Reduced durations
       ),
     );
 

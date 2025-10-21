@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tictactoe_xo_royale/core/extensions/responsive_extensions.dart';
 import 'package:tictactoe_xo_royale/core/models/game_history.dart';
 import 'package:tictactoe_xo_royale/core/providers/profile_provider.dart';
+import 'package:tictactoe_xo_royale/shared/widgets/icons/icon_text.dart';
 
 class HistoryList extends ConsumerStatefulWidget {
   const HistoryList({super.key});
@@ -62,27 +63,18 @@ class _HistoryListState extends ConsumerState<HistoryList> {
             children: [
               Row(
                 children: [
-                  Icon(
-                    Icons.history,
-                    color: Theme.of(context).colorScheme.primary,
-                    size: context.getResponsiveIconSize(
-                      phoneSize: 24.0,
-                      tabletSize: 28.0,
-                    ),
+                  IconText(
+                    icon: Icons.history,
+                    text: 'Game History',
+                    iconColor: Theme.of(context).colorScheme.primary,
+                    textStyle: Theme.of(context).textTheme.headlineSmall
+                        ?.copyWith(fontWeight: FontWeight.w600),
+                    size: IconTextSize.large,
+                    direction: Axis.horizontal,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
                   ),
-                  SizedBox(
-                    width: context.getResponsiveSpacing(
-                      phoneSpacing: 8.0,
-                      tabletSpacing: 12.0,
-                    ),
-                  ),
-                  Expanded(
-                    child: Text(
-                      'Game History',
-                      style: Theme.of(context).textTheme.headlineSmall
-                          ?.copyWith(fontWeight: FontWeight.w600),
-                    ),
-                  ),
+                  const Spacer(),
                   TextButton(
                     onPressed: () {
                       setState(() {
@@ -216,10 +208,6 @@ class _HistoryTile extends StatelessWidget {
       phoneSize: 20.0,
       tabletSize: 24.0,
     );
-    final smallIconSize = context.getResponsiveIconSize(
-      phoneSize: 14.0,
-      tabletSize: 16.0,
-    );
     final spacing = context.getResponsiveSpacing(
       phoneSpacing: 8.0,
       tabletSpacing: 16.0,
@@ -301,31 +289,37 @@ class _HistoryTile extends StatelessWidget {
                 // Simplified layout without time information
                 Row(
                   children: [
-                    Icon(
-                      Icons.grid_on,
-                      size: smallIconSize,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                    SizedBox(width: smallSpacing),
-                    Text(
-                      game.boardSize,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
+                    IconText(
+                      icon: Icons.grid_on,
+                      text: game.boardSize,
+                      iconColor: Theme.of(context).colorScheme.onSurfaceVariant,
+                      textStyle: Theme.of(context).textTheme.bodySmall
+                          ?.copyWith(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
+                          ),
+                      size: IconTextSize.small,
+                      direction: Axis.horizontal,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
                     ),
                     SizedBox(width: spacing),
-                    Icon(
-                      Icons.score,
-                      size: smallIconSize,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                    SizedBox(width: smallSpacing),
-                    Text(
-                      game.score,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        fontWeight: FontWeight.w500,
-                      ),
+                    IconText(
+                      icon: Icons.score,
+                      text: game.score,
+                      iconColor: Theme.of(context).colorScheme.onSurfaceVariant,
+                      textStyle: Theme.of(context).textTheme.bodySmall
+                          ?.copyWith(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
+                            fontWeight: FontWeight.w500,
+                          ),
+                      size: IconTextSize.small,
+                      direction: Axis.horizontal,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
                     ),
                   ],
                 ),

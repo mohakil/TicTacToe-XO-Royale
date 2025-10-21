@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:tictactoe_xo_royale/core/extensions/responsive_extensions.dart';
 import 'package:tictactoe_xo_royale/core/providers/achievements_provider.dart';
 import 'package:tictactoe_xo_royale/features/achievements/presentation/widgets/achievement_card.dart';
+import 'package:tictactoe_xo_royale/shared/widgets/icons/icon_text.dart';
 
 class AchievementPreviewCard extends ConsumerWidget {
   const AchievementPreviewCard({super.key});
@@ -39,28 +40,19 @@ class AchievementPreviewCard extends ConsumerWidget {
           // Header Row
           Row(
             children: [
-              Icon(
-                Icons.workspace_premium,
-                color: Theme.of(context).colorScheme.primary,
-                size: context.getResponsiveIconSize(
-                  phoneSize: 24.0,
-                  tabletSize: 26.0,
-                ),
+              IconText(
+                icon: Icons.workspace_premium,
+                text: 'Achievements',
+                iconColor: Theme.of(context).colorScheme.primary,
+                textStyle: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+                size: IconTextSize.large,
+                direction: Axis.horizontal,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
               ),
-              SizedBox(
-                width: context.getResponsiveSpacing(
-                  phoneSpacing: 8.0,
-                  tabletSpacing: 10.0,
-                ),
-              ),
-              Expanded(
-                child: Text(
-                  'Achievements',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
-                ),
-              ),
+              const Spacer(),
               TextButton(
                 onPressed: () => context.push('/achievements'),
                 style: TextButton.styleFrom(
@@ -89,59 +81,51 @@ class AchievementPreviewCard extends ConsumerWidget {
           ),
 
           // Progress Summary
-          Row(
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Progress: $unlockedCount / $totalCount',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.onSurface,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Progress',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w500,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                  Text(
+                    '$unlockedCount/$totalCount',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.tertiary,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: context.getResponsiveSpacing(
+                  phoneSpacing: 6.0,
+                  tabletSpacing: 8.0,
                 ),
               ),
-              const Spacer(),
-              Container(
-                padding: context.getResponsivePadding(
-                  phonePadding: 4.0,
-                  tabletPadding: 6.0,
+              // Progress bar matching profile screen win rate design
+              LinearProgressIndicator(
+                value: totalCount > 0 ? unlockedCount / totalCount : 0.0,
+                backgroundColor: Theme.of(context).colorScheme.surfaceDim,
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  Theme.of(context).colorScheme.tertiary,
                 ),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  '${totalCount == 0 ? 0 : ((unlockedCount / totalCount) * 100).round()}%',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+                minHeight: 8,
+                borderRadius: BorderRadius.circular(4),
               ),
             ],
           ),
 
           SizedBox(
             height: context.getResponsiveSpacing(
-              phoneSpacing: 8.0,
-              tabletSpacing: 10.0,
-            ),
-          ),
-
-          // Progress Bar
-          Container(
-            height: context.scale(4.0),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(2),
-            ),
-            child: FractionallySizedBox(
-              alignment: Alignment.centerLeft,
-              widthFactor: totalCount > 0 ? unlockedCount / totalCount : 0,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
+              phoneSpacing: 12.0,
+              tabletSpacing: 16.0,
             ),
           ),
 

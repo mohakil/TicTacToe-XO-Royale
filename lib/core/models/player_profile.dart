@@ -28,7 +28,7 @@ class PlayerProfile {
 
   factory PlayerProfile.defaultProfile() => const PlayerProfile(
     id: 'default_user',
-    nickname: 'Player',
+    nickname: 'Player 1',
     stats: PlayerStats(wins: 0, losses: 0, draws: 0, streak: 0),
     gems: 100,
     hints: 5,
